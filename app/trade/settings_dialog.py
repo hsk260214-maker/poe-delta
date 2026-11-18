@@ -28,7 +28,7 @@ def confirm_api(parent=None) -> bool:
 
 
 class SettingsDialog(QDialog):
-    def __init__(self, parent=None, lang: str = "en"):
+    def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("거래소 설정")
         self.setMinimumWidth(480)
@@ -41,9 +41,13 @@ class SettingsDialog(QDialog):
         form.addRow("검색 방식", self.mode)
         self.server = QComboBox()
         self.server.addItem("공식", config.OFFICIAL)
-        if lang == "ko" and config.KAKAO_ENABLED:
-            self.server.addItem("카카오", config.KAKAO)
-        self.server.setCurrentIndex(max(0, self.server.findData(trade.get("server", config.OFFICIAL))))
+        if config.KAKAO_ENABLED:
+            self.server.addItem("카카오 (한글 클라이언트 전용)", config.KAKAO)
+        index = self.server.findData(trade.get("server", config.OFFICIAL))
+        if index < 0:
+            index = 0
+            config.save(server=config.OFFICIAL)
+        self.server.setCurrentIndex(index)
         form.addRow("서버", self.server)
         self.league = QLineEdit(trade.get("league", ""))
         self.league.setPlaceholderText("현재 챌린지 리그 이름")

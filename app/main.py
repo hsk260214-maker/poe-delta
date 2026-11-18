@@ -259,8 +259,7 @@ def main() -> int:
         def _trade_settings(self) -> None:
             from trade.settings_dialog import SettingsDialog
 
-            model = self.trade_win.model or (self._last_model[0] if self._last_model else None)
-            SettingsDialog(self, model.lang if model else "en").exec()
+            SettingsDialog(self).exec()
             self.trade_hotkey.poll()
             if self.trade_win.model is not None:
                 self.trade_win.load(self.trade_win.model, self.trade_win._prev_fg)

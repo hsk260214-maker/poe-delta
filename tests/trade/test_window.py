@@ -148,7 +148,7 @@ def test_risk_accept_cancel_every_transition(app, monkeypatch):
 
     monkeypatch.setattr(QMessageBox, "exec", exec_box)
     monkeypatch.setattr(QMessageBox, "clickedButton", lambda box: box.chosen)
-    dialog = SettingsDialog(lang="ko")
+    dialog = SettingsDialog()
     assert config.mode() == "browser"
     assert not dialog.cookie.isEnabled()
     dialog.mode.setCurrentIndex(1)
@@ -174,6 +174,88 @@ def test_window_close_returns_focus(app, fixtures, monkeypatch):
     window.load((fixtures / "rare_en.txt").read_text(), 12345)
     window.close()
     assert calls == [12345]
+
+
+def test_settings_lists_kakao_without_any_item(app):
+    import storage
+    from trade.settings_dialog import SettingsDialog
+
+    assert not storage.SETTINGS_FILE.exists()
+    dialog = SettingsDialog()
+    assert [dialog.server.itemText(i) for i in range(dialog.server.count())] == [
+        "공식", "카카오 (한글 클라이언트 전용)"]
+    assert [dialog.server.itemData(i) for i in range(dialog.server.count())] == [config.OFFICIAL, config.KAKAO]
+    dialog.show()
+    app.processEvents()
+    dialog.close()
+    app.processEvents()
+    assert not storage.SETTINGS_FILE.exists()
+
+
+@pytest.mark.parametrize("case", ["kakao", "unknown", "missing", "disabled_kakao"])
+def test_settings_server_selection_matches_saved_value(app, monkeypatch, case):
+    import storage
+    from trade.settings_dialog import SettingsDialog
+
+    trade = {"league": "Standard"}
+    if case in ("kakao", "disabled_kakao"):
+        trade["server"] = config.KAKAO
+    elif case == "unknown":
+        trade["server"] = "https://unknown.invalid"
+    if case == "disabled_kakao":
+        monkeypatch.setattr(config, "KAKAO_ENABLED", False)
+    storage.save_settings({"trade": trade, "untouched": "keep"})
+    before = storage.SETTINGS_FILE.read_bytes()
+    before_mtime = storage.SETTINGS_FILE.stat().st_mtime_ns
+    dialog = SettingsDialog()
+    expected = config.KAKAO if case == "kakao" else config.OFFICIAL
+    assert dialog.server.currentData() == expected
+    assert config.settings().get("server", config.OFFICIAL) == expected
+    dialog.show()
+    app.processEvents()
+    dialog.close()
+    app.processEvents()
+    if case in ("missing", "kakao"):
+        assert storage.SETTINGS_FILE.read_bytes() == before
+        assert storage.SETTINGS_FILE.stat().st_mtime_ns == before_mtime
+    if case == "missing":
+        assert "server" not in config.settings()
+    else:
+        assert config.settings()["server"] == expected
+    assert storage.load_settings()["untouched"] == "keep"
+
+
+def test_kakao_blocks_english_with_action_and_keeps_korean_search(app, fixtures, monkeypatch):
+    from trade import browser
+    from trade.trade_window import TradeWindow
+
+    config.save(mode="browser", league="Standard", server=config.KAKAO)
+    opened = []
+    monkeypatch.setattr(browser, "open_url", lambda url: opened.append(url))
+    window = TradeWindow()
+    window.load((fixtures / "rare_en.txt").read_text())
+    assert not window.search_button.isEnabled()
+    assert window.hint.text() == "카카오 서버는 한글 클라이언트에서만 지원합니다. 거래소 설정에서 서버를 '공식'으로 바꾸세요"
+    window.search()
+    assert not opened
+    window.load((fixtures / "rare_ko.txt").read_text(encoding="utf-8"))
+    assert window.search_button.isEnabled()
+    window.search()
+    expected = json.loads((fixtures / "browser_links.json").read_text(encoding="utf-8"))
+    assert opened == [expected["rare_ko_kakao"]]
+    window.close()
+
+
+def test_korean_official_window_does_not_warn_about_different_market(app, fixtures):
+    from PySide6.QtWidgets import QLabel
+    from trade.trade_window import TradeWindow
+
+    config.save(mode="browser", league="Standard", server=config.OFFICIAL)
+    window = TradeWindow()
+    window.load((fixtures / "rare_ko.txt").read_text(encoding="utf-8"))
+    assert window.search_button.isEnabled()
+    assert not any("매물·시세가 다를 수 있습니다" in label.text() for label in window.findChildren(QLabel))
+    window.close()
 
 
 def test_editor_trade_button_uses_copied_original(app, fixtures, monkeypatch):

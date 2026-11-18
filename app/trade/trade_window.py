@@ -67,8 +67,6 @@ class TradeWindow(QWidget):
         self.hint.setTextFormat(Qt.TextFormat.PlainText)
         self.hint.setWordWrap(True)
         layout.addWidget(self.hint)
-        self.notice = QLabel()
-        layout.addWidget(self.notice)
         self.result_summary = QLabel()
         self.result_summary.setTextFormat(Qt.TextFormat.PlainText)
         self.result_summary.setWordWrap(True)
@@ -134,8 +132,6 @@ class TradeWindow(QWidget):
         self.links.setText(f"링크 ≥ {self.info.links}")
         self.corrupted.setChecked(True)
         self.corrupted.setText("타락" if self.info.corrupted else "타락 아님")
-        self.notice.setText("카카오 서버와 매물·시세가 다를 수 있습니다"
-                            if self.model and self.model.lang == "ko" and self.server == config.OFFICIAL else "")
         self.stats = conditions(self.info, trade.get("min_ratio", 0.9)) if self.info.supported else []
         self.inputs = []
         while self.stat_layout.count():

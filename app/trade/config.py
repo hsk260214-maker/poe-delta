@@ -25,4 +25,4 @@ def validate_server(server: str, lang: str) -> None:
     if server not in (OFFICIAL, KAKAO):
         raise ValueError("지원하지 않는 거래소 서버입니다")
     if server == KAKAO and (lang != "ko" or not KAKAO_ENABLED):
-        raise ValueError("카카오 서버는 한글 클라이언트에서만 지원합니다")
+        raise ValueError("카카오 서버는 한글 클라이언트에서만 지원합니다. 거래소 설정에서 서버를 '공식'으로 바꾸세요")
