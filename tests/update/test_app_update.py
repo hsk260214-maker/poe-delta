@@ -4,6 +4,7 @@ import pytest
 import requests
 
 import app_update
+from version import VERSION
 
 
 def response(status, data=None):
@@ -67,7 +68,7 @@ def test_missing_release_manual_notice_and_silent_auto(monkeypatch, manual):
     monkeypatch.setattr(updater, "_info", lambda title, text: notices.append((title, text)))
     updater.start()
     assert finished == [True]
-    assert notices == ([("프로그램 업데이트", "확인할 수 있는 릴리스가 없습니다 (지금 v1.1.0). 저장소가 비공개이거나 아직 릴리스가 없습니다.")] if manual else [])
+    assert notices == ([("프로그램 업데이트", f"확인할 수 있는 릴리스가 없습니다 (지금 v{VERSION}). 저장소가 비공개이거나 아직 릴리스가 없습니다.")] if manual else [])
 
 
 def test_new_loader_page_uses_custom_repo(monkeypatch):

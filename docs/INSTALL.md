@@ -1,11 +1,13 @@
 # POE Delta 설치·사용 설명서
 
-POE Delta는 Path of Exile 1용 Windows 프로그램입니다. [Exile Delta](https://github.com/KyungseokKANG/exile-delta)를 바탕으로 기능을 더한 커스텀판입니다.
+POE Delta는 Path of Exile 1용 Windows 프로그램입니다. 원작자 KyungseokKANG의 [Exile Delta](https://github.com/KyungseokKANG/exile-delta)(MIT)를 바탕으로 hsk260214-maker가 기능을 더한 커스텀판입니다.
 
-- **템 비교:** 게임에서 아이템에 `Ctrl+C`를 누르면, 그 템을 지금 캐릭터에 꼈을 때 DPS·EHP·최대 피격이 얼마나 바뀌는지 게임 위에 보여 줍니다. 계산은 Path of Building(PoB) 엔진으로 합니다.
-- **거래소 시세 검색:** 아이템에 `Ctrl+D`를 누르면, 비슷한 옵션의 가판대(즉시 구매) 매물을 공식 거래소에서 찾아 줍니다.
+| 기능 | 출처 |
+|---|---|
+| **템 비교:** 게임에서 아이템에 `Ctrl+C`를 누르면, 그 템을 지금 캐릭터에 꼈을 때 DPS·EHP·최대 피격이 얼마나 바뀌는지 게임 위에 보여 줍니다. 계산은 Path of Building(PoB) 엔진으로 합니다. 캐릭터 불러오기, 패시브 트리, 젬, 지도 경고 등도 포함합니다. 한글 클라이언트를 지원합니다. | 원본 Exile Delta 기능 |
+| **거래소 시세 검색:** 아이템에 `Ctrl+D`를 누르면, 비슷한 옵션의 가판대(즉시 구매) 매물을 공식 거래소에서 찾아 줍니다. | POE Delta 추가 기능 |
 
-한글 클라이언트도 지원합니다.
+아래 각 절 제목에도 출처를 표시했습니다. 원본 기능의 자세한 설명은 [원본 README](https://github.com/KyungseokKANG/exile-delta#readme)에 있습니다.
 
 ## 1. 준비
 
@@ -22,7 +24,7 @@ POE Delta는 Path of Exile 1용 Windows 프로그램입니다. [Exile Delta](htt
    - 백신이 막으면 이 파일을 예외로 등록해 주세요. Python으로 만든 실행 파일은 가끔 잘못 검출됩니다.
 4. 처음 실행하면 계산에 쓰는 PoB 엔진(약 370MB)을 PoB 공식 GitHub에서 한 번 받습니다. 몇 분 걸릴 수 있습니다.
 
-## 3. 캐릭터 등록
+## 3. 캐릭터 등록 (원본 Exile Delta 기능)
 
 캐릭터 화면에서 `+`를 누른 뒤 두 방법 중 하나로 불러옵니다.
 
@@ -40,7 +42,7 @@ PoB에서 만든 빌드 코드나 pobb.in 같은 링크를 붙여 넣습니다. 
 
 "1분마다 갱신"을 켜 두면 레벨업, 장비 교체, 패시브 변경이 알아서 반영됩니다(계정으로 불러온 경우).
 
-## 4. 템 비교 (`Ctrl+C`)
+## 4. 템 비교 (`Ctrl+C`) (원본 Exile Delta 기능)
 
 게임에서 아이템 위에 마우스를 올리고 `Ctrl+C`를 누르면 옵션변경 창이 뜹니다.
 
@@ -51,7 +53,7 @@ PoB에서 만든 빌드 코드나 pobb.in 같은 링크를 붙여 넣습니다. 
 
 메뉴(☰)의 "게임 Ctrl+C 감지"로 이 기능을 끄고 켤 수 있습니다.
 
-## 5. 거래소 시세 검색 (`Ctrl+D`)
+## 5. 거래소 시세 검색 (`Ctrl+D`) (POE Delta 추가 기능)
 
 1. 게임에서 아이템 위에 마우스를 올리고 `Ctrl+D`를 누릅니다. PoE 창이 앞에 있을 때만 동작하고, 다른 프로그램의 `Ctrl+D`는 그대로입니다.
 2. 검색 조건 창이 뜹니다. 옵션마다 체크와 최소·최대값을 조정합니다. 최소값은 실제 수치의 90%로 미리 채워집니다.
@@ -87,7 +89,7 @@ PoB에서 만든 빌드 코드나 pobb.in 같은 링크를 붙여 넣습니다. 
 - **단축키:** `Ctrl+D` 사용을 끄고 켭니다. Awakened PoE Trade처럼 `Ctrl+D`를 쓰는 프로그램을 같이 켜 두면 "Ctrl+D를 다른 프로그램이 쓰고 있습니다"가 뜹니다. 둘 중 하나만 쓰세요.
 - **POESESSID, 연락처:** 게임 위 시세 모드에서만 쓰는 선택 항목입니다. 비워 둬도 됩니다.
 
-## 6. 업데이트
+## 6. 업데이트 (원본 Exile Delta 구조, 받는 곳만 POE Delta에서 변경)
 
 프로그램을 켤 때마다 이 저장소에 새 버전이 있는지 확인합니다.
 
@@ -98,7 +100,7 @@ PoB에서 만든 빌드 코드나 pobb.in 같은 링크를 붙여 넣습니다. 
 
 원작자의 Exile Delta 업데이트로 바뀌지는 않습니다.
 
-## 7. 원본 Exile Delta와 함께 쓰기
+## 7. 원본 Exile Delta와 함께 쓰기 (POE Delta 변경 사항)
 
 - POE Delta와 원본 Exile Delta는 설정과 데이터를 따로 저장해서 동시에 켜도 됩니다.
 - 원본을 쓰던 PC에서 POE Delta를 처음 켜면 원본의 설정과 캐릭터를 **복사**해 옵니다. 원본 파일은 바꾸지 않습니다.
@@ -129,8 +131,9 @@ PoB에서 만든 빌드 코드나 pobb.in 같은 링크를 붙여 넣습니다. 
 
 ## 만든 곳과 라이선스
 
-- 원본: [Exile Delta](https://github.com/KyungseokKANG/exile-delta) (MIT, `LICENSE`)
-- 거래소 옵션 데이터: [Awakened PoE Trade](https://github.com/SnosMe/awakened-poe-trade) (MIT, `LICENSE-awakened-poe-trade.txt`)
+- 원본 프로그램: [Exile Delta](https://github.com/KyungseokKANG/exile-delta) — 원작자 KyungseokKANG (MIT, `LICENSE`)
+- POE Delta 추가·변경: [hsk260214-maker/poe-delta](https://github.com/hsk260214-maker/poe-delta). POE Delta에서 생긴 문제는 원작자가 아닌 이 저장소의 Issues로 알려 주세요.
+- 거래소 옵션 데이터 (POE Delta에서 사용): [Awakened PoE Trade](https://github.com/SnosMe/awakened-poe-trade) (MIT, `LICENSE-awakened-poe-trade.txt`)
 - 계산 엔진: [Path of Building Community](https://github.com/PathOfBuildingCommunity/PathOfBuilding) (실행할 때 공식 릴리스를 받아 씀)
 
 This product isn't affiliated with or endorsed by Grinding Gear Games in any way.

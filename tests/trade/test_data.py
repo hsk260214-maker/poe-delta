@@ -33,8 +33,9 @@ def test_data_provenance_and_converter():
     assert len(data["groups"]) == 86
     assert "MIT License" in (root / "data" / "LICENSE-awakened-poe-trade.txt").read_text()
     credit = next(line for line in (root / "README.md").read_text(encoding="utf-8").splitlines()
-                  if line.startswith("- [Awakened PoE Trade]"))
-    assert "오프라인 거래소 stat 데이터" in credit
+                  if line.startswith("- **POE Delta가 더 쓰는 외부 자료:**"))
+    assert "Awakened PoE Trade" in credit and "오프라인 거래소 stat 데이터" in credit
+    assert "803d188d1359c4d5b1e3826da5dc680ea74a158f" in credit
     spec = importlib.util.spec_from_file_location("build_trade_stats", root / "tools" / "build_trade_stats.py")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)

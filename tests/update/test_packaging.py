@@ -31,7 +31,9 @@ def test_package_contains_notices_and_trade_without_manifest_change(tmp_path, mo
     assert pack.main() == 0
     manifest = json.loads((output / "manifest.json").read_text())
     assert set(manifest) == {"version", "zip", "sha256", "min_loader"}
-    assert manifest["version"] == "1.1.0"
+    from version import VERSION
+
+    assert manifest["version"] == VERSION
     assert manifest["min_loader"] == 1
     payload = output / manifest["zip"]
     assert hashlib.sha256(payload.read_bytes()).hexdigest() == manifest["sha256"]

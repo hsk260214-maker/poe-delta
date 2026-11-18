@@ -1,6 +1,27 @@
-> **POE Delta (커스텀판)** — 이 저장소는 Exile Delta에 거래소 시세 검색(`Ctrl+D`)을 더한 커스텀판입니다.
-> 설치와 사용법은 **[docs/INSTALL.md](docs/INSTALL.md)**를 보세요. 받을 파일은 `PoeDelta-버전.zip`, 실행 파일은 `PoeDelta.exe`, 데이터 폴더는 `%APPDATA%\PoeDelta`·`%LOCALAPPDATA%\PoeDelta`입니다.
-> 아래는 원본 Exile Delta의 설명입니다(파일·폴더 이름은 원본 기준).
+# POE Delta — Exile Delta 커스텀판
+
+이 저장소는 **[KyungseokKANG/exile-delta](https://github.com/KyungseokKANG/exile-delta)**(Exile Delta, MIT 라이선스)를 바탕으로 [hsk260214-maker](https://github.com/hsk260214-maker)가 기능을 더한 커스텀판 **POE Delta**입니다.
+
+**Exile Delta 자체와 그 기능, 이 문서 아래쪽의 "원본 Exile Delta 설명"은 모두 원작자 [KyungseokKANG](https://github.com/KyungseokKANG)이 만들고 쓴 것입니다.** POE Delta에서 더하거나 바꾼 것은 아래 표의 "POE Delta" 줄뿐입니다.
+
+설치와 사용법: **[docs/INSTALL.md](docs/INSTALL.md)** · 받을 파일: [Releases](https://github.com/hsk260214-maker/poe-delta/releases/latest)의 `PoeDelta-버전.zip`
+
+## 원본 기능과 POE Delta 변경 구분
+
+| 구분 | 내용 | 만든 사람 |
+|---|---|---|
+| **원본 Exile Delta 기능** | 템 비교(`Ctrl+C`로 DPS·EHP·최대 피격 변화, "왜 이렇게 바뀌나", 옵션변경 창), 한글 클라이언트 지원, 캐릭터 불러오기·자동 갱신, 장비·주얼 기여도, 젬, 패시브 트리, 아이템 만들기, 최적 옵션 추천(베타), 지도 위험 옵션 경고, 아이템 필터, PoB 엔진 연동, 코드만 받는 자동 업데이트 구조 | KyungseokKANG |
+| **POE Delta 추가 기능** | 거래소 시세 검색(`Ctrl+D`): 조건 창, 브라우저 모드·게임 위 시세 모드, 가판대(즉시 구매) 매물만 검색, 카카오 거래소 선택 | hsk260214-maker |
+| **POE Delta 변경 사항** | 업데이트 받는 곳을 이 저장소로 변경, 프로그램 이름(`PoeDelta.exe`)·데이터 폴더(`%APPDATA%\PoeDelta`, `%LOCALAPPDATA%\PoeDelta`) 분리와 원본 설정 복사, 빌드·릴리스 스크립트 대상 변경, 원본 함수 일부를 공용 모듈(`app/winutil.py`, `app/ratelimit.py`)로 옮김(동작 동일), 테스트(`tests/`)와 문서(`docs/`) 추가 | hsk260214-maker |
+
+- **코드로 확인하기:** 커밋 기록에서 `Release v1.0.15`(`4fa6d68`)까지는 원작자의 커밋이고, 그 뒤 `FEAT-001`부터가 POE Delta 변경입니다. 원본 대비 바뀐 내용 전체는 [4fa6d68...custom 비교](https://github.com/hsk260214-maker/poe-delta/compare/4fa6d68...custom)에서 볼 수 있습니다.
+- **POE Delta가 더 쓰는 외부 자료:** [Awakened PoE Trade](https://github.com/SnosMe/awakened-poe-trade)(MIT)의 오프라인 거래소 stat 데이터 (고정 커밋 `803d188d1359c4d5b1e3826da5dc680ea74a158f`, `data/LICENSE-awakened-poe-trade.txt`)
+- **라이선스:** 원본의 MIT 라이선스(`LICENSE`, Copyright (c) 2026 KyungseokKANG)를 그대로 따릅니다.
+- **문의:** POE Delta에서 생긴 문제는 원작자가 아닌 이 저장소의 [Issues](https://github.com/hsk260214-maker/poe-delta/issues)로 알려 주세요.
+
+---
+
+> 아래부터는 **원본 Exile Delta의 README 원문**입니다 (작성: KyungseokKANG, 내용 수정 없음). 원문의 파일·폴더 이름(`ExileDelta.exe`, `%APPDATA%\ExileDelta` 등)과 "이 저장소" 같은 표현은 원본 저장소 기준입니다.
 
 # Exile Delta
 
@@ -103,7 +124,7 @@ powershell -ExecutionPolicy Bypass -File .\build.ps1 -NoRun  # dist\ExileDelta.e
 
 - [Path of Building Community](https://github.com/PathOfBuildingCommunity/PathOfBuilding) (MIT): DPS/EHP 계산은 전부 이걸로 합니다. 프로그램에 넣어서 배포하지 않고, 실행할 때 공식 릴리스를 받아서 써요.
 - [RePoE fork](https://repoe-fork.github.io/): 아이템 옵션, 영문/한글 문장 데이터
-- [Awakened PoE Trade](https://github.com/SnosMe/awakened-poe-trade) (MIT): 한글 클라이언트 문장이랑 이름 데이터 보충, 오프라인 거래소 stat 데이터 (`803d188d1359c4d5b1e3826da5dc680ea74a158f`, `data/LICENSE-awakened-poe-trade.txt`)
+- [Awakened PoE Trade](https://github.com/SnosMe/awakened-poe-trade) (MIT): 한글 클라이언트 문장이랑 이름 데이터 보충
 - [PySide6](https://doc.qt.io/qtforpython/), [lupa](https://github.com/scoder/lupa), [requests](https://github.com/psf/requests)
 
 ## 라이선스
