@@ -1,31 +1,9 @@
-"""즉시 저장하는 거래소 설정과 명시적 API 위험 확인."""
-import time
+"""즉시 저장하는 거래소 설정."""
 
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QDialog, QDoubleSpinBox, QFormLayout,
                                QHBoxLayout, QLabel, QLineEdit, QMessageBox, QPushButton)
 
 from trade import config, secret
-
-RISK_TEXT = (
-    "이 방식은 GGG 개발자 문서에 없는 거래소 내부 API를 사용합니다.\n"
-    "공식 문서는 이를 약관 위반으로 적고 있으며 계정 정지 위험이 있습니다.\n"
-    "Awakened PoE Trade 등도 같은 방식이지만 GGG는 허용을 보장하지 않습니다.\n"
-    "사용에 따른 위험은 사용자 계정이 부담합니다."
-)
-
-
-def confirm_api(parent=None) -> bool:
-    box = QMessageBox(parent)
-    box.setWindowTitle("게임 위 시세 모드 위험 안내")
-    box.setIcon(QMessageBox.Icon.Warning)
-    box.setText(RISK_TEXT)
-    accept = box.addButton("위험을 이해하고 사용", QMessageBox.ButtonRole.AcceptRole)
-    cancel = box.addButton("취소", QMessageBox.ButtonRole.RejectRole)
-    box.setDefaultButton(cancel)
-    box.setEscapeButton(cancel)
-    box.exec()
-    return box.clickedButton() is accept
-
 
 class SettingsDialog(QDialog):
     def __init__(self, parent=None):
@@ -35,15 +13,15 @@ class SettingsDialog(QDialog):
         form = QFormLayout(self)
         trade = config.settings()
         self.mode = QComboBox()
-        self.mode.addItem("브라우저 모드 (기본)", "browser")
-        self.mode.addItem("게임 위 시세 모드", "api")
+        self.mode.addItem("브라우저 모드", "browser")
+        self.mode.addItem("게임 위 시세 모드 (기본)", "api")
         self.mode.setCurrentIndex(1 if config.mode() == "api" else 0)
         form.addRow("검색 방식", self.mode)
         self.server = QComboBox()
         self.server.addItem("공식", config.OFFICIAL)
         if config.KAKAO_ENABLED:
             self.server.addItem("카카오 (한글 클라이언트 전용)", config.KAKAO)
-        index = self.server.findData(trade.get("server", config.OFFICIAL))
+        index = self.server.findData(trade.get("server", config.default_server()))
         if index < 0:
             index = 0
             config.save(server=config.OFFICIAL)
@@ -85,17 +63,7 @@ class SettingsDialog(QDialog):
         self._enable_api_fields()
 
     def _mode_changed(self) -> None:
-        requested = self.mode.currentData()
-        if requested == "api" and config.mode() != "api":
-            if not confirm_api(self):
-                self.mode.blockSignals(True)
-                self.mode.setCurrentIndex(0)
-                self.mode.blockSignals(False)
-                self._enable_api_fields()
-                return
-            config.save(mode="api", api_ack_at=time.time())
-        else:
-            config.save(mode=requested)
+        config.save(mode=self.mode.currentData())
         self._enable_api_fields()
 
     def _enable_api_fields(self) -> None:

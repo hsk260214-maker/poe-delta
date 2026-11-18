@@ -11,8 +11,11 @@ def settings() -> dict:
 
 
 def mode() -> str:
-    trade = settings()
-    return "api" if trade.get("mode") == "api" and trade.get("api_ack_at") else "browser"
+    return "api" if settings().get("mode", "api") == "api" else "browser"
+
+
+def default_server() -> str:
+    return KAKAO if KAKAO_ENABLED else OFFICIAL
 
 
 def save(**changes) -> None:

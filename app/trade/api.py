@@ -1,4 +1,4 @@
-"""위험 확인된 게임 위 시세 모드 전용. 요청을 직렬화한다."""
+"""게임 위 시세 모드 전용. 요청을 직렬화한다."""
 from __future__ import annotations
 
 import json
@@ -22,7 +22,7 @@ MESSAGES = {
     "login_required": "로그인이 필요할 수 있습니다. 거래소 설정에서 POESESSID를 넣어 주세요",
     "bad_league": "리그를 찾을 수 없습니다. 리그 이름을 확인하세요",
     "server": "거래소 서버 오류입니다. 잠시 후 다시 검색하세요",
-    "mode_disabled": "위험 안내를 확인한 게임 위 시세 모드에서만 요청할 수 있습니다",
+    "mode_disabled": "게임 위 시세 모드에서만 요청할 수 있습니다",
 }
 
 

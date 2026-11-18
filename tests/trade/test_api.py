@@ -104,11 +104,7 @@ def test_mode_guard_and_network_error(api, monkeypatch):
         client.search("Standard", {"query": {"status": {"option": "securable"}}})
     assert problem.value.kind == "mode_disabled"
     assert not calls
-    config.save(mode="api", api_ack_at=None)
-    with pytest.raises(api.TradeError):
-        client.search("Standard", {"query": {"status": {"option": "securable"}}})
-    assert not calls
-    config.save(mode="api", api_ack_at=1)
+    config.save(mode="api")
     with pytest.raises(api.TradeError) as problem:
         client.search("Standard", {"query": {"status": {"option": "securable"}}})
     assert problem.value.kind == "network"
