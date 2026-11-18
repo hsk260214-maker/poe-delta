@@ -1,22 +1,30 @@
-# Exile Delta build + run script (keep this file ASCII-only: Windows PowerShell 5.1)
-#   1) kill running ExileDelta.exe
+# POE Delta build + run script (keep this file ASCII-only: Windows PowerShell 5.1)
+#   1) stop only this dist\PoeDelta.exe
 #   2) build mod data (if missing) and icon
-#   3) PyInstaller -> dist\ExileDelta.exe
+#   3) PyInstaller -> dist\PoeDelta.exe
 #   4) launch the new exe
-#   -Name X : output exe name (default ExileDelta), -Zip : also make dist\X.zip
-#   after a successful build, older dist\ExileDelta*.exe / ExileSieve*.exe / .zip are stopped and deleted
-param([switch]$NoRun, [switch]$RefreshData, [string]$Name = 'ExileDelta', [switch]$Zip)
+#   -Name X : output exe name (default PoeDelta), -Zip : also make dist\X.zip
+#   after a successful build, only older dist\PoeDelta*.exe / .zip are removed
+param([switch]$NoRun, [switch]$RefreshData, [string]$Name = 'PoeDelta', [switch]$Zip)
 
 $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
 $name = $Name
-$work = Join-Path $env:TEMP 'exiledelta_build'
+$work = Join-Path (Join-Path $env:TEMP 'poedelta_build') ([guid]::NewGuid().ToString('N'))
+try {
+New-Item -ItemType Directory -Path $work -Force | Out-Null
 $exe = Join-Path $root "dist\$name.exe"
+
+function Get-BuildProcesses([string]$Executable) {
+    $fullPath = [System.IO.Path]::GetFullPath($Executable)
+    Get-Process -Name ([System.IO.Path]::GetFileNameWithoutExtension($fullPath)) -ErrorAction SilentlyContinue |
+        Where-Object { $_.Path -and $_.Path -ieq $fullPath }
+}
 
 Write-Host "[1/4] stop running $name"
 $deadline = (Get-Date).AddSeconds(20)
 while (Test-Path $exe) {
-    $procs = Get-Process -Name $name -ErrorAction SilentlyContinue
+    $procs = Get-BuildProcesses $exe
     if ($procs) {
         Write-Host ("      killing PID " + (($procs | ForEach-Object { $_.Id }) -join ', '))
         $procs | Stop-Process -Force -ErrorAction SilentlyContinue
@@ -45,7 +53,7 @@ if ($LASTEXITCODE -ne 0) { throw 'icon build failed' }
 Write-Host "[3/4] PyInstaller"
 # app code is NOT compiled into the exe: launcher\launcher.py runs it from files
 #   - built-in copy:  <exe>\appsrc\{app,data}   (staged below)
-#   - downloaded:     %LOCALAPPDATA%\ExileDelta\app\<ver>\   (GitHub release app-<ver>.zip)
+#   - downloaded:     %LOCALAPPDATA%\PoeDelta\app\<ver>\   (GitHub release app-<ver>.zip)
 # dist\app-<ver>.zip + dist\manifest.json are the update payload (release.ps1 uploads them)
 $stage = Join-Path $work 'appsrc'
 python "$root\tools\pack_app.py" $stage "$root\dist"
@@ -68,13 +76,13 @@ if ($Zip) {
     Write-Host "      zip: $zipPath"
 }
 
-# remove older builds (other dist\ExileDelta*.exe, old-name ExileSieve*.exe / .zip): stop them if running, then delete
+# remove only older PoeDelta builds in this dist; never touch upstream names
 Get-ChildItem (Join-Path $root 'dist') -File -ErrorAction SilentlyContinue |
-    Where-Object { ($_.Name -like 'ExileDelta*' -or $_.Name -like 'ExileSieve*') -and ($_.Extension -eq '.exe' -or $_.Extension -eq '.zip') -and $_.BaseName -ne $name } |
+    Where-Object { $_.Name -like 'PoeDelta*' -and ($_.Extension -eq '.exe' -or $_.Extension -eq '.zip') -and $_.BaseName -ne $name } |
     ForEach-Object {
         $old = $_
         if ($old.Extension -eq '.exe') {
-            $procs = Get-Process -Name $old.BaseName -ErrorAction SilentlyContinue
+            $procs = Get-BuildProcesses $old.FullName
             if ($procs) {
                 Write-Host ("      stop old " + $old.BaseName + " (PID " + (($procs | ForEach-Object { $_.Id }) -join ', ') + ")")
                 $procs | Stop-Process -Force -ErrorAction SilentlyContinue
@@ -106,4 +114,9 @@ if (-not $NoRun) {
     if (-not $started) { throw "launch failed: $exe" }
 } else {
     Write-Host "[4/4] launch skipped (-NoRun)"
+}
+} finally {
+    if (Test-Path -LiteralPath $work) {
+        Remove-Item -LiteralPath $work -Recurse -Force
+    }
 }

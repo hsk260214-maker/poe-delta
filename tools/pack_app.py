@@ -2,7 +2,7 @@
 
   python tools/pack_app.py <stage 폴더> <출력 폴더>
 
-묶는 것: app/**/*.py, app/pob/headless.lua, data/*.json  (zip 안 경로: app/..., data/...)
+묶는 것: app/**/*.py, app/pob/headless.lua, data/*.json, 두 MIT LICENSE.
 """
 from __future__ import annotations
 
@@ -21,6 +21,7 @@ def files() -> list[Path]:
     out = [p for p in (ROOT / "app").rglob("*.py") if "__pycache__" not in p.parts]
     out.append(ROOT / "app" / "pob" / "headless.lua")
     out += sorted((ROOT / "data").glob("*.json"))
+    out += [ROOT / "LICENSE", ROOT / "data" / "LICENSE-awakened-poe-trade.txt"]
     return sorted(set(out))
 
 

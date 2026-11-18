@@ -1,16 +1,16 @@
 """프로그램(앱 코드) 자동 업데이트 — GitHub 릴리스.
 
-릴리스 (github.com/KyungseokKANG/exile-delta/releases) 에는 release.ps1 이 아래 파일을 올린다:
+릴리스 (github.com/hsk260214-maker/poe-delta/releases) 에는 release.ps1 이 아래 파일을 올린다:
   manifest.json      {"version", "zip", "sha256", "min_loader", "notes"}
   app-<버전>.zip     앱 코드 (app/, data/) — 1~2MB
-  ExileDelta-<버전>.zip  처음 설치용 exe
+  PoeDelta-<버전>.zip  처음 설치용 exe
 
 걸러 내는 규칙:
   - '최신 릴리스'만 본다 (GitHub 가 시험판 Pre-release · 초안은 빼고 알려 줌)
   - 지금 버전보다 높은 버전만 · 이 PC 에서 시작에 실패했던 버전(state.json bad)은 건너뜀
   - min_loader 가 지금 exe 보다 높으면 코드만으로는 안 됨 → 새 exe 를 받으라고 안내
   - 받은 zip 은 SHA-256 이 manifest 와 같아야 설치
-설치: %LOCALAPPDATA%\\ExileDelta\\app\\<버전>\\ 에 풀고 state.json 의 current 를 바꾼 뒤 재시작 (실제 전환은 로더가 함).
+설치: %LOCALAPPDATA%\\PoeDelta\\app\\<버전>\\ 에 풀고 state.json 의 current 를 바꾼 뒤 재시작 (실제 전환은 로더가 함).
 로더 없이(개발 모드 python app\\main.py) 실행하면 동작하지 않는다.
 """
 from __future__ import annotations
@@ -28,8 +28,8 @@ import requests
 from paths import LOCAL
 from version import VERSION
 
-REPO = "KyungseokKANG/exile-delta"
-UA = {"User-Agent": "ExileDelta-updater", "Accept": "application/vnd.github+json"}
+REPO = "hsk260214-maker/poe-delta"
+UA = {"User-Agent": "PoeDelta-updater", "Accept": "application/vnd.github+json"}
 APPS = LOCAL / "app"
 RESTART = {"want": False}
 
@@ -122,6 +122,8 @@ def history(newer_than: str | None = None, upto: str | None = None) -> list[dict
                                       "notes": m.get("notes", "")}]
     else:
         r = requests.get(f"https://api.github.com/repos/{REPO}/releases?per_page=50", headers=UA, timeout=15)
+        if r.status_code == 404:
+            return []
         r.raise_for_status()
         rels = [{"version": x["tag_name"].lstrip("v"), "title": x.get("name") or x["tag_name"],
                  "date": (x.get("published_at") or "")[:10], "notes": x.get("body") or ""}
@@ -338,7 +340,9 @@ class StartupUpdater:
             what = "none"  # '이 버전 건너뛰기'
         if what == "none":
             if self.manual:
-                self._info("프로그램 업데이트", f"최신 버전입니다 (v{VERSION}).")
+                text = (f"확인할 수 있는 릴리스가 없습니다 (지금 v{VERSION}). 저장소가 비공개이거나 아직 릴리스가 없습니다."
+                        if inf is None else f"최신 버전입니다 (v{VERSION}).")
+                self._info("프로그램 업데이트", text)
             return self._done()
         if what == "bad":
             if self.manual:

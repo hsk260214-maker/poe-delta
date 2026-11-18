@@ -5,13 +5,20 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-from paths import APP_NAME
+from paths import APP_NAME, DIR_NAME, MIGRATION_FAILED, MIGRATION_WARNING
 EDGE = 6
 SECTIONS = ["캐릭터"]
 # 아이템 필터(O/△/X) 화면은 숨김. 다시 켜려면 SHOW_FILTER = True (코드·저장된 탭은 그대로 유지)
 SHOW_FILTER = False
 if SHOW_FILTER:
     SECTIONS.append("아이템 필터")
+
+
+def single_instance_key() -> str:
+    import hashlib
+    import os
+
+    return f"{DIR_NAME}-" + hashlib.md5(os.environ.get("APPDATA", "").lower().encode()).hexdigest()[:12]
 
 
 def _worker_main() -> int:
@@ -488,11 +495,8 @@ def main() -> int:
     app.setStyleSheet(build_qss())
 
     # 단일 실행: 이미 켜져 있으면 그 창을 앞으로 띄우고 종료 (두 개가 켜지면 Ctrl+C 창도 두 개 뜸)
-    import hashlib
-    import os
-
     from PySide6.QtNetwork import QLocalServer, QLocalSocket
-    key = "ExileDelta-" + hashlib.md5(os.environ.get("APPDATA", "").lower().encode()).hexdigest()[:12]
+    key = single_instance_key()
     sock = QLocalSocket()
     sock.connectToServer(key)
     if sock.waitForConnected(300):
@@ -519,6 +523,8 @@ def main() -> int:
 
     win._single_server = server
     win.showMaximized() if win.start_max else win.show()
+    if MIGRATION_FAILED:
+        QTimer.singleShot(0, lambda: win.flash(MIGRATION_WARNING))
     import app_update
 
     # 업데이트로 다시 켜진 경우: 이전 프로그램에 '창 떴음' 알림(이걸 보고 이전 창이 닫힘) + 업데이트됐다고 표시

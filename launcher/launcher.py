@@ -1,8 +1,8 @@
-"""Exile Delta 로더 (exe 의 시작점).
+"""POE Delta 로더 (exe 의 시작점).
 
 exe 안에는 Python · Qt 같은 실행 환경과 '기본 앱 코드' 한 벌(appsrc)이 들어 있다.
 실제로 실행하는 앱 코드는 다음 중 하나:
-  1) %LOCALAPPDATA%\\ExileDelta\\app\\<버전>\\   — GitHub 릴리스에서 받은 최신 코드 (exe 안 코드보다 새 버전일 때)
+  1) %LOCALAPPDATA%\\PoeDelta\\app\\<버전>\\   — GitHub 릴리스에서 받은 최신 코드 (exe 안 코드보다 새 버전일 때)
   2) exe 안의 기본 코드 (처음 실행 · 인터넷 없음 · 받은 버전이 고장났을 때)
 
 받은 버전이 정상 시작(.ok 표시)을 못 하고 3번 연속 실패하면 고장으로 표시하고 이전 버전/기본 코드로 돌아간다.
@@ -20,8 +20,7 @@ import traceback
 from pathlib import Path
 
 LOADER_VERSION = 1  # exe(로더 · 실행 환경)가 바뀌면 올림 → 릴리스 manifest 의 min_loader 와 비교
-DIR_NAME = "ExileDelta"
-OLD_DIR_NAMES = ("ExileSieve",)
+DIR_NAME = "PoeDelta"
 MAX_TRIES = 3
 
 
@@ -39,20 +38,9 @@ def _deps() -> None:  # pragma: no cover - 호출하지 않음. PyInstaller 가 
 
 
 def _local_dir() -> Path:
-    """app/paths.py 와 같은 규칙 (예전 이름 폴더가 있으면 새 이름으로 옮김)."""
+    """app/paths.py 와 같은 독립 LOCAL 경로. 원본은 복사하거나 옮기지 않는다."""
     base = Path(os.environ.get("LOCALAPPDATA") or Path.home())
-    new = base / DIR_NAME
-    if new.exists():
-        return new
-    for old_name in OLD_DIR_NAMES:
-        old = base / old_name
-        if old.exists():
-            try:
-                os.rename(old, new)
-                return new
-            except OSError:
-                return old
-    return new
+    return base / DIR_NAME
 
 
 def _vt(v: str) -> tuple:
@@ -75,7 +63,7 @@ def _valid(root: Path) -> bool:
 
 
 class State:
-    """%LOCALAPPDATA%\\ExileDelta\\app\\state.json — {current, previous, bad: [..], tries: {ver: n}}"""
+    """%LOCALAPPDATA%\\PoeDelta\\app\\state.json — {current, previous, bad: [..], tries: {ver: n}}"""
 
     def __init__(self, root: Path):
         self.path = root / "state.json"
@@ -149,7 +137,7 @@ def _error_box(text: str) -> None:
     try:
         import ctypes
 
-        ctypes.windll.user32.MessageBoxW(None, text[:3000], "Exile Delta 실행 오류", 0x10)
+        ctypes.windll.user32.MessageBoxW(None, text[:3000], "POE Delta 실행 오류", 0x10)
     except Exception:  # noqa: BLE001
         pass
 
