@@ -72,8 +72,13 @@ def test_korean_support_gem_clipboard_from_game(fixtures):
     for server, base in ((config.KAKAO, "덫 및 지뢰 피해 보조"), (config.OFFICIAL, "Trap and Mine Damage Support")):
         info = item_info(model, server)
         assert info.supported, info.message
-        assert conditions(info) == []
-        query = build_query(info, [])["query"]
+        rows = conditions(info)
+        assert [(row.text, row.badge, row.checked, row.minimum, row.maximum) for row in rows] == [
+            ("젬 레벨", "젬", True, 20, None), ("퀄리티 (%)", "젬", True, 18, None),
+        ]
+        query = build_query(info, rows)["query"]
+        assert query == build_query(info, [])["query"]
+        assert query["stats"] == [{"type": "and", "filters": []}]
         assert query["type"] == base
         assert query["filters"]["misc_filters"]["filters"] == {
             "corrupted": {"option": "false"}, "gem_level": {"min": 20}, "quality": {"min": 18},

@@ -200,11 +200,17 @@ def heist_conditions(info: TradeItem) -> list[StatCondition]:
 def conditions(info: TradeItem, ratio: float = 0.9) -> list[StatCondition]:
     if not info.model:
         return []
+    if info.identity and info.identity.gem_level is not None:
+        return [
+            StatCondition("젬 레벨", "gem_filter", Match("gem_level", reason=""), True,
+                          info.identity.gem_level, badge="젬"),
+            StatCondition("퀄리티 (%)", "gem_filter", Match("quality", reason=""), True,
+                          info.identity.quality, badge="젬"),
+        ]
     result = heist_conditions(info)
     for mod in info.model.mods:
-        if info.identity and (info.identity.gem_level is not None or
-                              (info.identity.apt_category == "Map"
-                               and mod.text in items.map_identity_lines(info.model.lang))):
+        if (info.identity and info.identity.apt_category == "Map"
+                and mod.text in items.map_identity_lines(info.model.lang)):
             continue
         english = mod_en(info.model, mod)
         matched = index().match(english, mod.kind, info.category) if english else Match()
@@ -217,6 +223,72 @@ def conditions(info: TradeItem, ratio: float = 0.9) -> list[StatCondition]:
                                    default_minimum(english, ratio) if english and not blueprint_enchant else None,
                                    badge=badge(mod) or mod.kind))
     return result
+
+
+def _gem_filters(identity: items.Identity, stats: list[StatCondition]) -> dict:
+    rows = {row.match.id: row for row in stats if row.kind == "gem_filter"}
+    filters = {}
+    for key, default, floor in (("gem_level", identity.gem_level, 1), ("quality", identity.quality, 0)):
+        if key not in rows:
+            filters[key] = {"min": default}
+            continue
+        row = rows[key]
+        if not row.checked:
+            continue
+        bounds = {}
+        for bound, value in (("min", row.minimum), ("max", row.maximum)):
+            if value is None:
+                continue
+            if not math.isfinite(value) or value < floor or int(value) != value:
+                raise ValueError(f"{row.text}: {floor} 이상의 정수를 입력하세요")
+            bounds[bound] = int(value)
+        if "min" in bounds and "max" in bounds and bounds["min"] > bounds["max"]:
+            raise ValueError(f"{row.text}: 최소값은 최대값보다 클 수 없습니다")
+        if bounds:
+            filters[key] = bounds
+    return filters
+
+
+CATEGORY_LABELS = {
+    "accessory.amulet": "목걸이", "accessory.belt": "허리띠", "accessory.ring": "반지",
+    "armour.boots": "장화", "armour.chest": "갑옷", "armour.gloves": "장갑",
+    "armour.helmet": "투구", "armour.quiver": "화살통", "armour.shield": "방패",
+    "weapon.bow": "활", "weapon.claw": "클로", "weapon.dagger": "단검",
+    "weapon.rod": "낚싯대", "weapon.oneaxe": "한손 도끼", "weapon.onemace": "한손 철퇴",
+    "weapon.onesword": "한손 검", "weapon.runedagger": "룬 단검", "weapon.sceptre": "셉터",
+    "weapon.staff": "지팡이", "weapon.twoaxe": "양손 도끼", "weapon.twomace": "양손 철퇴",
+    "weapon.twosword": "양손 검", "weapon.wand": "마법봉", "weapon.warstaff": "전쟁지팡이",
+    "jewel": "주얼", "jewel.abyss": "어비스 주얼", "jewel.cluster": "성단 주얼",
+    "heistmission.contract": "계약", "heistmission.blueprint": "도면",
+}
+
+
+@dataclass(frozen=True)
+class SearchTarget:
+    base: str | None = None
+    name: str | None = None
+    category: str | None = None
+    discriminator: str | None = None
+
+    @property
+    def label(self) -> str:
+        if self.category:
+            return CATEGORY_LABELS.get(self.category, self.category)
+        return " · ".join(part for part in (self.name, self.base) if part) or "검색할 수 없음"
+
+
+def search_target(info: TradeItem, exact_base: bool | None = None) -> SearchTarget:
+    if not info.supported:
+        return SearchTarget()
+    if info.heist:
+        if exact_base is None:
+            exact_base = info.category == heist.BLUEPRINT
+        if not exact_base:
+            return SearchTarget(category=heist.CATEGORIES[info.category])
+    if info.equipment_category and not exact_base:
+        return SearchTarget(category=info.equipment_category)
+    return SearchTarget(info.base, info.name if info.rarity == "Unique" else None,
+                        discriminator=info.identity.discriminator if info.identity else None)
 
 
 def build_query(info: TradeItem, stats: list[StatCondition], *, ilvl: bool = False,
@@ -246,12 +318,13 @@ def build_query(info: TradeItem, stats: list[StatCondition], *, ilvl: bool = Fal
             map_filters["map_blighted"] = {"option": "false"}
             filters["map_filters"] = {"filters": map_filters}
         if identity.gem_level is not None:
-            filters.setdefault("misc_filters", {"filters": {}})["filters"].update(
-                gem_level={"min": identity.gem_level}, quality={"min": identity.quality})
+            gem_filters = _gem_filters(identity, stats)
+            if gem_filters:
+                filters.setdefault("misc_filters", {"filters": {}})["filters"].update(gem_filters)
     selected = []
     not_enchanted = []
     for condition in stats:
-        if not condition.checked or not condition.match.id:
+        if condition.kind == "gem_filter" or not condition.checked or not condition.match.id:
             continue
         if info.heist and condition.kind.startswith("heist_"):
             key = condition.match.id
@@ -287,25 +360,23 @@ def build_query(info: TradeItem, stats: list[StatCondition], *, ilvl: bool = Fal
         selected.extend({"id": ids[name]} for name in info.influences if influences is None or name in influences)
     if identity:
         selected.extend({"id": stat_id} for stat_id in identity.map_ids)
-    query = {"status": {"option": "securable"}, "type": info.base,
+    target = search_target(info, exact_base)
+    query = {"status": {"option": "securable"}, "type": target.base,
              "stats": [{"type": "and", "filters": selected}], "filters": filters}
     if not_enchanted:
         query["stats"].append({"type": "not", "filters": not_enchanted})
-    if info.heist and not (exact_base if exact_base is not None else info.category == heist.BLUEPRINT):
-        del query["type"]
-        filters["type_filters"]["filters"]["category"] = {"option": heist.CATEGORIES[info.category]}
-    if info.equipment_category and not exact_base:
+    if target.category:
         del query["type"]
         kinds = filters.setdefault("type_filters", {"filters": {}})["filters"]
-        kinds["category"] = {"option": info.equipment_category}
-        if info.rarity == "Rare":
+        kinds["category"] = {"option": target.category}
+        if not info.heist and info.rarity == "Rare":
             kinds["rarity"] = {"option": "nonunique"}
-    if info.rarity == "Unique":
-        query["name"] = info.name
-    if identity and identity.discriminator:
+    if target.name is not None:
+        query["name"] = target.name
+    if target.discriminator:
         for key in ("name", "type"):
             if key in query:
-                query[key] = {"option": query[key], "discriminator": identity.discriminator}
+                query[key] = {"option": query[key], "discriminator": target.discriminator}
     return {"query": query, "sort": {"price": "asc"}}
 
 

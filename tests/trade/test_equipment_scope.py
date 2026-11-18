@@ -163,7 +163,7 @@ def test_window_base_and_switch_send_one_shared_query(app, monkeypatch):
         config.save(mode=mode, server=config.OFFICIAL, league="Standard")
         window.load(model)
         assert "type" not in window._query()["query"]
-        assert not window.base_button.isChecked() and window.base_button.text() == "장비 종류 전체 검색"
+        assert not window.base_button.isChecked() and window.base_button.text() == "반지 전체 검색"
         window.base_button.click()
         assert window.base_button.isChecked() and window.base_button.text() == "정확한 베이스: Topaz Ring"
         assert window.result_summary.text() == "조건이 바뀌었습니다. 검색을 눌러 주세요"

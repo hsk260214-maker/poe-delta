@@ -5,10 +5,11 @@ import math
 import time
 from uuid import uuid4
 
-from PySide6.QtCore import QEvent, QLocale, Qt, QTimer
+from PySide6.QtCore import QEvent, QLocale, QSignalBlocker, Qt, QTimer
 from PySide6.QtGui import QCursor, QDoubleValidator, QGuiApplication, QKeySequence, QShortcut
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QHBoxLayout, QHeaderView, QLabel,
-                               QLineEdit, QPushButton, QScrollArea, QTableWidget,
+from PySide6.QtWidgets import (QCheckBox, QComboBox, QGridLayout, QHBoxLayout, QHeaderView, QLabel,
+                               QLineEdit, QPushButton, QScrollArea, QSizePolicy, QStyle, QStyleOptionButton,
+                               QStylePainter, QTableWidget,
                                QTableWidgetItem, QVBoxLayout, QWidget)
 
 import winutil
@@ -16,7 +17,36 @@ from asyncjob import run_async
 from itemmodel import ItemModel, parse
 from theme import build_qss
 from trade import browser, config, focus_log, heist
-from trade.query import INFLUENCE_LABELS, build_query, conditions, item_info, league_for, result_rows, summary
+from trade.query import (INFLUENCE_LABELS, SearchTarget, build_query, conditions, item_info, league_for,
+                         result_rows, search_target, summary)
+
+
+class _ElidedText:
+    def paintEvent(self, event) -> None:
+        option = QStyleOptionButton()
+        self.initStyleOption(option)
+        rect = self.style().subElementRect(self.text_rect, option, self)
+        option.text = self.fontMetrics().elidedText(option.text, Qt.TextElideMode.ElideRight, rect.width())
+        painter = QStylePainter(self)
+        painter.drawControl(self.control, option)
+
+
+class _OptionCheck(_ElidedText, QCheckBox):
+    text_rect = QStyle.SubElement.SE_CheckBoxContents
+    control = QStyle.ControlElement.CE_CheckBox
+
+
+class _ScopeButton(_ElidedText, QPushButton):
+    text_rect = QStyle.SubElement.SE_PushButtonContents
+    control = QStyle.ControlElement.CE_PushButton
+
+
+def _wrapped_label() -> QLabel:
+    label = QLabel()
+    label.setTextFormat(Qt.TextFormat.PlainText)
+    label.setWordWrap(True)
+    label.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
+    return label
 
 
 class TradeWindow(QWidget):
@@ -24,7 +54,9 @@ class TradeWindow(QWidget):
         super().__init__(None, Qt.WindowType.Window | Qt.WindowType.WindowStaysOnTopHint)
         self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating)
         self.setWindowTitle("거래소 시세 검색")
-        self.setStyleSheet(build_qss())
+        self.setStyleSheet(build_qss() + "\nQPushButton:focus, QPushButton#FilterChip:focus {"
+                                      " border: 1px solid palette(highlight); }"
+                                      "\nQCheckBox:focus { outline: 1px solid palette(highlight); }")
         self.resize(760, 680)
         self.source_fn = source_fn
         self.model = None
@@ -42,39 +74,65 @@ class TradeWindow(QWidget):
         self.inputs = []
         self.influence_inputs = {}
         layout = QVBoxLayout(self)
-        self.title = QLabel()
-        self.title.setTextFormat(Qt.TextFormat.PlainText)
+        self.title = _wrapped_label()
+        self.title.setObjectName("SectionLabel")
         layout.addWidget(self.title)
+        self.copied_item = _wrapped_label()
+        layout.addWidget(self.copied_item)
         self.focus_hint = QLabel("거래소 창을 클릭하면 입력할 수 있습니다")
         self.focus_hint.hide()
         layout.addWidget(self.focus_hint)
-        self.mode_label = QLabel()
+        self.mode_label = _wrapped_label()
         layout.addWidget(self.mode_label)
         self.league = QComboBox()
         self.league.setEditable(True)
         self.league.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-        self.league.lineEdit().setPlaceholderText("리그 이름을 입력하세요 (예: 현재 챌린지 리그 이름)")
-        layout.addWidget(self.league)
+        self.league.setAccessibleName("리그")
+        self.league.lineEdit().setAccessibleName("리그 이름")
+        self.league.lineEdit().setPlaceholderText("리그 이름을 입력하세요")
+        league_row = QHBoxLayout()
+        league_name = QLabel("리그")
+        league_name.setBuddy(self.league)
+        league_row.addWidget(league_name)
+        league_row.addWidget(self.league, 1)
+        layout.addLayout(league_row)
         header = QHBoxLayout()
         self.ilvl = QCheckBox("아이템 레벨")
         self.links = QCheckBox("링크")
         self.corrupted = QCheckBox("타락 여부")
-        self.base_button = QPushButton("정확한 베이스")
+        self.base_button = _ScopeButton("정확한 베이스")
+        self.base_button.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
         self.base_button.setObjectName("FilterChip")
         self.base_button.setCheckable(True)
         self.base_button.hide()
         self.base_button.toggled.connect(self._base_changed)
-        header.addWidget(self.base_button)
+        layout.addWidget(self.base_button)
         for widget in (self.ilvl, self.links, self.corrupted):
             header.addWidget(widget)
             widget.toggled.connect(self._conditions_changed)
         header.addStretch(1)
         header.addWidget(QLabel("가판대 매물만"))
         layout.addLayout(header)
+        options_header = QHBoxLayout()
+        options_title = QLabel("검색 조건")
+        options_title.setObjectName("SectionLabel")
+        options_header.addWidget(options_title, 1)
+        self.select_all = QPushButton("전체 선택")
+        self.clear_all = QPushButton("전체 해제")
+        for button, state, name in ((self.select_all, True, "검색 옵션 전체 선택"),
+                                    (self.clear_all, False, "검색 옵션 전체 해제")):
+            button.setAccessibleName(name)
+            button.clicked.connect(lambda _checked, state=state: self._set_all_options(state))
+            button.hide()
+            options_header.addWidget(button)
+        layout.addLayout(options_header)
         scroll = QScrollArea()
+        scroll.setAccessibleName("검색 옵션")
+        scroll.setMinimumHeight(84)
         scroll.setWidgetResizable(True)
         self.stat_box = QWidget()
         self.stat_layout = QVBoxLayout(self.stat_box)
+        self.stat_layout.setContentsMargins(6, 6, 6, 6)
         self.stat_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         scroll.setWidget(self.stat_box)
         layout.addWidget(scroll, 1)
@@ -82,11 +140,15 @@ class TradeWindow(QWidget):
         self.hint.setTextFormat(Qt.TextFormat.PlainText)
         self.hint.setWordWrap(True)
         layout.addWidget(self.hint)
+        results_title = QLabel("검색 결과")
+        results_title.setObjectName("SectionLabel")
+        layout.addWidget(results_title)
         self.result_summary = QLabel()
         self.result_summary.setTextFormat(Qt.TextFormat.PlainText)
         self.result_summary.setWordWrap(True)
         layout.addWidget(self.result_summary)
         self.table = QTableWidget(0, 4)
+        self.table.setAccessibleName("검색 결과 목록")
         self.table.setHorizontalHeaderLabels(["가격", "판매자", "등록", "아이템 레벨"])
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
@@ -122,20 +184,42 @@ class TradeWindow(QWidget):
         if self._loading or not hasattr(self, "info"):
             return
         self._generation += 1
+        self._update_bulk_buttons()
         self._clear_results("조건이 바뀌었습니다. 검색을 눌러 주세요")
         self._validate()
 
     def _base_changed(self) -> None:
-        self._update_base_label()
+        self._update_target()
         self._conditions_changed()
 
-    def _update_base_label(self) -> None:
-        if self.base_button.isChecked():
-            label = f"정확한 베이스: {self.info.base}"
-        else:
-            label = {heist.CONTRACT: "계약 전체 검색", heist.BLUEPRINT: "도면 전체 검색"}.get(
-                self.info.category, "장비 종류 전체 검색")
+    def _update_target(self) -> None:
+        target = SearchTarget() if self._error else search_target(self.info, self.base_button.isChecked())
+        self.title.setText(f"검색 대상: {target.label}")
+        copied = self.model.name if self.model else ""
+        self.copied_item.setText(f"복사한 아이템: {copied}")
+        self.copied_item.setVisible(bool(copied and copied != target.label))
+        label = f"{target.label} 전체 검색" if target.category else f"정확한 베이스: {target.label}"
         self.base_button.setText(label)
+        self.base_button.setAccessibleName(f"검색 범위: {label}")
+        self.base_button.setToolTip(label)
+
+    def _enabled_options(self) -> list[QCheckBox]:
+        return [check for check, _, _ in self.inputs if check.isEnabled()]
+
+    def _update_bulk_buttons(self) -> None:
+        checks = self._enabled_options()
+        self.select_all.setVisible(bool(checks))
+        self.clear_all.setVisible(bool(checks))
+        self.select_all.setEnabled(any(not check.isChecked() for check in checks))
+        self.clear_all.setEnabled(any(check.isChecked() for check in checks))
+
+    def _set_all_options(self, checked: bool) -> None:
+        changed = [check for check in self._enabled_options() if check.isChecked() != checked]
+        for check in changed:
+            with QSignalBlocker(check):
+                check.setChecked(checked)
+        if changed:
+            self._conditions_changed()
 
     def load(self, item: ItemModel | str | None, hwnd: int = 0) -> None:
         self._loading = True
@@ -151,13 +235,15 @@ class TradeWindow(QWidget):
         except ValueError as error:
             self.info = item_info(self.model, config.OFFICIAL)
             self._error = str(error)
-        self.title.setText(self.model.name if self.model else "지원하지 않는 아이템")
         api = self.current_mode == "api"
-        self.mode_label.setText("게임 위 시세 모드 (공식 문서 밖 API 사용)" if api else "브라우저 모드")
+        server_name = {config.OFFICIAL: "공식", config.KAKAO: "카카오"}.get(self.server, "지원하지 않음")
+        mode_name = "게임 위 시세 모드 (공식 문서 밖 API 사용)" if api else "브라우저 모드"
+        self.mode_label.setText(f"서버: {server_name} · {mode_name}")
         self.search_button.setText("검색" if api else "브라우저로 검색")
         self.table.setVisible(api and self.info.supported)
         self.open_button.setVisible(api and self.info.supported)
-        self._clear_results("" if api else "브라우저에서 결과를 확인하세요")
+        self._clear_results("검색할 수 없는 아이템입니다" if not self.info.supported or self._error else
+                            "검색을 눌러 결과를 확인하세요" if api else "브라우저에서 결과를 확인하세요")
         self.league.blockSignals(True)
         self.league.clear()
         self.league.setEditText(league_for(self.source_fn(), trade.get("league", "")))
@@ -170,9 +256,10 @@ class TradeWindow(QWidget):
         self.links.setText(f"링크 ≥ {self.info.links}")
         self.corrupted.setChecked(True)
         self.corrupted.setText("타락" if self.info.corrupted else "타락 아님")
-        self.base_button.setChecked(bool(self.info.heist and self.info.category == heist.BLUEPRINT))
-        self._update_base_label()
-        self.base_button.setVisible(bool(self.info.supported and (self.info.equipment_category or self.info.heist)))
+        scoped = not self._error and search_target(self.info, True) != search_target(self.info, False)
+        self.base_button.setChecked(scoped and not search_target(self.info).category)
+        self._update_target()
+        self.base_button.setVisible(scoped)
         self.stats = conditions(self.info, trade.get("min_ratio", 0.9)) if self.info.supported or self.info.heist else []
         self.inputs = []
         self.influence_inputs = {}
@@ -182,49 +269,62 @@ class TradeWindow(QWidget):
             widget.setParent(None)
             widget.deleteLater()
         if self.info.heist and self.info.heist.area is not None and not heist.area_enabled(self.info.category):
-            self.stat_layout.addWidget(QLabel(
-                f"지역 레벨 {self.info.heist.area} · 지역 레벨 조건은 아직 지원하지 않습니다"))
+            area_note = _wrapped_label()
+            area_note.setText(f"지역 레벨 {self.info.heist.area} · 지역 레벨 조건은 아직 지원하지 않습니다")
+            self.stat_layout.addWidget(area_note)
         if self.info.influences or self.info.eldritch_sources:
             influence_box = QWidget()
-            influence_row = QHBoxLayout(influence_box)
-            influence_row.addWidget(QLabel("영향력"))
-            for name in self.info.influences:
+            influence_row = QGridLayout(influence_box)
+            influence_row.addWidget(QLabel("영향력"), 0, 0, 1, 2)
+            for i, name in enumerate(self.info.influences):
                 check = QCheckBox(INFLUENCE_LABELS[name])
                 check.setChecked(True)
                 check.toggled.connect(self._conditions_changed)
                 self.influence_inputs[name] = check
-                influence_row.addWidget(check)
-            influence_row.addStretch(1)
+                influence_row.addWidget(check, 1 + i // 2, i % 2)
             self.stat_layout.addWidget(influence_box)
             if self.info.eldritch_sources:
-                self.stat_layout.addWidget(QLabel("섬뜩한 영향력: " + " · ".join(self.info.eldritch_sources)))
+                sources = _wrapped_label()
+                sources.setText("섬뜩한 영향력: " + " · ".join(self.info.eldritch_sources))
+                self.stat_layout.addWidget(sources)
         sections = {}
         for implicit, title in ((True, "고정 옵션"), (False, "일반 및 기타 옵션")):
             if any((condition.kind == "implicit") == implicit for condition in self.stats):
                 section = QWidget()
                 section.setObjectName("implicitOptions" if implicit else "explicitOptions")
                 section_layout = QVBoxLayout(section)
+                section_layout.setContentsMargins(6, 6, 6, 6)
                 heading = QLabel(title)
                 heading.setObjectName("SectionLabel")
-                section_layout.addWidget(heading)
+                column_headers = QHBoxLayout()
+                column_headers.addWidget(heading, 1)
+                for text in ("최소", "최대"):
+                    label = QLabel(text)
+                    label.setFixedWidth(52)
+                    column_headers.addWidget(label)
+                section_layout.addLayout(column_headers)
                 self.stat_layout.addWidget(section)
                 sections[implicit] = section_layout
         for condition in self.stats:
             row = QWidget()
             form = QHBoxLayout(row)
-            check = QCheckBox(condition.text)
+            form.setContentsMargins(0, 3, 0, 3)
+            check = _OptionCheck(condition.text)
             check.setChecked(condition.checked)
             check.setEnabled(bool(condition.match.id))
-            check.setToolTip(condition.match.reason)
-            check.setMinimumWidth(350)
-            badge = QLabel(condition.badge)
+            check.setToolTip("\n".join(part for part in (condition.text, condition.match.reason) if part))
+            check.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
+            check.setMinimumWidth(64)
+            badge = QLabel("일반" if condition.badge == "explicit" else condition.badge)
             minimum, maximum = QLineEdit(), QLineEdit()
             for box, value, placeholder in ((minimum, condition.minimum, "최소"), (maximum, condition.maximum, "최대")):
-                validator = QDoubleValidator(box)
-                validator.setLocale(QLocale.c())
-                box.setValidator(validator)
+                if condition.kind != "gem_filter":
+                    validator = QDoubleValidator(box)
+                    validator.setLocale(QLocale.c())
+                    box.setValidator(validator)
                 box.setPlaceholderText(placeholder)
-                box.setMaximumWidth(85)
+                box.setFixedWidth(52)
+                box.setAccessibleName(f"{condition.text} {placeholder}")
                 box.setText("" if value is None else f"{value:g}")
                 box.setEnabled(bool(condition.match.id))
                 if condition.kind in ("heist_option", "heist_not") or (condition.kind == "heist_job" and box is maximum):
@@ -237,6 +337,7 @@ class TradeWindow(QWidget):
             form.addWidget(badge)
             if condition.kind in ("explicit", "fractured"):
                 switch = QPushButton("종류 전환")
+                switch.setAccessibleName(f"{condition.text} 종류 전환")
                 switch.setEnabled(bool(condition.match.alternate_id))
                 if not condition.match.alternate_id:
                     switch.setToolTip("같은 옵션에 대응하는 일반·분열 ID가 모두 있어야 합니다")
@@ -247,18 +348,32 @@ class TradeWindow(QWidget):
             check.toggled.connect(self._conditions_changed)
             sections[condition.kind == "implicit"].addWidget(row)
             self.inputs.append((check, minimum, maximum))
+        if not self.inputs:
+            self.stat_layout.addWidget(QLabel("표시할 검색 옵션이 없습니다"))
+        elif not self._enabled_options():
+            self.stat_layout.addWidget(QLabel("선택할 수 있는 검색 옵션이 없습니다"))
+        self._update_bulk_buttons()
         self.search_button.setVisible(bool(self.info.supported or self.info.heist))
         self._loading = False
         self._validate()
 
     def _switch_kind(self, condition, badge) -> None:
         condition.switch_kind()
-        badge.setText(condition.badge)
+        badge.setText("일반" if condition.badge == "explicit" else condition.badge)
         self._conditions_changed()
 
     def _query(self) -> dict:
         for condition, (check, minimum, maximum) in zip(self.stats, self.inputs):
             condition.checked = check.isChecked()
+            if condition.kind == "gem_filter":
+                if condition.checked:
+                    try:
+                        condition.minimum, condition.maximum = (
+                            int(text) if text else None for text in (minimum.text().strip(), maximum.text().strip())
+                        )
+                    except ValueError:
+                        raise ValueError(f"{condition.text}: 정수를 입력하세요") from None
+                continue
             for name, box in (("minimum", minimum), ("maximum", maximum)):
                 text = box.text().strip()
                 if text and not box.hasAcceptableInput():
