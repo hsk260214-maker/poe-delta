@@ -1,0 +1,12 @@
+[
+  {"name":"standard_low","league":" Standard ","level":12,"class":"Witch"},
+  {"name":"challenge_low","league":"New Challenge","level":50,"class":"Ranger"},
+  {"name":"unknown_missing","class":"Duelist"},
+  {"name":"hardcore","league":"Hardcore","level":88,"class":"Marauder"},
+  {"name":"challenge_high","league":"New Challenge","level":95,"class":"Witch"},
+  {"name":"standard_high","league":"Standard","level":90,"class":"Templar"},
+  {"name":"event","league":"Autumn Event","level":40,"class":"Shadow"},
+  {"name":"unknown_null","league":null,"level":10,"class":"Scion"},
+  {"name":"challenge_null_level","league":"New Challenge","level":null,"class":"Ranger"},
+  {"name":"unknown_blank","league":"   ","level":"not-a-number","class":"Duelist"}
+]

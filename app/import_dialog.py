@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
     QListWidgetItem,
     QPlainTextEdit,
     QPushButton,
+    QScrollArea,
     QStackedWidget,
     QToolButton,
     QVBoxLayout,
@@ -18,6 +19,7 @@ from PySide6.QtWidgets import (
 )
 
 from asyncjob import run_async
+from char_leagues import league_groups, league_of, league_sort_key
 from dialogs import DragHeader, FramelessDialog
 from editor import NoWheelCombo
 from pob import importers
@@ -33,6 +35,7 @@ class ImportDialog(FramelessDialog):
         self.source: dict = {}
         self._account = ""
         self._busy = False
+        self._league_choice: str | None = None
         self.resize(720, 560)
 
         v = QVBoxLayout(self.frame)
@@ -119,6 +122,21 @@ class ImportDialog(FramelessDialog):
         row.addWidget(self.account, 1)
         row.addWidget(self.list_btn)
         v.addLayout(row)
+        self.league_group = QButtonGroup(self)
+        self.league_group.setExclusive(True)
+        self.league_group.buttonClicked.connect(
+            lambda button: self._filter_league(button.property("league"), remember=True))
+        league_strip = QWidget()
+        self.league_layout = QHBoxLayout(league_strip)
+        self.league_layout.setContentsMargins(0, 0, 0, 0)
+        self.league_layout.setSpacing(6)
+        self.league_scroll = QScrollArea()
+        self.league_scroll.setWidgetResizable(True)
+        self.league_scroll.setFrameShape(QScrollArea.Shape.NoFrame)
+        self.league_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.league_scroll.setFixedHeight(54)
+        self.league_scroll.setWidget(league_strip)
+        v.addWidget(self.league_scroll)
         self.char_list = QListWidget()
         self.char_list.setObjectName("ResultList")
         self.char_list.itemDoubleClicked.connect(lambda _: self._do_import())
@@ -180,14 +198,60 @@ class ImportDialog(FramelessDialog):
         self._account, chars = res
         self.account.setText(self._account)
         self.settings["account"] = self._account
+        preferred = self._league_choice if self._league_choice is not None else self.settings.get("import_league", "")
+        while self.league_layout.count():
+            button = self.league_layout.takeAt(0).widget()
+            if button is not None:
+                self.league_group.removeButton(button)
+                button.deleteLater()
+        groups = league_groups(chars)
+        for name, count in [("", len(chars)), *groups]:
+            button = QPushButton(f"{name or '전체'} {count}")
+            button.setObjectName("FilterChip")
+            button.setCheckable(True)
+            button.setCursor(Qt.CursorShape.PointingHandCursor)
+            button.setProperty("league", name)
+            self.league_group.addButton(button)
+            self.league_layout.addWidget(button)
+        self.league_layout.addStretch(1)
         self.char_list.clear()
-        chars.sort(key=lambda c: (c.get("league", ""), -int(c.get("level", 0))))
-        for c in chars:
-            it = QListWidgetItem(f"  {c.get('name')}    Lv {c.get('level')}  ·  {c.get('class')}  ·  {c.get('league')}")
+        rows = []
+        for char in chars:
+            try:
+                level = int(char.get("level", 0))
+            except (TypeError, ValueError, OverflowError):
+                level = 0
+            rows.append((char, level))
+        rows.sort(key=lambda row: (league_sort_key(league_of(row[0])), -row[1]))
+        for c, level in rows:
+            it = QListWidgetItem(f"  {c.get('name')}    Lv {level}  ·  {c.get('class')}  ·  {league_of(c)}")
             it.setData(Qt.ItemDataRole.UserRole, c)
             self.char_list.addItem(it)
-        self.char_list.setCurrentRow(0)
-        self._set_status(f"캐릭터 {len(chars)}개. 가져올 캐릭터를 선택하세요.")
+        selected = preferred if preferred in {name for name, _ in groups} else ""
+        self._filter_league(selected)
+
+    def _filter_league(self, league: str, remember: bool = False) -> None:
+        for button in self.league_group.buttons():
+            button.setChecked(button.property("league") == league)
+        current = self.char_list.currentItem()
+        visible = []
+        for row in range(self.char_list.count()):
+            item = self.char_list.item(row)
+            item.setHidden(bool(league) and league_of(item.data(Qt.ItemDataRole.UserRole)) != league)
+            if not item.isHidden():
+                visible.append(item)
+        if current is None or current.isHidden():
+            if visible:
+                self.char_list.setCurrentItem(visible[0])
+            else:
+                self.char_list.setCurrentRow(-1)
+        total = self.char_list.count()
+        text = (f"{league} 캐릭터 {len(visible)}개 (전체 {total}개). 가져올 캐릭터를 선택하세요."
+                if league else f"캐릭터 {total}개. 가져올 캐릭터를 선택하세요.")
+        self._set_status(text)
+        if remember:
+            self._league_choice = league
+            self.settings["import_league"] = league
 
     def _on_err(self, msg: str) -> None:
         self._set_busy(False)
