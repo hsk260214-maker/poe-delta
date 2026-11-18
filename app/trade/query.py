@@ -203,7 +203,8 @@ def conditions(info: TradeItem, ratio: float = 0.9) -> list[StatCondition]:
     result = heist_conditions(info)
     for mod in info.model.mods:
         if info.identity and (info.identity.gem_level is not None or
-                              (info.identity.tier is not None and mod.text in items.map_identity_lines(info.model.lang))):
+                              (info.identity.apt_category == "Map"
+                               and mod.text in items.map_identity_lines(info.model.lang))):
             continue
         english = mod_en(info.model, mod)
         matched = index().match(english, mod.kind, info.category) if english else Match()
@@ -238,11 +239,12 @@ def build_query(info: TradeItem, stats: list[StatCondition], *, ilvl: bool = Fal
             filters["type_filters"] = {"filters": {"rarity": {"option": info.rarity.lower()}}}
         elif identity.gem_level is None and info.rarity == "Rare":
             filters["type_filters"] = {"filters": {"rarity": {"option": "nonunique"}}}
-        if identity.tier is not None:
-            filters["map_filters"] = {"filters": {
-                "map_tier": {"min": identity.tier, "max": identity.tier},
-                "map_blighted": {"option": "false"},
-            }}
+        if identity.apt_category == "Map":
+            map_filters = {}
+            if identity.tier is not None:
+                map_filters["map_tier"] = {"min": identity.tier, "max": identity.tier}
+            map_filters["map_blighted"] = {"option": "false"}
+            filters["map_filters"] = {"filters": map_filters}
         if identity.gem_level is not None:
             filters.setdefault("misc_filters", {"filters": {}})["filters"].update(
                 gem_level={"min": identity.gem_level}, quality={"min": identity.quality})

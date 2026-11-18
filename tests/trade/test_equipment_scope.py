@@ -163,7 +163,10 @@ def test_window_base_and_switch_send_one_shared_query(app, monkeypatch):
         config.save(mode=mode, server=config.OFFICIAL, league="Standard")
         window.load(model)
         assert "type" not in window._query()["query"]
+        assert not window.base_button.isChecked() and window.base_button.text() == "장비 종류 전체 검색"
         window.base_button.click()
+        assert window.base_button.isChecked() and window.base_button.text() == "정확한 베이스: Topaz Ring"
+        assert window.result_summary.text() == "조건이 바뀌었습니다. 검색을 눌러 주세요"
         check, minimum, maximum = window.inputs[0]
         check.setChecked(True)
         minimum.setText("20")
@@ -179,4 +182,53 @@ def test_window_base_and_switch_send_one_shared_query(app, monkeypatch):
     assert json.loads(parse_qs(urlsplit(opened[0]).query)["q"][0]) == sent[0]
     assert sent[0]["query"]["type"] == "Topaz Ring"
     assert sent[0]["query"]["status"] == {"option": "securable"}
+    window.close()
+
+
+def test_condition_change_discards_previous_and_in_flight_results(app, monkeypatch):
+    from trade import api, trade_window
+
+    pending, sent = [], []
+    monkeypatch.setattr(trade_window, "run_async", lambda work, done, fail: pending.append((work, done)))
+    monkeypatch.setattr(api.TradeClient, "leagues", lambda *args: ["Standard"])
+    monkeypatch.setattr(api.TradeClient, "remaining", lambda *args: 0)
+    monkeypatch.setattr(api.TradeClient, "fetch", lambda *args: {"result": []})
+    monkeypatch.setattr(trade_window, "result_rows", lambda _data: [
+        {"amount": 10, "currency": "chaos", "seller": "tester", "age": "1분 전", "ilvl": 80},
+    ])
+
+    def search(_client, _league, query, *_args):
+        sent.append(query)
+        return {"id": "test", "result": ["item"], "total": 1}
+
+    monkeypatch.setattr(api.TradeClient, "search", search)
+    config.save(mode="api", server=config.KAKAO, league="Standard")
+    window = trade_window.TradeWindow()
+    window.load(equipment("반지", "토파즈 반지", lang="ko", rarity="희귀", mods="최대 생명력 +30"))
+
+    def finish_search():
+        work, done = pending.pop()
+        done(work())
+
+    window.search()
+    finish_search()
+    assert "type" not in sent[0]["query"]
+    assert window.table.rowCount() == 1 and window.open_button.isEnabled() and window._result_link
+    window.base_button.click()
+    assert window.base_button.text() == "정확한 베이스: 토파즈 반지"
+    assert window.table.rowCount() == 0 and not window.open_button.isEnabled() and not window._result_link
+    assert window.result_summary.text() == "조건이 바뀌었습니다. 검색을 눌러 주세요"
+    assert not pending and len(sent) == 1
+
+    window.search()
+    finish_search()
+    assert sent[1]["query"]["type"] == "토파즈 반지"
+    assert window.table.rowCount() == 1
+
+    window.search()
+    window.corrupted.click()
+    assert len(pending) == 1 and len(sent) == 2
+    finish_search()
+    assert window.table.rowCount() == 0 and not window.open_button.isEnabled() and not window._result_link
+    assert window.result_summary.text() == "조건이 바뀌었습니다. 검색을 눌러 주세요"
     window.close()

@@ -46,6 +46,120 @@ def test_item_and_browser_queries(kind, rarity, name, detail, lang, expected, ex
     assert json.loads(parse_qs(urlsplit(url).query)["q"][0]) == packet
 
 
+@pytest.mark.parametrize("lang,server,kind,rarity,name,properties,requirements,description", [
+    ("ko", config.KAKAO, "보조 젬", "젬", "체온저하 보조",
+     "보조, 냉기\n레벨: 20 (최대)\n퀄리티: +20% (augmented)", "요구 사항:\n레벨: 70\n지능: 111",
+     "적에게 명중하는 스킬에 적용됩니다."),
+    ("ko", config.OFFICIAL, "보조 젬", "젬", "체온저하 보조",
+     "보조, 냉기\n레벨: 20 (augmented)\n퀄리티: +20% (augmented)", "요구사항:\n레벨: 70\n지능: 111",
+     "적에게 명중하는 스킬에 적용됩니다."),
+    ("en", config.OFFICIAL, "Support Gems", "Gem", "Hypothermia Support",
+     "Cold, Support\nLevel: 20 (Max) (augmented)\nQuality: +20% (augmented)",
+     "Requirements:\nLevel: 70\nInt: 111", "Supports any skill that hits enemies."),
+])
+def test_gem_clipboard_uses_properties_not_requirements(lang, server, kind, rarity, name, properties, requirements,
+                                                      description):
+    model = parse(copy(kind, rarity, name, properties, requirements, description, lang=lang))
+    info = item_info(model, server)
+    query = build_query(info, conditions(info))["query"]
+    assert query["type"] == ("체온저하 보조" if server == config.KAKAO else "Hypothermia Support")
+    misc = query["filters"]["misc_filters"]["filters"]
+    assert misc["gem_level"] == {"min": 20} and misc["quality"] == {"min": 20}
+
+
+def test_korean_support_gem_clipboard_from_game(fixtures):
+    model = parse((fixtures / "fix004_support_gem_ko.txt").read_text(encoding="utf-8"))
+    for server, base in ((config.KAKAO, "덫 및 지뢰 피해 보조"), (config.OFFICIAL, "Trap and Mine Damage Support")):
+        info = item_info(model, server)
+        assert info.supported, info.message
+        assert conditions(info) == []
+        query = build_query(info, [])["query"]
+        assert query["type"] == base
+        assert query["filters"]["misc_filters"]["filters"] == {
+            "corrupted": {"option": "false"}, "gem_level": {"min": 20}, "quality": {"min": 18},
+        }
+
+
+@pytest.mark.parametrize("derived_plain_copy", [False, True], ids=["advanced-original", "derived-plain-copy"])
+def test_originator_memories_is_optional_map_implicit(fixtures, derived_plain_copy):
+    text = (fixtures / "fix004_map_ko.txt").read_text(encoding="utf-8")
+    if derived_plain_copy:
+        text = text.replace("{ 고정 속성 부여 }\n", "").replace(" — 변경이 불가능한 값", " (implicit)")
+    model = parse(text)
+    info = item_info(model, config.KAKAO)
+    assert info.supported, info.message
+    assert info.identity.map_ids == ()
+    rows = conditions(info)
+    row, = [row for row in rows if row.kind == "implicit"]
+    assert row.text == "지역이 태초자의 기억의 영향을 받음" and not row.checked
+    assert all(not other.match.id and not other.checked for other in rows if other is not row)
+    query = build_query(info, rows)["query"]
+    assert query["type"] == {"option": "지도", "discriminator": "map"}
+    assert build_query(item_info(model, config.OFFICIAL), [])["query"]["type"] == {
+        "option": "Map", "discriminator": "map",
+    }
+    assert query["filters"]["type_filters"]["filters"]["rarity"] == {"option": "normal"}
+    assert query["filters"]["map_filters"]["filters"]["map_tier"] == {"min": 16, "max": 16}
+    assert query["stats"][0]["filters"] == []
+    row.checked = True
+    assert build_query(info, rows)["query"]["stats"][0]["filters"] == [{"id": "implicit.stat_2696470877"}]
+
+
+def test_map_identity_still_blocks_unknown_influence_and_conflicting_tiers():
+    text = copy("지도", "희귀", "재앙의 영역\n지도 (16등급)", "지도 등급: 16\n몬스터 레벨: 83",
+                "아이템 레벨: 83", "지역이 태초자의 기억의 영향을 받음 (implicit)", lang="ko")
+    unknown = item_info(parse(text + "\n지역이 알 수 없는 세력의 영향을 받음 (implicit)"), config.KAKAO)
+    assert not unknown.supported and "지도 정체성" in unknown.message
+    conflicting = item_info(parse(text.replace("지도 등급: 16", "지도 등급: 16\n지도 등급: 15")), config.KAKAO)
+    assert not conflicting.supported and "서로 일치하지 않습니다" in conflicting.message
+
+
+@pytest.mark.parametrize("kind,name,base", [
+    ("특수 플라스크", "분석가의 비취 플라스크 - 영양", "비취 플라스크"),
+    ("반지", "차원의 토파즈 반지 - 레인저", "토파즈 반지"),
+])
+def test_korean_magic_clipboard_with_suffix(kind, name, base):
+    model = parse(copy(kind, "마법", name, "아이템 레벨: 83", lang="ko"))
+    info = item_info(model, config.KAKAO)
+    query = build_query(info, conditions(info), exact_base=True)["query"]
+    assert query["type"] == base
+    assert query["filters"]["type_filters"]["filters"]["rarity"] == {"option": "magic"}
+
+
+def test_korean_magic_flask_clipboard_from_game(fixtures):
+    model = parse((fixtures / "fix004_flask_ko.txt").read_text(encoding="utf-8"))
+    info = item_info(model, config.KAKAO)
+    rows = conditions(info)
+    assert [(row.text, row.kind, row.checked) for row in rows] == [
+        ("충전이 가득 차면 사용", "enchant", False),
+        ("사용 시 연막 생성", "implicit", False),
+        ("지속시간 23% 증가", "explicit", True),
+        ("효과를 받는 동안 이동 속도 10% 증가", "explicit", True),
+    ]
+    assert [row.badge for row in rows[:2]] == ["인챈트", "고정"]
+    query = build_query(info, rows)["query"]
+    assert query["type"] == "휘안석 플라스크"
+    assert build_query(item_info(model, config.OFFICIAL), [])["query"]["type"] == "Stibnite Flask"
+    assert query["filters"]["type_filters"]["filters"]["rarity"] == {"option": "magic"}
+
+
+def test_nightmare_map_clipboard_allows_exact_base_without_tier(fixtures):
+    text = (fixtures / "fix004_nightmare_map_ko.txt").read_text(encoding="utf-8")
+    model = parse(text)
+    for server, base in ((config.KAKAO, "악몽 지도"), (config.OFFICIAL, "Nightmare Map")):
+        info = item_info(model, server)
+        assert info.supported, info.message
+        assert info.identity.map_ids == ()
+        rows = conditions(info)
+        assert any(row.text == "플레이어의 효과 범위 27% 감폭" for row in rows)
+        query = build_query(info, rows)["query"]
+        assert query["type"] == base
+        assert query["filters"]["type_filters"]["filters"]["rarity"] == {"option": "nonunique"}
+        assert "map_tier" not in query["filters"]["map_filters"]["filters"]
+    generic = item_info(parse(text.replace("\n악몽 지도\n", "\n지도\n")), config.KAKAO)
+    assert not generic.supported and "지도 등급을 읽을 수 없습니다" in generic.message
+
+
 @pytest.mark.parametrize("lang,kind,rarity,name,detail", [
     ("en", "Rings", "Normal", "Superior Topaz Ring", "Item Level: 75"),
     ("ko", "반지", "일반", "상급 토파즈 반지", "아이템 레벨: 75"),

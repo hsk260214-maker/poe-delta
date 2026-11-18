@@ -3,13 +3,18 @@ import json
 import re
 from dataclasses import dataclass
 from functools import lru_cache
+from itertools import takewhile
 
 from data import resource_path
+from itemmodel import mod_en
 from trade.config import OFFICIAL
+from trade.stats import index
 
 MAP_TIER = re.compile(r"\s*\((?:Tier\s+(\d+)|(\d+)\s*등급)\)", re.I)
 VARIANT = re.compile(r"^(?:Synthesised|Foulborn|Vestigial|결합된|삿된|흔적(?:이 남은)?)\s")
 UNKNOWN_MAP = re.compile(r"occupied by|influenced by|citadel|시타델|성채|점령|영향을 받|손에 넘어", re.I)
+ORIGINATOR_MEMORIES_ID = "implicit.stat_2696470877"
+REQUIREMENTS = {"Requirements:", "요구 사항:", "요구사항:"}
 GUARDIAN_NAMES = {"Shaper Guardian Map", "쉐이퍼 수호자 지도", "Lair of the Hydra Map",
                   "Pit of the Chimera Map", "Maze of the Minotaur Map", "Forge of the Phoenix Map",
                   "히드라의 소굴 지도", "키메라의 구덩이 지도", "미노타우로스의 미로 지도", "불사조의 대장간 지도"}
@@ -144,15 +149,16 @@ def resolve(model, category, rarity, server, *, equipment=False):
         gem = _lookup(lang, "GEM", "Gem", name)
         if gem[4] or gem[5] or any(re.match(r"^(?:Vaal |바알 )", line) for line in lines):
             raise ValueError("변형·바알 젬은 아직 시세 검색을 지원하지 않습니다")
-        level = _number(lines, {"Level", "레벨"}, r"(\d+)(?:\s*\((?:Max|최대)\))?")
+        properties = list(takewhile(lambda line: line not in REQUIREMENTS, lines))
+        level = _number(properties, {"Level", "레벨"}, r"(\d+)(?:\s*\((?:Max|최대)\))?(?:\s*\(augmented\))?")
         if not level:
             raise ValueError("젬 레벨을 읽을 수 없습니다")
-        quality = _number(lines, {"Quality", "퀄리티"}, r"\+?(\d+)%")
+        quality = _number(properties, {"Quality", "퀄리티"}, r"\+?(\d+)%(?:\s*\(augmented\))?")
         return Identity(_localized(gem, target), gem_level=level, quality=quality or 0)
     if rarity not in {"Normal", "Magic", "Rare", "Unique"}:
         raise ValueError("지원하지 않는 품목 등급입니다")
     if rarity in {"Normal", "Magic"}:
-        if VARIANT.match(name) or " - " in name or {"Synthesised Item", "결합된 아이템"}.intersection(lines):
+        if VARIANT.match(name) or {"Synthesised Item", "결합된 아이템"}.intersection(lines):
             raise ValueError("정체성을 바꾸는 변형 품목은 검색할 수 없습니다")
         name = re.sub(r"^(?:Superior|상급)\s+", "", name, count=1)
     tier = None
@@ -169,12 +175,12 @@ def resolve(model, category, rarity, server, *, equipment=False):
             if tier is not None and tier != suffix_tier:
                 raise ValueError("지도 등급이 서로 일치하지 않습니다")
             tier = suffix_tier
-        if not tier:
-            raise ValueError("지도 등급을 읽을 수 없습니다")
     classes = ("Jewel", "Cluster Jewel") if equipment and category == "Jewel" else category
     base = _lookup(lang, "ITEM", classes, name, rarity == "Magic")
     if base[4] or category == "Map" and base[1] not in MAP_BASES:
         raise ValueError("이 품목 변형은 아직 시세 검색을 지원하지 않습니다")
+    if category == "Map" and (tier == 0 or (tier is None and base[1] != "Nightmare Map")):
+        raise ValueError("지도 등급을 읽을 수 없습니다")
     unique_name = ""
     if rarity == "Unique":
         unique = _lookup(lang, "UNIQUE", category, model.name)
@@ -185,7 +191,14 @@ def resolve(model, category, rarity, server, *, equipment=False):
     if category == "Map":
         known = map_identity_lines(lang)
         map_ids = tuple(dict.fromkeys(known[line] for line in lines if line in known))
-        if any(UNKNOWN_MAP.search(line) and line not in known for line in lines):
+        unresolved = {line for line in lines if UNKNOWN_MAP.search(line) and line not in known}
+        ordinary_implicits = {
+            mod.text for mod in model.mods
+            if mod.text in unresolved and mod.kind == "implicit"
+            and (english := mod_en(model, mod))
+            and index().match(english, mod.kind, "Map").id == ORIGINATOR_MEMORIES_ID
+        }
+        if unresolved - ordinary_implicits:
             raise ValueError("지도 정체성을 정확히 식별할 수 없습니다")
     return Identity(_localized(base, target), unique_name,
                     "map" if category == "Map" and base[1] == "Map" else None, tier,

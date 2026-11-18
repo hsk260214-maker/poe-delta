@@ -32,6 +32,7 @@ class TradeWindow(QWidget):
         self._open_id = ""
         self._close_intent = None
         self._busy = False
+        self._loading = False
         self._generation = 0
         self._until = 0.0
         self._placing = False
@@ -59,13 +60,14 @@ class TradeWindow(QWidget):
         self.links = QCheckBox("링크")
         self.corrupted = QCheckBox("타락 여부")
         self.base_button = QPushButton("정확한 베이스")
+        self.base_button.setObjectName("FilterChip")
         self.base_button.setCheckable(True)
         self.base_button.hide()
-        self.base_button.toggled.connect(self._validate)
+        self.base_button.toggled.connect(self._base_changed)
         header.addWidget(self.base_button)
         for widget in (self.ilvl, self.links, self.corrupted):
             header.addWidget(widget)
-            widget.toggled.connect(self._validate)
+            widget.toggled.connect(self._conditions_changed)
         header.addStretch(1)
         header.addWidget(QLabel("가판대 매물만"))
         layout.addLayout(header)
@@ -108,9 +110,35 @@ class TradeWindow(QWidget):
 
     def _league_changed(self) -> None:
         config.save(league=self.league.currentText().strip())
+        self._conditions_changed()
+
+    def _clear_results(self, message: str) -> None:
+        self._result_link = ""
+        self.open_button.setEnabled(False)
+        self.table.setRowCount(0)
+        self.result_summary.setText(message)
+
+    def _conditions_changed(self) -> None:
+        if self._loading or not hasattr(self, "info"):
+            return
+        self._generation += 1
+        self._clear_results("조건이 바뀌었습니다. 검색을 눌러 주세요")
         self._validate()
 
+    def _base_changed(self) -> None:
+        self._update_base_label()
+        self._conditions_changed()
+
+    def _update_base_label(self) -> None:
+        if self.base_button.isChecked():
+            label = f"정확한 베이스: {self.info.base}"
+        else:
+            label = {heist.CONTRACT: "계약 전체 검색", heist.BLUEPRINT: "도면 전체 검색"}.get(
+                self.info.category, "장비 종류 전체 검색")
+        self.base_button.setText(label)
+
     def load(self, item: ItemModel | str | None, hwnd: int = 0) -> None:
+        self._loading = True
         self._generation += 1
         self.model = parse(item) if isinstance(item, str) else item
         self._prev_fg = hwnd
@@ -129,10 +157,7 @@ class TradeWindow(QWidget):
         self.search_button.setText("검색" if api else "브라우저로 검색")
         self.table.setVisible(api and self.info.supported)
         self.open_button.setVisible(api and self.info.supported)
-        self.open_button.setEnabled(False)
-        self._result_link = ""
-        self.table.setRowCount(0)
-        self.result_summary.setText("" if api else "브라우저에서 결과를 확인하세요")
+        self._clear_results("" if api else "브라우저에서 결과를 확인하세요")
         self.league.blockSignals(True)
         self.league.clear()
         self.league.setEditText(league_for(self.source_fn(), trade.get("league", "")))
@@ -146,6 +171,7 @@ class TradeWindow(QWidget):
         self.corrupted.setChecked(True)
         self.corrupted.setText("타락" if self.info.corrupted else "타락 아님")
         self.base_button.setChecked(bool(self.info.heist and self.info.category == heist.BLUEPRINT))
+        self._update_base_label()
         self.base_button.setVisible(bool(self.info.supported and (self.info.equipment_category or self.info.heist)))
         self.stats = conditions(self.info, trade.get("min_ratio", 0.9)) if self.info.supported or self.info.heist else []
         self.inputs = []
@@ -165,7 +191,7 @@ class TradeWindow(QWidget):
             for name in self.info.influences:
                 check = QCheckBox(INFLUENCE_LABELS[name])
                 check.setChecked(True)
-                check.toggled.connect(self._validate)
+                check.toggled.connect(self._conditions_changed)
                 self.influence_inputs[name] = check
                 influence_row.addWidget(check)
             influence_row.addStretch(1)
@@ -203,7 +229,7 @@ class TradeWindow(QWidget):
                 box.setEnabled(bool(condition.match.id))
                 if condition.kind in ("heist_option", "heist_not") or (condition.kind == "heist_job" and box is maximum):
                     box.hide()
-                box.textChanged.connect(self._validate)
+                box.textChanged.connect(self._conditions_changed)
             if not condition.match.id:
                 row.setStyleSheet("QLabel, QCheckBox { color: #777777; }")
                 row.setToolTip(condition.match.reason)
@@ -218,16 +244,17 @@ class TradeWindow(QWidget):
                 form.addWidget(switch)
             form.addWidget(minimum)
             form.addWidget(maximum)
-            check.toggled.connect(self._validate)
+            check.toggled.connect(self._conditions_changed)
             sections[condition.kind == "implicit"].addWidget(row)
             self.inputs.append((check, minimum, maximum))
         self.search_button.setVisible(bool(self.info.supported or self.info.heist))
+        self._loading = False
         self._validate()
 
     def _switch_kind(self, condition, badge) -> None:
         condition.switch_kind()
         badge.setText(condition.badge)
-        self._validate()
+        self._conditions_changed()
 
     def _query(self) -> dict:
         for condition, (check, minimum, maximum) in zip(self.stats, self.inputs):
@@ -276,6 +303,7 @@ class TradeWindow(QWidget):
         league, server, lang = self.league.currentText().strip(), self.server, self.model.lang
         if self.current_mode == "browser":
             browser.open_url(browser.build_url(league, query, server, lang))
+            self.result_summary.setText("브라우저에서 결과를 확인하세요")
             return
         from trade.api import TradeClient, TradeError
 
