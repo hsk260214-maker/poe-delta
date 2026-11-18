@@ -17,7 +17,7 @@ def test_golden_queries_and_links(fixtures, language, rarity):
     expected = json.loads((fixtures / f"{rarity}_expected.json").read_text(encoding="utf-8"))
     info = item_info(model)
     assert info.supported
-    assert build_query(info, conditions(info)) == expected
+    assert build_query(info, conditions(info), exact_base=True) == expected
     for server in (config.OFFICIAL, config.KAKAO) if language == "ko" else (config.OFFICIAL,):
         info = item_info(model, server)
         correct = json.loads(json.dumps(expected))
@@ -25,7 +25,7 @@ def test_golden_queries_and_links(fixtures, language, rarity):
             correct["query"]["type"] = model.base
             if rarity == "unique":
                 correct["query"]["name"] = model.name
-        actual = build_query(info, conditions(info))
+        actual = build_query(info, conditions(info), exact_base=True)
         assert actual == correct
         links = json.loads((fixtures / "browser_links.json").read_text(encoding="utf-8"))
         expected_url = links[f"{rarity}_{language}_{'kakao' if server == config.KAKAO else 'official'}"]
@@ -99,9 +99,8 @@ def test_default_minimum(text, expected):
     assert default_minimum(text) == expected
 
 
-@pytest.mark.parametrize("filename", ["magic_en.txt", "currency_ko.txt"])
-def test_unsupported_items(fixtures, filename):
-    info = item_info(parse((fixtures / filename).read_text(encoding="utf-8")))
+def test_unsupported_items(fixtures):
+    info = item_info(parse((fixtures / "currency_ko.txt").read_text(encoding="utf-8")))
     assert not info.supported
     with pytest.raises(ValueError, match="지원하지 않습니다"):
         build_query(info, [])

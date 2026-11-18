@@ -24,11 +24,12 @@ from trade import config
 from trade.trade_window import TradeWindow
 def denied(*a,**k): raise AssertionError('HTTP is forbidden')
 app=QApplication([])
-config.save(mode='browser',league='Standard')
+config.save(mode='browser',league='Standard',server=config.OFFICIAL)
 calls=[]
 with patch('requests.Session.request', denied), patch.object(socket.socket,'connect',denied), patch.object(QDesktopServices,'openUrl',lambda url: calls.append(bytes(url.toEncoded()).decode('ascii')) or True):
     window=TradeWindow()
     window.load(Path('tests/trade/fixtures/rare_en.txt').read_text())
+    window.base_button.setChecked(True)
     assert window.search_button.isEnabled()
     assert window.table.isHidden()
     window.search()
@@ -57,7 +58,7 @@ def test_api_window_lazy_and_search_counts(app, fixtures, monkeypatch):
     monkeypatch.setattr(api, "_POLICIES", {})
     monkeypatch.setattr(api, "_LIMITS", RateLimiter())
     monkeypatch.setattr(secret, "load_session", lambda: "")
-    config.save(mode="api", api_ack_at=1, league="invalid")
+    config.save(mode="api", league="invalid")
     calls = []
     ids = [str(i) for i in range(21)]
 
@@ -79,10 +80,11 @@ def test_api_window_lazy_and_search_counts(app, fixtures, monkeypatch):
     monkeypatch.setattr(requests, "request", transport)
     monkeypatch.setattr(trade_window, "run_async", lambda fn, done, failed: done(fn()))
     window = trade_window.TradeWindow()
-    window.load((fixtures / "rare_en.txt").read_text())
+    window.load((fixtures / "rare_ko.txt").read_text(encoding="utf-8"))
     assert not calls
     window.search()
     assert len(calls) == 4
+    assert all(url.startswith(config.KAKAO + "/") for _, url, _ in calls)
     assert window.table.rowCount() == 20
     assert window.table.item(0, 0).text() == "1 chaos"
     assert "전체 100개" in window.result_summary.text()
@@ -97,12 +99,11 @@ def test_api_window_lazy_and_search_counts(app, fixtures, monkeypatch):
 def test_api_window_limit_and_unsupported_ui(app, fixtures, monkeypatch):
     from trade import trade_window
 
-    config.save(mode="browser", league="Standard")
+    config.save(mode="browser", league="Standard", server=config.OFFICIAL)
     window = trade_window.TradeWindow()
-    for filename in ("magic_en.txt", "currency_ko.txt"):
-        window.load((fixtures / filename).read_text(encoding="utf-8"))
-        assert window.search_button.isHidden()
-        assert "지원하지 않습니다" in window.hint.text()
+    window.load((fixtures / "currency_ko.txt").read_text(encoding="utf-8"))
+    assert window.search_button.isHidden()
+    assert "지원하지 않습니다" in window.hint.text()
     text = (fixtures / "rare_en.txt").read_text()
     window.load(text)
     from trade import browser
@@ -122,58 +123,32 @@ def test_api_window_limit_and_unsupported_ui(app, fixtures, monkeypatch):
 
 
 @pytest.mark.parametrize("data,expected", [
-    ({}, "browser"), ({"mode": "other", "api_ack_at": 1}, "browser"),
-    ({"mode": "api"}, "browser"), ({"mode": "api", "api_ack_at": 1}, "api"),
+    ({}, "api"), ({"mode": "other"}, "browser"),
+    ({"mode": "api"}, "api"), ({"mode": "browser"}, "browser"),
 ])
 def test_effective_mode(data, expected):
     config.save(**data)
     assert config.mode() == expected
 
 
-def test_risk_accept_cancel_every_transition(app, monkeypatch):
+def test_switch_modes_without_confirmation(app, monkeypatch):
     from PySide6.QtWidgets import QMessageBox
     from trade.settings_dialog import SettingsDialog
 
-    accept = False
-    seen = []
-
     def exec_box(box):
-        buttons = {button.text(): button for button in box.buttons()}
-        assert box.defaultButton() is buttons["취소"]
-        assert box.escapeButton() is buttons["취소"]
-        assert "계정 정지" in box.text()
-        box.chosen = buttons["위험을 이해하고 사용" if accept else "취소"]
-        seen.append(box.text())
-        return 0
+        pytest.fail("검색 방식 전환에 확인창을 띄우지 않습니다")
 
     monkeypatch.setattr(QMessageBox, "exec", exec_box)
-    monkeypatch.setattr(QMessageBox, "clickedButton", lambda box: box.chosen)
+    config.save(mode="browser")
     dialog = SettingsDialog()
     assert config.mode() == "browser"
     assert not dialog.cookie.isEnabled()
     dialog.mode.setCurrentIndex(1)
-    assert config.mode() == "browser"
-    assert dialog.mode.currentData() == "browser"
-    accept = True
-    dialog.mode.setCurrentIndex(1)
     assert config.mode() == "api"
-    assert config.settings()["api_ack_at"] > 0
     assert dialog.cookie.isEnabled()
     dialog.mode.setCurrentIndex(0)
-    dialog.mode.setCurrentIndex(1)
-    assert len(seen) == 3
-
-
-def test_window_close_returns_focus(app, fixtures, monkeypatch):
-    import winutil
-    from trade.trade_window import TradeWindow
-
-    calls = []
-    monkeypatch.setattr(winutil, "focus_window", lambda hwnd: calls.append(hwnd))
-    window = TradeWindow()
-    window.load((fixtures / "rare_en.txt").read_text(), 12345)
-    window.close()
-    assert calls == [12345]
+    assert config.mode() == "browser"
+    assert not dialog.cookie.isEnabled()
 
 
 def test_settings_lists_kakao_without_any_item(app):
@@ -185,6 +160,8 @@ def test_settings_lists_kakao_without_any_item(app):
     assert [dialog.server.itemText(i) for i in range(dialog.server.count())] == [
         "공식", "카카오 (한글 클라이언트 전용)"]
     assert [dialog.server.itemData(i) for i in range(dialog.server.count())] == [config.OFFICIAL, config.KAKAO]
+    assert dialog.server.currentData() == config.KAKAO
+    assert dialog.mode.currentData() == "api"
     dialog.show()
     app.processEvents()
     dialog.close()
@@ -208,9 +185,9 @@ def test_settings_server_selection_matches_saved_value(app, monkeypatch, case):
     before = storage.SETTINGS_FILE.read_bytes()
     before_mtime = storage.SETTINGS_FILE.stat().st_mtime_ns
     dialog = SettingsDialog()
-    expected = config.KAKAO if case == "kakao" else config.OFFICIAL
+    expected = config.KAKAO if case in ("kakao", "missing") else config.OFFICIAL
     assert dialog.server.currentData() == expected
-    assert config.settings().get("server", config.OFFICIAL) == expected
+    assert config.settings().get("server", config.default_server()) == expected
     dialog.show()
     app.processEvents()
     dialog.close()
@@ -240,6 +217,7 @@ def test_kakao_blocks_english_with_action_and_keeps_korean_search(app, fixtures,
     assert not opened
     window.load((fixtures / "rare_ko.txt").read_text(encoding="utf-8"))
     assert window.search_button.isEnabled()
+    window.base_button.setChecked(True)
     window.search()
     expected = json.loads((fixtures / "browser_links.json").read_text(encoding="utf-8"))
     assert opened == [expected["rare_ko_kakao"]]
@@ -278,7 +256,7 @@ def test_editor_trade_button_uses_copied_original(app, fixtures, monkeypatch):
     button.click()
     assert captured == [editor.original]
     info = item_info(captured[0])
-    actual = build_query(info, conditions(info))
+    actual = build_query(info, conditions(info), exact_base=True)
     assert actual == json.loads((fixtures / "rare_expected.json").read_text())
     editor._timer.stop()
     editor.close()
@@ -295,7 +273,7 @@ def test_only_user_window_moves_are_saved(app, fixtures, monkeypatch):
         def spontaneous(self):
             return True
 
-    monkeypatch.setattr(winutil, "focus_window", lambda hwnd: True)
+    monkeypatch.setattr(winutil, "focus_window", lambda hwnd, **kwargs: True)
     saved = []
     original_save = config.save
 

@@ -14,12 +14,14 @@ class Match:
     id: str = ""
     invert: bool = False
     reason: str = "거래소 옵션과 맞추지 못함"
+    alternate_id: str = ""
 
 
 class StatIndex:
     def __init__(self, data: dict):
         self.entries = data["entries"]
         self.groups = data["groups"]
+        self.influences = data["influences"]
         self.by_skeleton: dict[str, list[dict]] = {}
         self.by_group: dict[int, list[int]] = {}
         for i, entry in enumerate(self.entries):
@@ -55,7 +57,10 @@ class StatIndex:
         ids = self.entries[number]["ids"].get(kind, [])
         if len(ids) != 1 or not ids[0].startswith(kind + ".") or len(signs) != 1:
             return Match(reason="후보가 여러 개" if len(ids) > 1 or len(signs) > 1 else "거래소 옵션과 맞추지 못함")
-        return Match(ids[0], signs.pop(), "")
+        other = {"explicit": "fractured", "fractured": "explicit"}.get(kind)
+        alternate = self.entries[number]["ids"].get(other, []) if other else []
+        alternate_id = alternate[0] if len(alternate) == 1 and alternate[0].startswith(other + ".") else ""
+        return Match(ids[0], signs.pop(), "", alternate_id)
 
 
 @lru_cache(maxsize=1)

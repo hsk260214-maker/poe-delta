@@ -3,8 +3,9 @@ from __future__ import annotations
 
 import math
 import time
+from uuid import uuid4
 
-from PySide6.QtCore import QLocale, Qt, QTimer
+from PySide6.QtCore import QEvent, QLocale, Qt, QTimer
 from PySide6.QtGui import QCursor, QDoubleValidator, QGuiApplication, QKeySequence, QShortcut
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QHBoxLayout, QHeaderView, QLabel,
                                QLineEdit, QPushButton, QScrollArea, QTableWidget,
@@ -14,19 +15,22 @@ import winutil
 from asyncjob import run_async
 from itemmodel import ItemModel, parse
 from theme import build_qss
-from trade import browser, config
-from trade.query import build_query, conditions, item_info, league_for, result_rows, summary
+from trade import browser, config, focus_log
+from trade.query import INFLUENCE_LABELS, build_query, conditions, item_info, league_for, result_rows, summary
 
 
 class TradeWindow(QWidget):
     def __init__(self, source_fn=lambda: None):
         super().__init__(None, Qt.WindowType.Window | Qt.WindowType.WindowStaysOnTopHint)
+        self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating)
         self.setWindowTitle("거래소 시세 검색")
         self.setStyleSheet(build_qss())
         self.resize(760, 680)
         self.source_fn = source_fn
         self.model = None
         self._prev_fg = 0
+        self._open_id = ""
+        self._close_intent = None
         self._busy = False
         self._generation = 0
         self._until = 0.0
@@ -35,10 +39,14 @@ class TradeWindow(QWidget):
         self._result_link = ""
         self.stats = []
         self.inputs = []
+        self.influence_inputs = {}
         layout = QVBoxLayout(self)
         self.title = QLabel()
         self.title.setTextFormat(Qt.TextFormat.PlainText)
         layout.addWidget(self.title)
+        self.focus_hint = QLabel("거래소 창을 클릭하면 입력할 수 있습니다")
+        self.focus_hint.hide()
+        layout.addWidget(self.focus_hint)
         self.mode_label = QLabel()
         layout.addWidget(self.mode_label)
         self.league = QComboBox()
@@ -50,6 +58,11 @@ class TradeWindow(QWidget):
         self.ilvl = QCheckBox("아이템 레벨")
         self.links = QCheckBox("링크")
         self.corrupted = QCheckBox("타락 여부")
+        self.base_button = QPushButton("정확한 베이스")
+        self.base_button.setCheckable(True)
+        self.base_button.hide()
+        self.base_button.toggled.connect(self._validate)
+        header.addWidget(self.base_button)
         for widget in (self.ilvl, self.links, self.corrupted):
             header.addWidget(widget)
             widget.toggled.connect(self._validate)
@@ -82,11 +95,11 @@ class TradeWindow(QWidget):
         self.open_button = QPushButton("거래소에서 열기")
         self.open_button.clicked.connect(lambda: self._result_link and browser.open_url(self._result_link))
         close = QPushButton("닫기")
-        close.clicked.connect(self.close)
+        close.clicked.connect(lambda: self._request_close("button"))
         for widget in (self.search_button, self.open_button, close):
             footer.addWidget(widget)
         layout.addLayout(footer)
-        QShortcut(QKeySequence("Esc"), self, activated=self.close)
+        QShortcut(QKeySequence("Esc"), self, activated=self._close_on_escape)
         QShortcut(QKeySequence("Return"), self, activated=self.search)
         QShortcut(QKeySequence("Enter"), self, activated=self.search)
         self.league.currentTextChanged.connect(self._league_changed)
@@ -102,7 +115,7 @@ class TradeWindow(QWidget):
         self.model = parse(item) if isinstance(item, str) else item
         self._prev_fg = hwnd
         trade = config.settings()
-        self.server = trade.get("server", config.OFFICIAL)
+        self.server = trade.get("server", config.default_server())
         self.current_mode = config.mode()
         self._error = ""
         try:
@@ -125,18 +138,48 @@ class TradeWindow(QWidget):
         self.league.setEditText(league_for(self.source_fn(), trade.get("league", "")))
         self.league.blockSignals(False)
         self.ilvl.setChecked(False)
-        self.ilvl.setVisible(self.info.rarity == "Rare")
+        self.ilvl.setVisible(self.info.rarity == "Rare" and self.info.identity is None)
         self.ilvl.setText(f"아이템 레벨 ≥ {self.info.ilvl}")
         self.links.setChecked(self.info.links >= 5)
         self.links.setVisible(self.info.links >= 5)
         self.links.setText(f"링크 ≥ {self.info.links}")
         self.corrupted.setChecked(True)
         self.corrupted.setText("타락" if self.info.corrupted else "타락 아님")
+        self.base_button.setChecked(False)
+        self.base_button.setVisible(bool(self.info.supported and self.info.equipment_category))
         self.stats = conditions(self.info, trade.get("min_ratio", 0.9)) if self.info.supported else []
         self.inputs = []
+        self.influence_inputs = {}
         while self.stat_layout.count():
             widget = self.stat_layout.takeAt(0).widget()
+            widget.hide()
+            widget.setParent(None)
             widget.deleteLater()
+        if self.info.influences or self.info.eldritch_sources:
+            influence_box = QWidget()
+            influence_row = QHBoxLayout(influence_box)
+            influence_row.addWidget(QLabel("영향력"))
+            for name in self.info.influences:
+                check = QCheckBox(INFLUENCE_LABELS[name])
+                check.setChecked(True)
+                check.toggled.connect(self._validate)
+                self.influence_inputs[name] = check
+                influence_row.addWidget(check)
+            influence_row.addStretch(1)
+            self.stat_layout.addWidget(influence_box)
+            if self.info.eldritch_sources:
+                self.stat_layout.addWidget(QLabel("섬뜩한 영향력: " + " · ".join(self.info.eldritch_sources)))
+        sections = {}
+        for implicit, title in ((True, "고정 옵션"), (False, "일반 및 기타 옵션")):
+            if any((condition.kind == "implicit") == implicit for condition in self.stats):
+                section = QWidget()
+                section.setObjectName("implicitOptions" if implicit else "explicitOptions")
+                section_layout = QVBoxLayout(section)
+                heading = QLabel(title)
+                heading.setObjectName("SectionLabel")
+                section_layout.addWidget(heading)
+                self.stat_layout.addWidget(section)
+                sections[implicit] = section_layout
         for condition in self.stats:
             row = QWidget()
             form = QHBoxLayout(row)
@@ -145,7 +188,7 @@ class TradeWindow(QWidget):
             check.setEnabled(bool(condition.match.id))
             check.setToolTip(condition.match.reason)
             check.setMinimumWidth(350)
-            badge = QLabel(condition.kind)
+            badge = QLabel(condition.badge)
             minimum, maximum = QLineEdit(), QLineEdit()
             for box, value, placeholder in ((minimum, condition.minimum, "최소"), (maximum, condition.maximum, "최대")):
                 validator = QDoubleValidator(box)
@@ -161,12 +204,24 @@ class TradeWindow(QWidget):
                 row.setToolTip(condition.match.reason)
             form.addWidget(check, 1)
             form.addWidget(badge)
+            if condition.kind in ("explicit", "fractured"):
+                switch = QPushButton("종류 전환")
+                switch.setEnabled(bool(condition.match.alternate_id))
+                if not condition.match.alternate_id:
+                    switch.setToolTip("같은 옵션에 대응하는 일반·분열 ID가 모두 있어야 합니다")
+                switch.clicked.connect(lambda _, c=condition, b=badge: self._switch_kind(c, b))
+                form.addWidget(switch)
             form.addWidget(minimum)
             form.addWidget(maximum)
             check.toggled.connect(self._validate)
-            self.stat_layout.addWidget(row)
+            sections[condition.kind == "implicit"].addWidget(row)
             self.inputs.append((check, minimum, maximum))
         self.search_button.setVisible(self.info.supported)
+        self._validate()
+
+    def _switch_kind(self, condition, badge) -> None:
+        condition.switch_kind()
+        badge.setText(condition.badge)
         self._validate()
 
     def _query(self) -> dict:
@@ -181,7 +236,9 @@ class TradeWindow(QWidget):
             if condition.minimum is not None and condition.maximum is not None and condition.minimum > condition.maximum:
                 raise ValueError("최소값은 최대값보다 클 수 없습니다")
         return build_query(self.info, self.stats, ilvl=self.ilvl.isChecked(),
-                           links=self.links.isChecked(), corrupted=self.corrupted.isChecked())
+                           links=self.links.isChecked(), corrupted=self.corrupted.isChecked(),
+                           exact_base=self.base_button.isChecked(),
+                           influences={name for name, check in self.influence_inputs.items() if check.isChecked()})
 
     def _validate(self) -> None:
         if not hasattr(self, "info"):
@@ -269,6 +326,9 @@ class TradeWindow(QWidget):
         self._job = run_async(work, complete, failed)
 
     def show_item(self, item, hwnd: int = 0) -> None:
+        self._open_id = uuid4().hex
+        self._close_intent = None
+        self.focus_hint.hide()
         if self._position_timer.isActive():
             self._save_position()
         self.load(item, hwnd)
@@ -286,10 +346,32 @@ class TradeWindow(QWidget):
                   max(available.top(), min(y, available.bottom() - self.height() + 1)))
         self.show()
         self._placing = False
-        winutil.focus_window(int(self.winId()))
-        self.raise_()
-        self.activateWindow()
-        self.league.setFocus()
+        own = int(self.winId())
+        activated = winutil.focus_window(own, allow_alt_fallback=False)
+        foreground = winutil.foreground_window()
+        success = activated and foreground == own
+        if success:
+            self.league.setFocus()
+        else:
+            self.focus_hint.show()
+        focus_log.record(self._open_id, "open", winutil.foreground_category(foreground),
+                         activation="success" if success else "denied")
+
+    def changeEvent(self, event) -> None:
+        super().changeEvent(event)
+        if event.type() == QEvent.Type.ActivationChange and self.isActiveWindow():
+            self.focus_hint.hide()
+
+    def _close_on_escape(self) -> None:
+        if self.isActiveWindow():
+            self._request_close("esc")
+
+    def _request_close(self, source: str) -> None:
+        self._close_intent = source
+        try:
+            self.close()
+        finally:
+            self._close_intent = None
 
     def moveEvent(self, event) -> None:
         if self.isVisible() and not self._placing and event.spontaneous():
@@ -301,8 +383,34 @@ class TradeWindow(QWidget):
         config.save(window={"x": self.x(), "y": self.y()})
 
     def closeEvent(self, event) -> None:
-        if self._position_timer.isActive():
-            self._save_position()
-        if self._prev_fg:
-            winutil.focus_window(self._prev_fg)
-        super().closeEvent(event)
+        try:
+            foreground = winutil.foreground_window()
+            was_foreground = self.isVisible() and foreground == int(self.winId())
+            source = self._close_intent or ("system" if event.spontaneous() else "code")
+            open_id, game = self._open_id, self._prev_fg
+            if open_id:
+                focus_log.record(open_id, "close", winutil.foreground_category(foreground),
+                                 source=source, was_foreground=was_foreground)
+            if self._position_timer.isActive():
+                self._save_position()
+            super().closeEvent(event)
+            if open_id and event.isAccepted() and was_foreground and source != "code":
+                QTimer.singleShot(0, self, lambda: self._restore_after_close(open_id, game))
+        finally:
+            self._close_intent = None
+
+    def _restore_after_close(self, open_id: str, game: int) -> None:
+        if self._open_id != open_id or self.isVisible():
+            return
+        foreground = winutil.foreground_window()
+        category = winutil.foreground_category(foreground)
+        if game and foreground == game:
+            result = "game_already_foreground"
+        elif not winutil.window_exists(game):
+            result = "invalid_game"
+        elif category != "poe_delta":
+            result = "unrelated_foreground"
+        else:
+            result = ("restored" if winutil.focus_window(game, allow_alt_fallback=False)
+                      and winutil.foreground_window() == game else "denied")
+        focus_log.record(open_id, "after_hide", category, result=result)
