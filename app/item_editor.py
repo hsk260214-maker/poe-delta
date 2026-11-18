@@ -7,9 +7,8 @@ from __future__ import annotations
 import copy
 import html
 import re
-import sys
 
-from PySide6.QtCore import QPoint, QRect, QSize, Qt, QTimer
+from PySide6.QtCore import QPoint, QRect, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QCursor, QDoubleValidator, QGuiApplication, QKeySequence, QShortcut
 from PySide6.QtWidgets import (
     QCheckBox,
@@ -29,6 +28,7 @@ from PySide6.QtWidgets import (
 
 from itemmodel import ItemModel, Mod, badge, cat_scalar, compose_en, get_quality, scale_numbers, set_quality
 from overlay import COL, DIM, SPIN, Overlay
+from winutil import send_copy_to, foreground_other, focus_window, key_down, press_ctrl_c
 
 NUM_RE = re.compile(r"\d+(?:\.\d+)?")  # 부호(+/-)는 글자로 남기고 숫자만 입력칸
 RANGE_RE = re.compile(r"\((-?\d+(?:\.\d+)?)-(-?\d+(?:\.\d+)?)\)")
@@ -42,34 +42,6 @@ FLAG_KO = {"Corrupted": "타락", "Searing Exarch Item": "작열의 총주교", 
            "전쟁군주 아이템": "전쟁군주", "결합된 아이템": "결합된", "분열된 아이템": "분열된"}
 FLAG_COLOR = {"타락": "#e0644c", "작열의 총주교": "#e8a25a", "세계 포식자": "#9fb5ff"}
 SUB_COLOR = {"exarch": "#e8a25a", "eater": "#9fb5ff", "eldritch": "#c8a96a", "corrupted": "#e0644c"}
-
-
-def _send_copy_to(hwnd: int) -> bool:
-    """hwnd(게임 창)를 앞으로 돌리고 Ctrl+C 를 보낸다. Windows 전용."""
-    if sys.platform != "win32" or not hwnd:
-        return False
-    try:
-        import ctypes
-
-        user32 = ctypes.windll.user32
-        if not user32.IsWindow(hwnd):
-            return False
-        import os
-
-        pid = ctypes.c_ulong(0)
-        user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
-        if pid.value == os.getpid():
-            return False  # 이 프로그램 창이면 넘기지 않음 (프로그램 안에서 연 경우)
-        kernel32 = ctypes.windll.kernel32
-        my_tid = kernel32.GetCurrentThreadId()
-        tid = user32.GetWindowThreadProcessId(hwnd, None)
-        attached = tid and tid != my_tid and user32.AttachThreadInput(my_tid, tid, True)
-        user32.SetForegroundWindow(hwnd)
-        if attached:
-            user32.AttachThreadInput(my_tid, tid, False)
-        return True
-    except Exception:  # noqa: BLE001
-        return False
 
 
 class _VGrip(QWidget):
@@ -113,85 +85,6 @@ class _VGrip(QWidget):
             s = load_settings()
             s["editor_extra_h"] = self.win._extra_h
             save_settings(s)
-
-
-def _foreground_other() -> int:
-    """지금 앞에 있는 창이 다른 프로그램(게임)이면 그 hwnd, 아니면 0."""
-    if sys.platform != "win32":
-        return 0
-    try:
-        import ctypes
-        import os
-
-        user32 = ctypes.windll.user32
-        fg = user32.GetForegroundWindow()
-        pid = ctypes.c_ulong(0)
-        user32.GetWindowThreadProcessId(fg, ctypes.byref(pid))
-        return fg if fg and pid.value != os.getpid() else 0
-    except Exception:  # noqa: BLE001
-        return 0
-
-
-def _focus_window(hwnd: int) -> bool:
-    """hwnd 창을 맨 앞 + 키보드 포커스로. 다른 프로그램(게임)이 앞에 있어도 되게 그 창의 입력 스레드에 잠깐 붙어서 넘김."""
-    if sys.platform != "win32" or not hwnd:
-        return False
-    try:
-        import ctypes
-
-        user32 = ctypes.windll.user32
-        if not user32.IsWindow(hwnd):
-            return False
-        my_tid = ctypes.windll.kernel32.GetCurrentThreadId()
-        fg = user32.GetForegroundWindow()
-        if fg == hwnd:
-            return True
-        fg_tid = user32.GetWindowThreadProcessId(fg, None) if fg else 0
-        attached = bool(fg_tid and fg_tid != my_tid and user32.AttachThreadInput(my_tid, fg_tid, True))
-        try:
-            user32.BringWindowToTop(hwnd)
-            ok = bool(user32.SetForegroundWindow(hwnd)) and user32.GetForegroundWindow() == hwnd
-            if not ok:
-                # 포그라운드 잠금 풀기: 이 프로그램이 마지막 입력을 보낸 것으로 만들어야 넘겨줌 (Alt 한 번 톡)
-                # (게임이 관리자 권한이면 이것도 막힘 → 이 프로그램도 관리자 권한으로 켜야 함)
-                kb = user32.keybd_event
-                kb(0x12, 0, 0x0001, 0)
-                kb(0x12, 0, 0x0001 | 0x0002, 0)
-                ok = bool(user32.SetForegroundWindow(hwnd)) and user32.GetForegroundWindow() == hwnd
-        finally:
-            if attached:
-                user32.AttachThreadInput(my_tid, fg_tid, False)
-        return ok
-    except Exception:  # noqa: BLE001
-        return False
-
-
-def _key_down(vk: int) -> bool:
-    if sys.platform != "win32":
-        return False
-    try:
-        import ctypes
-
-        # 0x8000 = 지금 눌림, 0x0001 = 지난 확인 이후 눌린 적 있음 (짧게 톡 누른 것도 잡기)
-        return bool(ctypes.windll.user32.GetAsyncKeyState(vk) & 0x8001)
-    except Exception:  # noqa: BLE001
-        return False
-
-
-def _press_ctrl_c() -> None:
-    if sys.platform != "win32":
-        return
-    try:
-        import ctypes
-
-        kb = ctypes.windll.user32.keybd_event
-        VK_CONTROL, VK_C, UP = 0x11, 0x43, 0x0002
-        kb(VK_CONTROL, 0x1D, 0, 0)
-        kb(VK_C, 0x2E, 0, 0)
-        kb(VK_C, 0x2E, UP, 0)
-        kb(VK_CONTROL, 0x1D, UP, 0)
-    except Exception:  # noqa: BLE001
-        pass
 
 
 class _Drag(QFrame):
@@ -393,6 +286,8 @@ class ModRow(QFrame):
 
 class ItemEditor(QWidget):
     """게임에서 Ctrl+C → 이 창이 뜬다 (자동으로 닫히지 않음, Esc / ✕ 로 닫기). 창 하나를 재사용."""
+
+    tradeRequested = Signal(object, object)
 
     def __init__(self, db, char_page):
         super().__init__(None)
@@ -614,6 +509,10 @@ class ItemEditor(QWidget):
         tip.setStyleSheet(f"color: {DIM}; font-size: 9.5pt;")
         foot.addWidget(tip)
         foot.addStretch(1)
+        trade = QPushButton("거래소 검색")
+        trade.clicked.connect(lambda: self.original is not None and self.tradeRequested.emit(
+            self.original, getattr(self, "_prev_fg", 0)))
+        foot.addWidget(trade)
         close2 = QPushButton("닫기")
         close2.setObjectName("SmallClose")
         close2.setToolTip("닫기 (Esc)")
@@ -849,14 +748,14 @@ class ItemEditor(QWidget):
         표시, 게임에 Ctrl+C 를 넘김 → 새 아이템이 오면 내용이 바뀜. 안 오면 원래대로 + 안내."""
         if self.frameGeometry().contains(QCursor.pos()):
             return  # 커서가 이 창 위 → 복사할 게임 아이템 없음
-        if not _send_copy_to(getattr(self, "_prev_fg", 0)):
+        if not send_copy_to(getattr(self, "_prev_fg", 0)):
             return
         loads = self._loads
         self._token += 1  # 계산 중이던 결과는 무시
         self._spin.stop()
         self._wait.stop()
         self.result.setText(f"<span style='color:#c8a96a'>◐</span> <span style='color:{DIM}'>게임에서 새 아이템 불러오는 중…</span>")
-        QTimer.singleShot(150, _press_ctrl_c)
+        QTimer.singleShot(150, press_ctrl_c)
 
         def check():
             if self._loads == loads and self.model is not None:
@@ -1134,7 +1033,7 @@ class ItemEditor(QWidget):
         """처음엔 커서 근처, 이후엔 사용자가 옮겨 둔 자리 그대로.
         뜰 때 포커스를 가져옴 → Esc 가 게임으로 안 가고 이 창이 닫힘, 닫히면 포커스는 게임으로 돌려줌.
         이 창에 포커스가 있어도 게임 아이템 위 Ctrl+C 는 게임으로 넘겨서(_forward_copy) 다음 아이템을 바로 볼 수 있음."""
-        fg = _foreground_other()
+        fg = foreground_other()
         if fg:
             self._prev_fg = fg
         elif not (self.isVisible() and self.isActiveWindow()):
@@ -1165,14 +1064,14 @@ class ItemEditor(QWidget):
     def _grab_focus(self) -> None:
         if not self.isVisible():
             return
-        _focus_window(int(self.winId()))
+        focus_window(int(self.winId()))
         self.raise_()
         self.activateWindow()
 
     def hideEvent(self, e):
         # 이 창이 포커스를 쥔 채 닫히면 게임으로 돌려줌 (Esc 누르고 바로 게임 조작)
         if self.isActiveWindow() and getattr(self, "_prev_fg", 0):
-            _focus_window(self._prev_fg)
+            focus_window(self._prev_fg)
         self._esc_timer.stop()
         if self.equip_panel is not None:
             self.equip_panel.hide()
@@ -1184,7 +1083,7 @@ class ItemEditor(QWidget):
         """게임이 포커스를 쥐고 있을 때도 Esc 로 닫기 (이 창에 포커스가 있으면 단축키가 처리)."""
         if not self.isVisible() or self.isActiveWindow():
             return
-        down = _key_down(0x1B)
+        down = key_down(0x1B)
         if down and not self._esc_down:
             self.close()
         self._esc_down = down

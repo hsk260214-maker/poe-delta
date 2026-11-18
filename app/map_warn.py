@@ -141,9 +141,9 @@ class MapWarn(QWidget):
             g = screen.availableGeometry()
             x = min(max(g.left(), pos.x() - self.width() // 2), g.right() - self.width())
             y = min(max(g.top(), pos.y() - 40), g.bottom() - self.height() - 40)
-        from item_editor import _foreground_other
+        from winutil import foreground_other
 
-        fg = _foreground_other()
+        fg = foreground_other()
         if fg:
             self._prev_fg = fg
         elif not (self.isVisible() and self.isActiveWindow()):
@@ -156,36 +156,36 @@ class MapWarn(QWidget):
 
     def _grab_focus(self) -> None:
         """뜰 때 포커스를 가져와서 Esc 가 게임으로 안 가고 이 창이 닫히게."""
-        from item_editor import _focus_window
+        from winutil import focus_window
 
         if not self.isVisible():
             return
-        _focus_window(int(self.winId()))
+        focus_window(int(self.winId()))
         self.raise_()
         self.activateWindow()
 
     def hideEvent(self, e):
-        from item_editor import _focus_window
+        from winutil import focus_window
 
         if self.isActiveWindow() and getattr(self, "_prev_fg", 0):
-            _focus_window(self._prev_fg)  # 닫히면 게임으로 돌려줌
+            focus_window(self._prev_fg)  # 닫히면 게임으로 돌려줌
         self._esc_timer.stop()
         super().hideEvent(e)
 
     def _forward_copy(self) -> None:
-        from item_editor import _press_ctrl_c, _send_copy_to
+        from winutil import press_ctrl_c, send_copy_to
 
         if self.frameGeometry().contains(QCursor.pos()):
             return  # 커서가 이 창 위 → 복사할 게임 아이템 없음
-        if _send_copy_to(self._prev_fg):
-            QTimer.singleShot(150, _press_ctrl_c)
+        if send_copy_to(self._prev_fg):
+            QTimer.singleShot(150, press_ctrl_c)
 
     def _poll_esc(self) -> None:
-        from item_editor import _key_down
+        from winutil import key_down
 
         if not self.isVisible():
             return
-        down = _key_down(0x1B)
+        down = key_down(0x1B)
         if down and not self._esc_down:
             self.close()
         self._esc_down = down

@@ -239,15 +239,18 @@ def build_ko_en(refresh: bool) -> None:
 APT = "https://raw.githubusercontent.com/SnosMe/awakened-poe-trade/master/renderer/public/data/"
 
 
-def apt_ndjson(path: str, refresh: bool) -> list[dict]:
+def apt_ndjson(path: str, refresh: bool, base: str = APT, flatten: bool = True) -> list[dict]:
     """Awakened PoE Trade (MIT) 데이터. 묶음 줄({"stats": [...]}) 은 펼친다."""
-    cp = CACHE / ("apt_" + path.replace("/", "_"))
-    download(APT + path, cp, refresh)
+    import hashlib
+
+    prefix = "" if base == APT else hashlib.sha256(base.encode("utf-8")).hexdigest()[:16] + "_"
+    cp = CACHE / ("apt_" + prefix + path.replace("/", "_"))
+    download(base + path, cp, refresh)
     out = []
     for line in cp.read_text(encoding="utf-8").splitlines():
         if line.strip():
             x = json.loads(line)
-            out.extend(x["stats"] if "stats" in x else [x])
+            out.extend(x["stats"] if flatten and "stats" in x else [x])
     return out
 
 

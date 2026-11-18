@@ -1,0 +1,6 @@
+[
+  {"headers":{"X-Rate-Limit-Policy":"search","X-Rate-Limit-Rules":"ip","X-Rate-Limit-Ip":"4:10:20","X-Rate-Limit-Ip-State":"1:10:0"},"status":200,"wait":0},
+  {"headers":{"X-Rate-Limit-Policy":"search","X-Rate-Limit-Rules":"ip","X-Rate-Limit-Ip":"4:10:20","X-Rate-Limit-Ip-State":"4:10:0"},"status":200,"wait":10},
+  {"headers":{"X-Rate-Limit-Policy":"fetch","X-Rate-Limit-Rules":"ip","X-Rate-Limit-Ip":"4:10:20","X-Rate-Limit-Ip-State":"1:10:25"},"status":200,"wait":25},
+  {"headers":{"X-Rate-Limit-Policy":"fetch","Retry-After":"12"},"status":429,"wait":12}
+]

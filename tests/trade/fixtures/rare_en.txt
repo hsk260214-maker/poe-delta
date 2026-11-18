@@ -1,0 +1,20 @@
+Item Class: Body Armours
+Rarity: Rare
+Doom Shell
+Astral Plate
+--------
+Armour: 1000
+Sockets: R-R-R-R-R-R
+--------
+Item Level: 86
+--------
++12% to Fire Resistance (implicit)
+--------
++100 to Armour
++100 to maximum Life
++40% to Fire Resistance (fractured)
+30% increased Movement Speed
+10% increased Attack Speed
++20 to maximum Life (crafted)
+--------
+Corrupted

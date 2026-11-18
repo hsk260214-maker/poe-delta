@@ -35,31 +35,14 @@ PAUSE_UNTIL = 0.0  # 429 를 받으면 이 시각까지 요청 안 함
 
 def _note_rate(r: requests.Response) -> None:
     import time
+    from ratelimit import parse_headers
 
     global PAUSE_UNTIL
-    pol = r.headers.get("X-Rate-Limit-Policy")
-    for rule in (r.headers.get("X-Rate-Limit-Rules") or "").split(","):
-        rule = rule.strip()
-        lim, st = r.headers.get(f"X-Rate-Limit-{rule}"), r.headers.get(f"X-Rate-Limit-{rule}-State")
-        if not (pol and lim and st):
-            continue
-        try:
-            rows = []
-            for a, b in zip(lim.split(","), st.split(",")):
-                mx, per, _pen = (int(x) for x in a.split(":"))
-                hits, _per, restricted = (int(x) for x in b.split(":"))
-                rows.append((hits, mx, per))
-                if restricted > 0:
-                    PAUSE_UNTIL = max(PAUSE_UNTIL, time.time() + restricted)
-            RL[pol] = (time.time(), rows)
-        except ValueError:
-            pass
-    if r.status_code == 429:
-        try:
-            wait = int(r.headers.get("Retry-After") or 60)
-        except ValueError:
-            wait = 60
-        PAUSE_UNTIL = max(PAUSE_UNTIL, time.time() + wait)
+    now = time.time()
+    note = parse_headers(r.headers, r.status_code, now)
+    if note.policy and note.rows:
+        RL[note.policy] = (now, note.rows)
+    PAUSE_UNTIL = max(PAUSE_UNTIL, note.restricted_until)
 
 
 def budget_note() -> str | None:

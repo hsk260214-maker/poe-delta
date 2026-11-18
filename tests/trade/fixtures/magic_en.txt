@@ -1,0 +1,7 @@
+Item Class: Rings
+Rarity: Magic
+Healthy Gold Ring
+--------
+Item Level: 50
+--------
++30 to maximum Life

@@ -41,6 +41,8 @@ def main() -> int:
     from storage import load_settings, save_settings
     from theme import build_qss
     from titlebar import TitleBar
+    from trade.hotkey import TradeHotkey
+    from trade.trade_window import TradeWindow
 
     class MainWindow(QWidget):
         def __init__(self, db: ModDB):
@@ -137,6 +139,8 @@ def main() -> int:
             self.overlay.editRequested.connect(self._open_editor)
             self.editor_win: ItemEditor | None = None
             self._last_model = None
+            self.trade_win = TradeWindow(lambda: (self.char_page._cur() or {}).get("source"))
+            self.trade_hotkey = TradeHotkey(self, self.flash)
             self.watch_clipboard = bool(self.settings.get("watch_clipboard", True))
             QApplication.clipboard().dataChanged.connect(self._on_clipboard)
             # 한글→영문 사전(약 1초)을 미리 백그라운드로 읽어 첫 Ctrl+C 지연 방지
@@ -145,8 +149,7 @@ def main() -> int:
             import ko2en
             threading.Thread(target=ko2en.preload, daemon=True).start()
             # 옵션 조정 창도 미리 만들어 둠 (첫 Ctrl+C 때 창 생성 지연 방지)
-            QTimer.singleShot(3000, lambda: self.editor_win or setattr(
-                self, "editor_win", ItemEditor(self.db, self.char_page)))
+            QTimer.singleShot(3000, self._ensure_editor)
 
             self.set_section(int(self.settings.get("section", 0)))
             self._cursor_timer = QTimer(self, interval=50, timeout=self._poll_edge_cursor)
@@ -213,6 +216,7 @@ def main() -> int:
             act.setCheckable(True)
             act.setChecked(self.watch_clipboard)
             act.toggled.connect(self._set_watch)
+            self.menu.addAction("거래소 설정", self._trade_settings)
             self.menu.addSeparator()
             from version import VERSION
 
@@ -237,13 +241,29 @@ def main() -> int:
                 if getattr(self, "map_warn", None) is not None:
                     self.map_warn.hide()
 
+        def _ensure_editor(self) -> None:
+            if self.editor_win is None:
+                self.editor_win = ItemEditor(self.db, self.char_page)
+                self.editor_win.tradeRequested.connect(self._show_trade)
+
+        def _show_trade(self, item, hwnd=0) -> None:
+            self.trade_win.show_item(item, hwnd)
+
+        def _trade_settings(self) -> None:
+            from trade.settings_dialog import SettingsDialog
+
+            model = self.trade_win.model or (self._last_model[0] if self._last_model else None)
+            SettingsDialog(self, model.lang if model else "en").exec()
+            self.trade_hotkey.poll()
+            if self.trade_win.model is not None:
+                self.trade_win.load(self.trade_win.model, self.trade_win._prev_fg)
+
         def _open_editor(self) -> None:
             if not self._last_model or self._last_model[0] is None:
                 return
             model, slot = self._last_model
             self.overlay.hide()
-            if self.editor_win is None:
-                self.editor_win = ItemEditor(self.db, self.char_page)
+            self._ensure_editor()
             try:
                 self.editor_win.load(model, slot)
             except Exception as ex:  # noqa: BLE001
@@ -293,14 +313,21 @@ def main() -> int:
             return True
 
         # ---------- 클립보드 → 옵션 조정 창 ----------
-        def _on_clipboard(self, attempt: int = 0) -> None:
+        def _on_clipboard(self, attempt: int = 0, destination=None) -> None:
             """게임에서 Ctrl+C → 옵션 조정 창(장착 시 DPS/EHP 변화)을 바로 띄운다."""
-            if not self.watch_clipboard:
-                return
+            if attempt == 0:
+                live, hwnd = self.trade_hotkey.pending.consume()
+                destination = ("trade", hwnd) if live else ("existing", 0)
+                if not live and not self.watch_clipboard:
+                    return
             text = QApplication.clipboard().text()
             if not text.strip() and attempt < 5:
                 # 게임이 아직 클립보드를 잡고 있으면 빈 값이 옴 → 조금 뒤 다시 읽기 (첫 Ctrl+C 가 씹히던 문제)
-                QTimer.singleShot((60, 120, 250, 400, 700)[attempt], lambda: self._on_clipboard(attempt + 1))
+                QTimer.singleShot((60, 120, 250, 400, 700)[attempt], lambda: self._on_clipboard(attempt + 1, destination))
+                return
+            if destination[0] == "trade":
+                if text.strip():
+                    self._show_trade(text, destination[1])
                 return
             if self._show_map(text):
                 return
@@ -373,6 +400,8 @@ def main() -> int:
             except OSError:
                 pass
             self.filter_page.save_now()
+            self.trade_hotkey.stop()
+            self.trade_win.close()
             self.overlay.close()
             if self.editor_win is not None:
                 self.editor_win.close()

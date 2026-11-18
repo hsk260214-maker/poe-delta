@@ -1,0 +1,8 @@
+Item Class: Helmets
+Rarity: Unique
+Goldrim
+Leather Cap
+--------
+Item Level: 75
+--------
++30 to maximum Life

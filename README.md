@@ -99,7 +99,7 @@ powershell -ExecutionPolicy Bypass -File .\build.ps1 -NoRun  # dist\ExileDelta.e
 
 - [Path of Building Community](https://github.com/PathOfBuildingCommunity/PathOfBuilding) (MIT): DPS/EHP 계산은 전부 이걸로 합니다. 프로그램에 넣어서 배포하지 않고, 실행할 때 공식 릴리스를 받아서 써요.
 - [RePoE fork](https://repoe-fork.github.io/): 아이템 옵션, 영문/한글 문장 데이터
-- [Awakened PoE Trade](https://github.com/SnosMe/awakened-poe-trade) (MIT): 한글 클라이언트 문장이랑 이름 데이터 보충
+- [Awakened PoE Trade](https://github.com/SnosMe/awakened-poe-trade) (MIT): 한글 클라이언트 문장이랑 이름 데이터 보충, 오프라인 거래소 stat 데이터 (`803d188d1359c4d5b1e3826da5dc680ea74a158f`, `data/LICENSE-awakened-poe-trade.txt`)
 - [PySide6](https://doc.qt.io/qtforpython/), [lupa](https://github.com/scoder/lupa), [requests](https://github.com/psf/requests)
 
 ## 라이선스
