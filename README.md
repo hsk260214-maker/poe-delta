@@ -1,3 +1,7 @@
+> **POE Delta (커스텀판)** — 이 저장소는 Exile Delta에 거래소 시세 검색(`Ctrl+D`)을 더한 커스텀판입니다.
+> 설치와 사용법은 **[docs/INSTALL.md](docs/INSTALL.md)**를 보세요. 받을 파일은 `PoeDelta-버전.zip`, 실행 파일은 `PoeDelta.exe`, 데이터 폴더는 `%APPDATA%\PoeDelta`·`%LOCALAPPDATA%\PoeDelta`입니다.
+> 아래는 원본 Exile Delta의 설명입니다(파일·폴더 이름은 원본 기준).
+
 # Exile Delta
 
 POE1 하다가 템 하나 주울 때마다 PoB 켜서 붙여넣고 비교하는 게 너무 귀찮아서 만든 프로그램입니다.
