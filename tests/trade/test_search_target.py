@@ -1,5 +1,5 @@
 import pytest
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QPoint, Qt
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QLabel, QScrollArea
 
@@ -52,6 +52,23 @@ def test_nightmare_map_title_matches_exact_payload(app, fixtures):
     window.close()
 
 
+def test_trade_window_keeps_copied_option_order_including_unmatched_rows(app):
+    config.save(server=config.KAKAO, mode="api", league="Standard")
+    window = TradeWindow()
+    try:
+        window.load(RING)
+        window.show()
+        app.processEvents()
+        checks = sorted((check for check, _, _ in window.inputs),
+                        key=lambda check: check.mapTo(window, QPoint()).y())
+        assert [check.text() for check in checks] == [
+            "생명력 최대치 +30", "번개 저항 +20%", "지원하지 않는 옵션 17% 증가",
+        ]
+        assert not checks[-1].isEnabled()
+    finally:
+        window.close()
+
+
 def test_scope_toggle_updates_title_even_when_bounds_are_invalid(app):
     config.save(server=config.KAKAO, mode="browser", league="Standard")
     window = TradeWindow()
@@ -67,7 +84,7 @@ def test_scope_toggle_updates_title_even_when_bounds_are_invalid(app):
     window.base_button.click()
     assert window.title.text() == "토파즈 반지"
     assert window.scope_badge.text() == "정확한 베이스"
-    assert window.base_button.text() == "정확한 베이스: 토파즈 반지"
+    assert window.base_button.text() == "반지 전체로 전환"
     assert not window.search_button.isEnabled()
     hi.clear()
     assert window._query()["query"]["type"] == "토파즈 반지"
@@ -88,8 +105,8 @@ def test_category_labels_cover_exactly_the_supported_trade_ids():
 
 
 @pytest.mark.parametrize("fixture,label,toggle_label,checked", [
-    ("heist_contract_ko.txt", "계약", "정확한 베이스: 계약: 벙커", False),
-    ("heist_blueprint_ko.txt", "도면: 취약 지점", "도면 전체 검색", True),
+    ("heist_contract_ko.txt", "계약", "계약 전체로 전환", False),
+    ("heist_blueprint_ko.txt", "도면: 취약 지점", "정확한 베이스로 전환: 도면: 취약 지점", True),
 ])
 def test_heist_title_respects_scope_defaults(app, fixtures, fixture, label, toggle_label, checked):
     config.save(server=config.KAKAO, mode="browser", league="Standard")
@@ -187,6 +204,70 @@ def test_narrow_trade_window_has_scrollable_rows_and_keyboard_access(app, mode):
     QTest.keyClick(window.base_button, Qt.Key.Key_Space)
     assert window.title.text() == "토파즈 반지"
     assert not window.grab().isNull()
+    window.close()
+
+
+@pytest.mark.parametrize("server,base", [(config.KAKAO, "금지된 책"), (config.OFFICIAL, "Forbidden Tome")])
+def test_forbidden_tome_item_level_search(app, fixtures, server, base):
+    config.save(server=server, mode="api", league="Standard")
+    text = (fixtures / "forbidden_tome_ko.txt").read_text(encoding="utf-8")
+    window = TradeWindow()
+    try:
+        window.load(text)
+        assert window.title.text() == base and not window.ilvl.isHidden()
+        assert window.ilvl.isChecked() and window.ilvl.text() == "아이템 레벨 ≥ 85"
+        query = window._query()["query"]
+        assert query["type"] == base and "name" not in query
+        assert query["filters"] == {"misc_filters": {"filters": {"ilvl": {"min": 85}}}}
+        assert query["stats"] == [{"type": "and", "filters": []}]
+        window.ilvl.click()
+        assert window._query()["query"]["filters"] == {}
+        window.load(text.replace("아이템 레벨: 85\n--------\n", ""))
+        assert window.ilvl.isHidden() and window._query()["query"]["filters"] == {}
+        window.load(text.replace("금지된 책", "다른 성역 연구 아이템"))
+        assert not window.info.supported
+    finally:
+        window.close()
+
+
+@pytest.mark.parametrize("fixture,level", [
+    ("rare_en.txt", 86),
+    ("magic_en.txt", 50),
+    ("unique_en.txt", 75),
+    ("fix004_map_ko.txt", 83),
+    ("fix004_flask_ko.txt", 80),
+    ("heist_contract_ko.txt", 83),
+    ("heist_blueprint_ko.txt", 83),
+    ("fix004_support_gem_ko.txt", None),
+])
+def test_supported_items_offer_their_copied_item_level(app, fixtures, fixture, level):
+    config.save(server=config.OFFICIAL, mode="browser", league="Standard")
+    window = TradeWindow()
+    try:
+        window.load((fixtures / fixture).read_text(encoding="utf-8"))
+        assert window.info.supported, window.info.message
+        assert window.ilvl.isHidden() == (level is None)
+        assert not window.ilvl.isChecked()
+        misc = lambda: window._query()["query"]["filters"]["misc_filters"]["filters"]
+        assert "ilvl" not in misc()
+        if level is not None:
+            assert window.ilvl.text() == f"아이템 레벨 ≥ {level}"
+            window.ilvl.click()
+            assert misc()["ilvl"] == {"min": level}
+    finally:
+        window.close()
+
+
+def test_default_trade_window_fits_six_results(app, fixtures):
+    config.save(server=config.KAKAO, mode="api", league="Standard")
+    window = TradeWindow()
+    window.load((fixtures / "fix004_support_gem_ko.txt").read_text(encoding="utf-8"))
+    window.result_summary.setText("전체 20개 · 최저가 9 chaos")
+    window.table.setRowCount(20)
+    window.show()
+    app.processEvents()
+    assert window.table.visualRect(window.table.model().index(5, 0)).bottom() < window.table.viewport().height()
+    assert window.search_button.geometry().bottom() < window.height()
     window.close()
 
 

@@ -31,10 +31,10 @@ def test_package_contains_notices_and_trade_without_manifest_change(tmp_path, mo
     assert pack.main() == 0
     manifest = json.loads((output / "manifest.json").read_text())
     assert set(manifest) == {"version", "zip", "sha256", "min_loader"}
-    from version import VERSION
+    from version import MIN_LOADER, VERSION
 
     assert manifest["version"] == VERSION
-    assert manifest["min_loader"] == 1
+    assert manifest["min_loader"] == MIN_LOADER
     payload = output / manifest["zip"]
     assert hashlib.sha256(payload.read_bytes()).hexdigest() == manifest["sha256"]
     with zipfile.ZipFile(payload) as archive:

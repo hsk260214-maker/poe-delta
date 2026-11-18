@@ -25,7 +25,11 @@ EXTRA_CLASSES = {"Jewels": "Jewel", "주얼": "Jewel", "Abyss Jewels": "Abyss Je
                  "Fishing Rods": "Fishing Rod", "낚싯대": "Fishing Rod"}
 GEAR = WEAPONS | ARMOUR | {"Ring", "Amulet", "Belt", "Quiver", "Jewel", "Abyss Jewel"}
 SUPPORTED = GEAR | heist.CATEGORIES.keys()
+FORBIDDEN_TOME = "Forbidden Tome"
+TOME_COPY_NAMES = {"ko": ("성역 연구", "금지된 책"), "en": ("Sanctum Research", FORBIDDEN_TOME)}
 NUMBERS = re.compile(r"[+-]?\d+(?:\.\d+)?")
+FASTER_ATTACKS_KO = re.compile(r"장착된 젬에 ([1-9][0-9]*)레벨 공격 속도 증가( 보조)? 보조 효과 적용")
+FASTER_ATTACKS_EN = re.compile(r"Socketed Gems are Supported by Level ([1-9][0-9]*) \u200b?Faster Attacks( Support)?")
 INFLUENCE_LABELS = {"Shaper": "쉐이퍼", "Elder": "엘더", "Crusader": "십자군",
                     "Redeemer": "대속자", "Hunter": "사냥꾼", "Warlord": "전쟁군주"}
 
@@ -56,6 +60,10 @@ class TradeItem:
     blocked_reason: str = ""
     equipment_category: str = ""
     heist: heist.Heist | None = None
+
+    @property
+    def can_filter_ilvl(self) -> bool:
+        return self.supported and self.ilvl > 0
 
     @property
     def message(self) -> str:
@@ -101,6 +109,12 @@ def item_info(model: ItemModel | None, server: str = OFFICIAL) -> TradeItem:
                 info.name = ""
     ilvl = field(model.head, ITEM_LEVEL_KEYS)
     info.ilvl = int(ilvl) if ilvl.isdigit() else 0
+    if info.rarity == "Currency" and (info.class_label, model.base) == TOME_COPY_NAMES.get(model.lang):
+        info.category = FORBIDDEN_TOME
+        info.base = FORBIDDEN_TOME if server == OFFICIAL else TOME_COPY_NAMES["ko"][1]
+        info.name = ""
+        info.supported = True
+        return info
     sockets = field(model.head, property_keys("Sockets"))
     info.links = max((len(group.split("-")) for group in sockets.split()), default=0)
     info.corrupted = any(flag in model.flags for flag in CORRUPT_FLAGS)
@@ -197,8 +211,17 @@ def heist_conditions(info: TradeItem) -> list[StatCondition]:
     return rows
 
 
+def _faster_attacks(text: str) -> tuple[str, int] | None:
+    match = FASTER_ATTACKS_KO.fullmatch(text) or FASTER_ATTACKS_EN.fullmatch(text)
+    if not match:
+        return None
+    level = int(match[1])
+    suffix = " Support" if match[2] else ""
+    return f"Socketed Gems are Supported by Level {level} \u200bFaster Attacks{suffix}", level
+
+
 def conditions(info: TradeItem, ratio: float = 0.9) -> list[StatCondition]:
-    if not info.model:
+    if not info.model or info.category == FORBIDDEN_TOME:
         return []
     if info.identity and info.identity.gem_level is not None:
         return [
@@ -212,15 +235,17 @@ def conditions(info: TradeItem, ratio: float = 0.9) -> list[StatCondition]:
         if (info.identity and info.identity.apt_category == "Map"
                 and mod.text in items.map_identity_lines(info.model.lang)):
             continue
-        english = mod_en(info.model, mod)
+        support = _faster_attacks(mod.text)
+        english = support[0] if support else mod_en(info.model, mod)
         matched = index().match(english, mod.kind, info.category) if english else Match()
         if mod.kind == "implicit" and mod.sub == "eldritch":
             matched = Match(reason="총주교·포식자 옵션의 출처가 모호합니다")
         blueprint_enchant = info.heist is not None and info.category == heist.BLUEPRINT and mod.kind == "enchant"
+        minimum = (support[1] if support else default_minimum(english, ratio)) if english and not blueprint_enchant else None
         result.append(StatCondition(mod.text, mod.kind, matched,
                                    bool(matched.id and (blueprint_enchant or (info.rarity == "Rare" and mod.kind in ("explicit", "fractured"))
                                                         or (info.rarity == "Magic" and mod.kind == "explicit"))),
-                                   default_minimum(english, ratio) if english and not blueprint_enchant else None,
+                                   minimum,
                                    badge=badge(mod) or mod.kind))
     return result
 
@@ -297,9 +322,9 @@ def build_query(info: TradeItem, stats: list[StatCondition], *, ilvl: bool = Fal
     if not info.supported:
         raise ValueError(info.message)
     filters = {}
-    if ilvl and info.rarity == "Rare" and info.identity is None:
+    if ilvl and info.can_filter_ilvl:
         filters.setdefault("misc_filters", {"filters": {}})["filters"]["ilvl"] = {"min": info.ilvl}
-    if corrupted:
+    if corrupted and info.category != FORBIDDEN_TOME:
         filters.setdefault("misc_filters", {"filters": {}})["filters"]["corrupted"] = {"option": "true" if info.corrupted else "false"}
     if links and info.links >= 5:
         filters["socket_filters"] = {"filters": {"links": {"min": info.links}}}

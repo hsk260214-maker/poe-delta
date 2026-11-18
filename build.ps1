@@ -58,7 +58,7 @@ Write-Host "[3/4] PyInstaller"
 $stage = Join-Path $work 'appsrc'
 python "$root\tools\pack_app.py" $stage "$root\dist"
 if ($LASTEXITCODE -ne 0) { throw 'pack_app failed' }
-python -m PyInstaller --noconfirm --onefile --windowed --log-level WARN `
+python -m PyInstaller --noconfirm --onefile --windowed --uac-admin --log-level WARN `
     --name $name `
     --icon "$root\assets\icon.ico" `
     --add-data "$stage;appsrc" `

@@ -41,6 +41,53 @@ def test_equipment_category_and_exact_localized_base(en, ko, base_en, base_ko, c
         assert exact["type"] == base and "type_filters" not in exact["filters"]
 
 
+@pytest.mark.parametrize("suffix,stat_id", [
+    ("보조", "explicit.indexable_support_86"),
+    ("보조 보조", "explicit.effect_4291787627"),
+])
+def test_socketed_faster_attacks_variants_send_distinct_filters(suffix, stat_id):
+    model = equipment("반지", "황금 반지", lang="ko", rarity="희귀",
+                      mods=f"장착된 젬에 16레벨 공격 속도 증가 {suffix} 효과 적용")
+    for server in (config.KAKAO, config.OFFICIAL):
+        info = item_info(model, server)
+        stats = conditions(info)
+        assert [(s.checked, s.minimum) for s in stats] == [(True, 16)]
+        filters = build_query(info, stats)["query"]["stats"][0]["filters"]
+        assert filters == [{"id": stat_id, "value": {"min": 16}}]
+
+
+def test_two_stone_ring_with_shared_trade_base(fixtures):
+    model = parse((fixtures / "two_stone_ring_ko.txt").read_text(encoding="utf-8"))
+    for server, base in ((config.KAKAO, "쌍보석 반지"), (config.OFFICIAL, "Two-Stone Ring")):
+        info = item_info(model, server)
+        assert info.supported, info.message
+        stats = conditions(info)
+        category = build_query(info, stats)["query"]
+        assert category["filters"]["type_filters"]["filters"]["category"] == {"option": "accessory.ring"}
+        exact = build_query(info, stats, exact_base=True)["query"]
+        assert exact["type"] == base and "name" not in exact
+        implicit = next(stat for stat in stats if stat.kind == "implicit" and "냉기 및 번개 저항" in stat.text)
+        assert not implicit.checked and implicit.match.id.startswith("implicit.")
+        implicit.checked = True
+        filtered = build_query(info, stats, exact_base=True)["query"]
+        assert any(row["id"] == implicit.match.id for row in filtered["stats"][0]["filters"])
+
+
+@pytest.mark.parametrize("label,name,implicit,official,category", [
+    ("장화", "두 가지 색 장화", "냉기 및 번개 저항 +10%", "Two-Toned Boots", "armour.boots"),
+    ("화살통", "무거운 화살통", "Adds 13 to 25 Physical Damage to Attacks", "Heavy Arrow Quiver", "armour.quiver"),
+    ("화살통", "무거운 화살통", "Adds 1 to 4 Physical Damage to Attacks", "Heavy Quiver", "armour.quiver"),
+])
+def test_shared_localized_equipment_base_uses_verified_implicit(label, name, implicit, official, category):
+    model = equipment(label, name, lang="ko", rarity="희귀", mods=f"{implicit} (implicit)")
+    for server, base in ((config.KAKAO, name), (config.OFFICIAL, official)):
+        info = item_info(model, server)
+        assert info.supported, info.message
+        assert build_query(info, [])["query"]["filters"]["type_filters"]["filters"]["category"]["option"] == category
+        assert build_query(info, [], exact_base=True)["query"]["type"] == base
+    assert not item_info(equipment(label, name, lang="ko", rarity="희귀")).supported
+
+
 @pytest.mark.parametrize("rarity,base", [("Normal", "Topaz Ring"), ("Magic", "Healthy Topaz Ring")])
 def test_equipment_rarity_is_unchanged_in_both_scopes(rarity, base, monkeypatch):
     model = equipment("Rings", base, rarity=rarity)
@@ -163,9 +210,9 @@ def test_window_base_and_switch_send_one_shared_query(app, monkeypatch):
         config.save(mode=mode, server=config.OFFICIAL, league="Standard")
         window.load(model)
         assert "type" not in window._query()["query"]
-        assert not window.base_button.isChecked() and window.base_button.text() == "반지 전체 검색"
+        assert not window.base_button.isChecked() and window.base_button.text() == "정확한 베이스로 전환: Topaz Ring"
         window.base_button.click()
-        assert window.base_button.isChecked() and window.base_button.text() == "정확한 베이스: Topaz Ring"
+        assert window.base_button.isChecked() and window.base_button.text() == "반지 전체로 전환"
         assert window.result_summary.text() == "조건이 바뀌었습니다. 검색을 눌러 주세요"
         check, minimum, maximum = window.inputs[0]
         check.setChecked(True)
@@ -215,7 +262,7 @@ def test_condition_change_discards_previous_and_in_flight_results(app, monkeypat
     assert "type" not in sent[0]["query"]
     assert window.table.rowCount() == 1 and window.open_button.isEnabled() and window._result_link
     window.base_button.click()
-    assert window.base_button.text() == "정확한 베이스: 토파즈 반지"
+    assert window.base_button.text() == "반지 전체로 전환"
     assert window.table.rowCount() == 0 and not window.open_button.isEnabled() and not window._result_link
     assert window.result_summary.text() == "조건이 바뀌었습니다. 검색을 눌러 주세요"
     assert not pending and len(sent) == 1

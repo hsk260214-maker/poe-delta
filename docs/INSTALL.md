@@ -20,6 +20,7 @@ POE Delta는 Path of Exile 1용 Windows 프로그램입니다. 원작자 Kyungse
 1. 이 저장소의 [Releases](https://github.com/hsk260214-maker/poe-delta/releases/latest) 페이지에서 `PoeDelta-버전.zip`을 받습니다. 같은 페이지의 `app-버전.zip`, `manifest.json`은 프로그램이 업데이트할 때 쓰는 파일이라 받지 않아도 됩니다.
 2. 압축을 원하는 폴더에 풉니다. 바탕화면이나 `내 문서` 아래도 괜찮습니다. 안에는 `PoeDelta.exe`와 라이선스 파일 2개가 있습니다.
 3. `PoeDelta.exe`를 실행합니다.
+   - Windows가 관리자 권한을 요청하면 **예**를 누릅니다. 기존 설치에서 «새 설치 파일 필요»가 나오면 최신 설치용 ZIP을 받아 새 `PoeDelta.exe`로 실행합니다.
    - 서명되지 않은 프로그램이라 처음에 Windows가 "PC 보호" 경고를 띄울 수 있습니다. **추가 정보 → 실행**을 누르면 됩니다.
    - 백신이 막으면 이 파일을 예외로 등록해 주세요. Python으로 만든 실행 파일은 가끔 잘못 검출됩니다.
 4. 처음 실행하면 계산에 쓰는 PoB 엔진(약 370MB)을 PoB 공식 GitHub에서 한 번 받습니다. 몇 분 걸릴 수 있습니다.

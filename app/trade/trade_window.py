@@ -17,8 +17,8 @@ from asyncjob import run_async
 from itemmodel import ItemModel, parse
 from theme import build_qss
 from trade import browser, config, focus_log, heist
-from trade.query import (INFLUENCE_LABELS, SearchTarget, build_query, conditions, item_info, league_for,
-                         result_rows, search_target, summary)
+from trade.query import (FORBIDDEN_TOME, INFLUENCE_LABELS, SearchTarget, build_query, conditions, item_info,
+                         league_for, result_rows, search_target, summary)
 
 TRADE_WINDOW_STYLE = """
 QWidget#TradeHero {
@@ -33,10 +33,24 @@ QLabel#TradeScope {
     border-radius: 6px; padding: 3px 9px;
 }
 QLabel#TradeSource { color: #c2c5cb; }
+QLabel#TradeOptionKind {
+    padding: 2px; border-radius: 4px; background: #252933; color: #e4e8f1;
+}
+QLabel#TradeOptionKind[kind="implicit"] { background: #352a1d; color: #f3cf95; }
+QLabel#TradeOptionKind[kind="crafted"] { background: #1c3543; color: #b7e4f8; }
+QLabel#TradeOptionKind[kind="fractured"] { background: #3a3046; color: #ead6ff; }
+QLabel#TradeOptionKind[kind="enchant"] { background: #233a31; color: #c4efdb; }
+QWidget#TradeOptionDivider { background: #68563e; }
 QLabel#TradeResultStatus {
     color: #e3e4e7; background: #191d23; border: 1px solid #343943; padding: 6px;
 }
 QPushButton:focus, QPushButton#FilterChip:focus { border: 1px solid palette(highlight); }
+QPushButton#TradeScopeSwitch {
+    color: #ffe3ad; background: #302619; border: 1px solid #ba9457;
+    border-radius: 6px; padding: 6px 12px; font-weight: 700;
+}
+QPushButton#TradeScopeSwitch:hover { background: #48351f; }
+QPushButton#TradeScopeSwitch:focus { border-color: #ffffff; }
 QCheckBox:focus { outline: 1px solid palette(highlight); }
 QPushButton#TradeSearch:enabled {
     color: #17120b; background: #e8bc74; border: 2px solid #e8bc74; font-weight: 700;
@@ -80,7 +94,7 @@ class TradeWindow(QWidget):
         self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating)
         self.setWindowTitle("거래소 시세 검색")
         self.setStyleSheet(build_qss() + TRADE_WINDOW_STYLE)
-        self.resize(760, 680)
+        self.resize(760, 850)
         self.source_fn = source_fn
         self.model = None
         self._prev_fg = 0
@@ -143,7 +157,7 @@ class TradeWindow(QWidget):
         self.corrupted = QCheckBox("타락 여부")
         self.base_button = _ScopeButton("정확한 베이스")
         self.base_button.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
-        self.base_button.setObjectName("FilterChip")
+        self.base_button.setObjectName("TradeScopeSwitch")
         self.base_button.setCheckable(True)
         self.base_button.hide()
         self.base_button.toggled.connect(self._base_changed)
@@ -262,7 +276,9 @@ class TradeWindow(QWidget):
         suffix = " · 검색에 사용하지 않음" if unused else ""
         self.copied_item.setText(f"복사한 이름: {copied}{suffix}")
         self.copied_item.setVisible(distinct)
-        label = f"{target.label} 전체 검색" if target.category else f"정확한 베이스: {target.label}"
+        category = search_target(self.info, False) if scope else SearchTarget()
+        label = (f"정확한 베이스로 전환: {exact.label}" if target.category
+                 else f"{category.label} 전체로 전환")
         self.base_button.setText(label)
         self.base_button.setAccessibleName(f"검색 범위: {label}")
         self.base_button.setToolTip(label)
@@ -311,13 +327,15 @@ class TradeWindow(QWidget):
         self.league.clear()
         self.league.setEditText(league_for(self.source_fn(), trade.get("league", "")))
         self.league.blockSignals(False)
-        self.ilvl.setChecked(False)
-        self.ilvl.setVisible(self.info.rarity == "Rare" and self.info.identity is None)
+        tome = self.info.category == FORBIDDEN_TOME
+        self.ilvl.setChecked(tome and self.info.can_filter_ilvl)
+        self.ilvl.setVisible(self.info.can_filter_ilvl)
         self.ilvl.setText(f"아이템 레벨 ≥ {self.info.ilvl}")
         self.links.setChecked(self.info.links >= 5)
         self.links.setVisible(self.info.links >= 5)
         self.links.setText(f"링크 ≥ {self.info.links}")
         self.corrupted.setChecked(True)
+        self.corrupted.setVisible(not tome)
         self.corrupted.setText("타락" if self.info.corrupted else "타락 아님")
         scoped = not self._error and search_target(self.info, True) != search_target(self.info, False)
         self.base_button.setChecked(scoped and not search_target(self.info).category)
@@ -350,14 +368,28 @@ class TradeWindow(QWidget):
                 sources = _wrapped_label()
                 sources.setText("섬뜩한 영향력: " + " · ".join(self.info.eldritch_sources))
                 self.stat_layout.addWidget(sources)
-        sections = {}
-        for implicit, title in ((True, "고정 옵션"), (False, "일반 및 기타 옵션")):
-            if any((condition.kind == "implicit") == implicit for condition in self.stats):
+        section_layout = None
+        previous_kind = None
+        section_titles = {
+            "implicit": "고정 옵션", "explicit": "일반 옵션", "crafted": "제작 옵션",
+            "fractured": "분열 옵션", "enchant": "인챈트",
+            "gem_filter": "젬 조건",
+        }
+        for condition in self.stats:
+            kind = condition.kind
+            section_kind = kind if kind in section_titles else "other"
+            if section_kind != previous_kind:
+                if previous_kind is not None:
+                    divider = QWidget()
+                    divider.setObjectName("TradeOptionDivider")
+                    divider.setAttribute(Qt.WidgetAttribute.WA_StyledBackground)
+                    divider.setFixedHeight(1)
+                    self.stat_layout.addWidget(divider)
                 section = QWidget()
-                section.setObjectName("implicitOptions" if implicit else "explicitOptions")
+                section.setObjectName(f"{section_kind}Options")
                 section_layout = QVBoxLayout(section)
                 section_layout.setContentsMargins(6, 6, 6, 6)
-                heading = QLabel(title)
+                heading = QLabel(section_titles.get(section_kind, "기타 옵션"))
                 heading.setObjectName("SectionLabel")
                 column_headers = QHBoxLayout()
                 column_headers.addWidget(heading, 1)
@@ -367,8 +399,7 @@ class TradeWindow(QWidget):
                     column_headers.addWidget(label)
                 section_layout.addLayout(column_headers)
                 self.stat_layout.addWidget(section)
-                sections[implicit] = section_layout
-        for condition in self.stats:
+                previous_kind = section_kind
             row = QWidget()
             form = QHBoxLayout(row)
             form.setContentsMargins(0, 3, 0, 3)
@@ -379,6 +410,8 @@ class TradeWindow(QWidget):
             check.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
             check.setMinimumWidth(64)
             badge = QLabel("일반" if condition.badge == "explicit" else condition.badge)
+            badge.setObjectName("TradeOptionKind")
+            badge.setProperty("kind", condition.kind)
             minimum, maximum = QLineEdit(), QLineEdit()
             for box, value, placeholder in ((minimum, condition.minimum, "최소"), (maximum, condition.maximum, "최대")):
                 if condition.kind != "gem_filter":
@@ -409,7 +442,7 @@ class TradeWindow(QWidget):
             form.addWidget(minimum)
             form.addWidget(maximum)
             check.toggled.connect(self._conditions_changed)
-            sections[condition.kind == "implicit"].addWidget(row)
+            section_layout.addWidget(row)
             self.inputs.append((check, minimum, maximum))
         if not self.inputs:
             self.stat_layout.addWidget(QLabel("표시할 검색 옵션이 없습니다"))
@@ -423,6 +456,9 @@ class TradeWindow(QWidget):
     def _switch_kind(self, condition, badge) -> None:
         condition.switch_kind()
         badge.setText("일반" if condition.badge == "explicit" else condition.badge)
+        badge.setProperty("kind", condition.kind)
+        badge.style().unpolish(badge)
+        badge.style().polish(badge)
         self._conditions_changed()
 
     def _query(self) -> dict:

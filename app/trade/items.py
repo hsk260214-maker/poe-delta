@@ -79,7 +79,12 @@ class BaseNotFound(ValueError):
     pass
 
 
-def _lookup(lang, namespace, category, name, magic=False):
+def _confirmed_trade_rows(rows, confirmed_base):
+    matching = [row for row in rows if row[:2] == ["ITEM", confirmed_base]]
+    return list({tuple(row): row for row in matching}.values()) if matching else rows
+
+
+def _lookup(lang, namespace, category, name, magic=False, *, confirmed_base=""):
     categories = (category,) if isinstance(category, str) else category
     rows = [row for row in catalog()["items"][lang]
             if row[0] == namespace and row[3] in categories]
@@ -94,15 +99,17 @@ def _lookup(lang, namespace, category, name, magic=False):
             candidates = [row for row in candidates if len(row[2]) == length]
     if not candidates:
         raise BaseNotFound("정확한 베이스 또는 품목 변형을 식별할 수 없습니다")
+    candidates = _confirmed_trade_rows(candidates, confirmed_base)
     if len(candidates) != 1:
         raise ValueError("정확한 베이스 또는 품목 변형을 식별할 수 없습니다")
     return candidates[0]
 
 
-def _localized(row, lang):
+def _localized(row, lang, *, confirmed_base=""):
     # refName만이 아니라 분류·discriminator까지 동일한 상대 레코드를 선택한다.
     targets = [other for other in catalog()["items"][lang]
                if other[:2] == row[:2] and other[3:] == row[3:]]
+    targets = _confirmed_trade_rows(targets, confirmed_base)
     if len(targets) != 1:
         raise ValueError("동일한 현지화 품목을 식별할 수 없습니다")
     return targets[0][2]
@@ -136,6 +143,29 @@ def resolve_heist(model, category, rarity, server):
             raise ValueError("고유 이름과 베이스를 함께 확인할 수 없습니다")
         name = _localized(unique, target)
     return Identity(_localized(base, target), name, base[4])
+
+
+def _confirmed_equipment_base(model, category):
+    if category not in {"Ring", "Boots", "Quiver"}:
+        return ""
+    implicits = [mod_en(model, mod) or "" for mod in model.mods if mod.kind == "implicit" and not mod.sub]
+    if category in {"Ring", "Boots"}:
+        matches = sum(bool(re.fullmatch(
+            r"\+\d+% to (?:Fire and Cold|Fire and Lightning|Cold and Lightning) Resistances",
+            text, re.I,
+        )) for text in implicits)
+        if matches == 1:
+            return "Two-Stone Ring" if category == "Ring" else "Two-Toned Boots"
+    elif len(implicits) == 1:
+        match = re.fullmatch(r"Adds (\d+) to (\d+) Physical Damage to Attacks", implicits[0], re.I)
+        if match:
+            low, high = map(int, match.groups())
+            # 현행 베이스와 단종 베이스의 기본 고정 피해 범위가 겹치지 않는다.
+            if 12 <= low <= 15 and 24 <= high <= 27:
+                return "Heavy Arrow Quiver"
+            if (low, high) == (1, 4):
+                return "Heavy Quiver"
+    return ""
 
 
 def resolve(model, category, rarity, server, *, equipment=False):
@@ -176,7 +206,8 @@ def resolve(model, category, rarity, server, *, equipment=False):
                 raise ValueError("지도 등급이 서로 일치하지 않습니다")
             tier = suffix_tier
     classes = ("Jewel", "Cluster Jewel") if equipment and category == "Jewel" else category
-    base = _lookup(lang, "ITEM", classes, name, rarity == "Magic")
+    confirmed_base = _confirmed_equipment_base(model, category)
+    base = _lookup(lang, "ITEM", classes, name, rarity == "Magic", confirmed_base=confirmed_base)
     if base[4] or category == "Map" and base[1] not in MAP_BASES:
         raise ValueError("이 품목 변형은 아직 시세 검색을 지원하지 않습니다")
     if category == "Map" and (tier == 0 or (tier is None and base[1] != "Nightmare Map")):
@@ -200,7 +231,7 @@ def resolve(model, category, rarity, server, *, equipment=False):
         }
         if unresolved - ordinary_implicits:
             raise ValueError("지도 정체성을 정확히 식별할 수 없습니다")
-    return Identity(_localized(base, target), unique_name,
+    return Identity(_localized(base, target, confirmed_base=confirmed_base), unique_name,
                     "map" if category == "Map" and base[1] == "Map" else None, tier,
                     map_ids=map_ids, apt_category=base[3])
 

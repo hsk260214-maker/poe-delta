@@ -206,9 +206,9 @@ def test_area_gate_and_both_search_modes(app, monkeypatch):
         config.save(mode=mode, server=config.OFFICIAL, league="Standard")
         window.load(BLUEPRINT)
         assert window.base_button.isChecked()
-        assert window.base_button.text() == "정확한 베이스: Blueprint: Mansion"
+        assert window.base_button.text() == "도면 전체로 전환"
         window.base_button.click()
-        assert window.base_button.text() == "도면 전체 검색"
+        assert window.base_button.text() == "정확한 베이스로 전환: Blueprint: Mansion"
         check, minimum, _ = next(inputs for row, inputs in zip(window.stats, window.inputs) if row.kind == "heist_area")
         assert not check.isChecked() and minimum.text() == "83"
         check.setChecked(True)

@@ -19,7 +19,7 @@ import sys
 import traceback
 from pathlib import Path
 
-LOADER_VERSION = 1  # exe(로더 · 실행 환경)가 바뀌면 올림 → 릴리스 manifest 의 min_loader 와 비교
+LOADER_VERSION = 2  # exe(로더 · 실행 환경)가 바뀌면 올림 → 릴리스 manifest 의 min_loader 와 비교
 DIR_NAME = "PoeDelta"
 MAX_TRIES = 3
 

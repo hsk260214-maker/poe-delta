@@ -4,7 +4,7 @@ from urllib.parse import parse_qs, urlsplit
 
 import pytest
 import requests
-from PySide6.QtWidgets import QLabel, QWidget
+from PySide6.QtWidgets import QLabel
 
 from itemmodel import parse
 from trade import browser, config
@@ -130,15 +130,18 @@ def test_window_both_modes_send_same_selected_query(app, fixtures, monkeypatch, 
         assert [check.text() for check in window.influence_inputs.values()] == ["쉐이퍼", "엘더"]
         assert all(check.isChecked() for check in window.influence_inputs.values())
         window.influence_inputs["Shaper"].setChecked(False)
-        implicit = window.findChild(QWidget, "implicitOptions")
-        explicit = window.findChild(QWidget, "explicitOptions")
         for condition, (check, minimum, maximum) in zip(window.stats, window.inputs):
-            assert (implicit if condition.kind == "implicit" else explicit).isAncestorOf(check)
+            section = check.parentWidget().parentWidget()
+            assert section.objectName() == f"{condition.kind}Options"
             check.setChecked(condition.match.id == "implicit.stat_2250533757")
             if check.isChecked():
                 minimum.setText("2")
                 maximum.setText("5")
-        assert {label.text() for label in explicit.findChildren(QLabel)} >= {"제작", "분열", "인챈트"}
+        nodes = [window.stat_layout.itemAt(i).widget() for i in range(window.stat_layout.count())]
+        kinds = [node.objectName() for node in nodes if node.objectName()]
+        sections = [kind for kind in kinds if kind.endswith("Options")]
+        assert {"craftedOptions", "fracturedOptions", "enchantOptions"} <= set(sections)
+        assert kinds.count("TradeOptionDivider") == len(sections) - 1
         assert not calls
         window.search()
     assert len(opened) == 1
