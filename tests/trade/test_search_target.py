@@ -31,8 +31,10 @@ def test_nightmare_map_title_matches_exact_payload(app, fixtures):
     text = (fixtures / "fix004_nightmare_map_ko.txt").read_text(encoding="utf-8")
     window = TradeWindow()
     window.load(text.replace("고대의 연결부", "경악의 선택"))
-    assert window.title.text() == "검색 대상: 악몽 지도"
-    assert window.copied_item.text() == "복사한 아이템: 경악의 선택"
+    assert window.target_caption.text() == "검색 대상"
+    assert window.title.text() == "악몽 지도"
+    assert window.scope_badge.text() == "정확한 베이스"
+    assert window.copied_item.text() == "복사한 이름: 경악의 선택 · 검색에 사용하지 않음"
     assert window.base_button.isHidden()
     assert build_query(window.info, []) == {
         "query": {
@@ -54,14 +56,17 @@ def test_scope_toggle_updates_title_even_when_bounds_are_invalid(app):
     config.save(server=config.KAKAO, mode="browser", league="Standard")
     window = TradeWindow()
     window.load(RING)
-    assert window.title.text() == "검색 대상: 반지"
+    assert window.title.text() == "반지"
+    assert window.scope_badge.text() == "반지 전체"
+    assert "검색에 사용하지 않음" in window.copied_item.text()
     assert window._query()["query"]["filters"]["type_filters"]["filters"]["category"] == {"option": "accessory.ring"}
     _, lo, hi = window.inputs[0]
     lo.setText("10")
     hi.setText("1")
     assert not window.search_button.isEnabled()
     window.base_button.click()
-    assert window.title.text() == "검색 대상: 토파즈 반지"
+    assert window.title.text() == "토파즈 반지"
+    assert window.scope_badge.text() == "정확한 베이스"
     assert window.base_button.text() == "정확한 베이스: 토파즈 반지"
     assert not window.search_button.isEnabled()
     hi.clear()
@@ -90,8 +95,10 @@ def test_heist_title_respects_scope_defaults(app, fixtures, fixture, label, togg
     config.save(server=config.KAKAO, mode="browser", league="Standard")
     window = TradeWindow()
     window.load((fixtures / fixture).read_text(encoding="utf-8"))
-    assert window.title.text() == f"검색 대상: {label}"
+    assert window.title.text() == label
     assert window.base_button.isChecked() == checked
+    if checked:
+        assert "검색에 사용하지 않음" not in window.copied_item.text()
     assert ("type" in window._query()["query"]) == checked
     window.base_button.click()
     assert window.base_button.text() == toggle_label
@@ -104,17 +111,22 @@ def test_unique_gem_and_unsupported_targets(app, fixtures):
     window = TradeWindow()
     text = "아이템 종류: 지도\n아이템 희귀도: 고유\n겁쟁이의 시험\n지도 (8등급)\n--------\n아이템 레벨: 75"
     window.load(text)
-    assert window.title.text() == "검색 대상: The Coward's Trial · Map"
+    assert window.title.text() == "The Coward's Trial · Map"
+    assert window.scope_badge.text() == "고유"
+    assert window.copied_item.text() == "복사한 이름: 겁쟁이의 시험"
     query = window._query()["query"]
     assert query["name"] == {"option": "The Coward's Trial", "discriminator": "map"}
     assert query["type"] == {"option": "Map", "discriminator": "map"}
     gem = (fixtures / "fix004_support_gem_ko.txt").read_text(encoding="utf-8")
     window.load(gem)
-    assert window.title.text() == "검색 대상: Trap and Mine Damage Support"
+    assert window.title.text() == "Trap and Mine Damage Support"
+    assert window.scope_badge.text() == "젬"
+    assert window.copied_item.text() == "복사한 이름: 덫 및 지뢰 피해 보조"
     assert window._query()["query"]["type"] == "Trap and Mine Damage Support"
     assert not window.clear_all.isHidden() and window.clear_all.isEnabled()
     window.load(gem.replace("덫 및 지뢰 피해 보조", "미지원 젬"))
-    assert window.title.text() == "검색 대상: 검색할 수 없음"
+    assert window.title.text() == "검색할 수 없음"
+    assert window.scope_badge.isHidden()
     assert window.select_all.isHidden() and window.clear_all.isHidden()
     window.close()
 
@@ -150,8 +162,9 @@ def test_bulk_actions_only_change_enabled_option_checks(app, fixtures, monkeypat
     window.close()
 
 
-def test_narrow_trade_window_has_scrollable_rows_and_keyboard_access(app):
-    config.save(server=config.KAKAO, mode="browser", league="Standard")
+@pytest.mark.parametrize("mode", ["api", "browser"])
+def test_narrow_trade_window_has_scrollable_rows_and_keyboard_access(app, mode):
+    config.save(server=config.KAKAO, mode=mode, league="Standard")
     text = RING.replace("검사 반지", "길게 복사한 아이템 이름 " * 10).replace(
         "지원하지 않는 옵션", "매우 긴 한글 옵션 이름 " * 10)
     window = TradeWindow()
@@ -160,6 +173,8 @@ def test_narrow_trade_window_has_scrollable_rows_and_keyboard_access(app):
     window.show()
     app.processEvents()
     assert window.width() == 390
+    assert window.search_button.geometry().bottom() < window.height()
+    assert window.title.fontMetrics().height() > window.target_caption.fontMetrics().height()
     scroll = window.findChild(QScrollArea)
     assert scroll.horizontalScrollBar().maximum() == 0
     assert window.copied_item.height() > window.copied_item.fontMetrics().height()
@@ -170,6 +185,31 @@ def test_narrow_trade_window_has_scrollable_rows_and_keyboard_access(app):
     window.base_button.setFocus()
     assert window.base_button.hasFocus()
     QTest.keyClick(window.base_button, Qt.Key.Key_Space)
-    assert window.title.text() == "검색 대상: 토파즈 반지"
+    assert window.title.text() == "토파즈 반지"
     assert not window.grab().isNull()
+    window.close()
+
+
+@pytest.mark.parametrize("server", [config.OFFICIAL, config.KAKAO])
+@pytest.mark.parametrize("mode", ["api", "browser"])
+def test_serverless_header_preserves_mode_and_canonical_target(app, server, mode):
+    config.save(server=server, mode=mode, league="Standard")
+    window = TradeWindow()
+    ring = "아이템 종류: 반지\n아이템 희귀도: 마법\n차원의 토파즈 반지 - 레인저\n--------\n아이템 레벨: 83"
+    window.load(ring)
+    assert window.server == server and window.current_mode == mode
+    assert window.league.currentText() == "Standard"
+    assert window.mode_label.text() == (
+        "POE Delta · 게임 위 시세 모드 (공식 문서 밖 API 사용)" if mode == "api" else "POE Delta · 브라우저 모드"
+    )
+    assert window.scope_badge.text() == "반지 전체"
+    assert window.copied_item.text() == "복사한 이름: 차원의 토파즈 반지 - 레인저"
+    window.base_button.click()
+    base = "Topaz Ring" if server == config.OFFICIAL else "토파즈 반지"
+    assert window.title.text() == base == window._query()["query"]["type"]
+    assert window.copied_item.text() == "복사한 이름: 차원의 토파즈 반지 - 레인저"
+    window.load(ring.replace("마법", "일반").replace("차원의 토파즈 반지 - 레인저", "상급 토파즈 반지"))
+    window.base_button.click()
+    assert window.title.text() == base
+    assert window.copied_item.text() == "복사한 이름: 상급 토파즈 반지"
     window.close()

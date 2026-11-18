@@ -20,6 +20,31 @@ from trade import browser, config, focus_log, heist
 from trade.query import (INFLUENCE_LABELS, SearchTarget, build_query, conditions, item_info, league_for,
                          result_rows, search_target, summary)
 
+TRADE_WINDOW_STYLE = """
+QWidget#TradeHero {
+    background: #28221d;
+    border: 1px solid #58462f;
+    border-left: 4px solid #d8a759;
+}
+QLabel#TradeCaption { color: #f0c682; font-weight: 700; }
+QLabel#TradeTarget { color: #f6f0e5; font-size: 28px; font-weight: 700; }
+QLabel#TradeScope {
+    color: #f3cf95; background: #352a1d; border: 1px solid #6a553b;
+    border-radius: 6px; padding: 3px 9px;
+}
+QLabel#TradeSource { color: #c2c5cb; }
+QLabel#TradeResultStatus {
+    color: #e3e4e7; background: #191d23; border: 1px solid #343943; padding: 6px;
+}
+QPushButton:focus, QPushButton#FilterChip:focus { border: 1px solid palette(highlight); }
+QCheckBox:focus { outline: 1px solid palette(highlight); }
+QPushButton#TradeSearch:enabled {
+    color: #17120b; background: #e8bc74; border: 2px solid #e8bc74; font-weight: 700;
+}
+QPushButton#TradeSearch:hover { background: #f3cf95; }
+QPushButton#TradeSearch:focus:enabled { border-color: #ffffff; }
+"""
+
 
 class _ElidedText:
     def paintEvent(self, event) -> None:
@@ -54,9 +79,7 @@ class TradeWindow(QWidget):
         super().__init__(None, Qt.WindowType.Window | Qt.WindowType.WindowStaysOnTopHint)
         self.setAttribute(Qt.WidgetAttribute.WA_ShowWithoutActivating)
         self.setWindowTitle("거래소 시세 검색")
-        self.setStyleSheet(build_qss() + "\nQPushButton:focus, QPushButton#FilterChip:focus {"
-                                      " border: 1px solid palette(highlight); }"
-                                      "\nQCheckBox:focus { outline: 1px solid palette(highlight); }")
+        self.setStyleSheet(build_qss() + TRADE_WINDOW_STYLE)
         self.resize(760, 680)
         self.source_fn = source_fn
         self.model = None
@@ -74,16 +97,34 @@ class TradeWindow(QWidget):
         self.inputs = []
         self.influence_inputs = {}
         layout = QVBoxLayout(self)
+        self.mode_label = _wrapped_label()
+        layout.addWidget(self.mode_label)
+        hero = QWidget()
+        hero.setObjectName("TradeHero")
+        hero.setAttribute(Qt.WidgetAttribute.WA_StyledBackground)
+        hero_layout = QVBoxLayout(hero)
+        hero_layout.setContentsMargins(14, 10, 14, 10)
+        self.target_caption = QLabel("검색 대상")
+        self.target_caption.setObjectName("TradeCaption")
+        hero_layout.addWidget(self.target_caption)
         self.title = _wrapped_label()
-        self.title.setObjectName("SectionLabel")
-        layout.addWidget(self.title)
+        self.title.setObjectName("TradeTarget")
+        hero_layout.addWidget(self.title)
+        self.scope_badge = QLabel()
+        self.scope_badge.setTextFormat(Qt.TextFormat.PlainText)
+        self.scope_badge.setObjectName("TradeScope")
+        hero_layout.addWidget(self.scope_badge, alignment=Qt.AlignmentFlag.AlignLeft)
         self.copied_item = _wrapped_label()
-        layout.addWidget(self.copied_item)
+        self.copied_item.setObjectName("TradeSource")
+        hero_layout.addWidget(self.copied_item)
+        layout.addWidget(hero)
         self.focus_hint = QLabel("거래소 창을 클릭하면 입력할 수 있습니다")
         self.focus_hint.hide()
         layout.addWidget(self.focus_hint)
-        self.mode_label = _wrapped_label()
-        layout.addWidget(self.mode_label)
+        controls = QWidget()
+        controls.setObjectName("TradeControls")
+        control_layout = QVBoxLayout(controls)
+        control_layout.setContentsMargins(0, 0, 0, 0)
         self.league = QComboBox()
         self.league.setEditable(True)
         self.league.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
@@ -95,7 +136,7 @@ class TradeWindow(QWidget):
         league_name.setBuddy(self.league)
         league_row.addWidget(league_name)
         league_row.addWidget(self.league, 1)
-        layout.addLayout(league_row)
+        control_layout.addLayout(league_row)
         header = QHBoxLayout()
         self.ilvl = QCheckBox("아이템 레벨")
         self.links = QCheckBox("링크")
@@ -106,13 +147,14 @@ class TradeWindow(QWidget):
         self.base_button.setCheckable(True)
         self.base_button.hide()
         self.base_button.toggled.connect(self._base_changed)
-        layout.addWidget(self.base_button)
+        control_layout.addWidget(self.base_button)
         for widget in (self.ilvl, self.links, self.corrupted):
             header.addWidget(widget)
             widget.toggled.connect(self._conditions_changed)
         header.addStretch(1)
         header.addWidget(QLabel("가판대 매물만"))
-        layout.addLayout(header)
+        control_layout.addLayout(header)
+        layout.addWidget(controls)
         options_header = QHBoxLayout()
         options_title = QLabel("검색 조건")
         options_title.setObjectName("SectionLabel")
@@ -144,6 +186,7 @@ class TradeWindow(QWidget):
         results_title.setObjectName("SectionLabel")
         layout.addWidget(results_title)
         self.result_summary = QLabel()
+        self.result_summary.setObjectName("TradeResultStatus")
         self.result_summary.setTextFormat(Qt.TextFormat.PlainText)
         self.result_summary.setWordWrap(True)
         layout.addWidget(self.result_summary)
@@ -155,6 +198,7 @@ class TradeWindow(QWidget):
         layout.addWidget(self.table, 1)
         footer = QHBoxLayout()
         self.search_button = QPushButton()
+        self.search_button.setObjectName("TradeSearch")
         self.search_button.clicked.connect(self.search)
         self.open_button = QPushButton("거래소에서 열기")
         self.open_button.clicked.connect(lambda: self._result_link and browser.open_url(self._result_link))
@@ -194,10 +238,30 @@ class TradeWindow(QWidget):
 
     def _update_target(self) -> None:
         target = SearchTarget() if self._error else search_target(self.info, self.base_button.isChecked())
-        self.title.setText(f"검색 대상: {target.label}")
+        self.title.setText(target.label)
+        self.title.setAccessibleName(f"검색 대상: {target.label}")
+        if target.category:
+            scope = f"{target.label} 전체"
+        elif target.name:
+            scope = "고유"
+        elif target.base is None:
+            scope = ""
+        elif self.info.identity and self.info.identity.gem_level is not None:
+            scope = "젬"
+        else:
+            scope = "정확한 베이스"
+        self.scope_badge.setText(scope)
+        self.scope_badge.setVisible(bool(scope))
         copied = self.model.name if self.model else ""
-        self.copied_item.setText(f"복사한 아이템: {copied}")
-        self.copied_item.setVisible(bool(copied and copied != target.label))
+        distinct = bool(copied and copied not in (target.label, target.name))
+        exact = search_target(self.info, True) if scope else SearchTarget()
+        source_base = self.model.base if self.model else ""
+        generated = (self.info.rarity == "Rare" and source_base and exact.base
+                     and source_base not in copied and exact.base not in copied)
+        unused = distinct and (generated or (target.category and copied == exact.base))
+        suffix = " · 검색에 사용하지 않음" if unused else ""
+        self.copied_item.setText(f"복사한 이름: {copied}{suffix}")
+        self.copied_item.setVisible(distinct)
         label = f"{target.label} 전체 검색" if target.category else f"정확한 베이스: {target.label}"
         self.base_button.setText(label)
         self.base_button.setAccessibleName(f"검색 범위: {label}")
@@ -236,9 +300,8 @@ class TradeWindow(QWidget):
             self.info = item_info(self.model, config.OFFICIAL)
             self._error = str(error)
         api = self.current_mode == "api"
-        server_name = {config.OFFICIAL: "공식", config.KAKAO: "카카오"}.get(self.server, "지원하지 않음")
         mode_name = "게임 위 시세 모드 (공식 문서 밖 API 사용)" if api else "브라우저 모드"
-        self.mode_label.setText(f"서버: {server_name} · {mode_name}")
+        self.mode_label.setText(f"POE Delta · {mode_name}")
         self.search_button.setText("검색" if api else "브라우저로 검색")
         self.table.setVisible(api and self.info.supported)
         self.open_button.setVisible(api and self.info.supported)
