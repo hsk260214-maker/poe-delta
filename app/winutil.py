@@ -47,7 +47,40 @@ def foreground_other() -> int:
         return 0
 
 
-def focus_window(hwnd: int) -> bool:
+def foreground_window() -> int:
+    if sys.platform != "win32":
+        return 0
+    import ctypes
+
+    get_foreground = ctypes.windll.user32.GetForegroundWindow
+    get_foreground.restype = ctypes.c_void_p
+    return get_foreground() or 0
+
+
+def window_exists(hwnd: int) -> bool:
+    if sys.platform != "win32" or not hwnd:
+        return False
+    import ctypes
+
+    return bool(ctypes.windll.user32.IsWindow(hwnd))
+
+
+def foreground_category(hwnd: int) -> str:
+    if not hwnd:
+        return "none"
+    if sys.platform != "win32":
+        return "other"
+    import ctypes
+    import os
+
+    pid = ctypes.c_ulong()
+    ctypes.windll.user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
+    if pid.value == os.getpid():
+        return "poe_delta"
+    return "game" if is_poe_window(hwnd) else "other"
+
+
+def focus_window(hwnd: int, *, allow_alt_fallback: bool = True) -> bool:
     """hwnd 창을 맨 앞 + 키보드 포커스로. 다른 프로그램(게임)이 앞에 있어도 되게 그 창의 입력 스레드에 잠깐 붙어서 넘김."""
     if sys.platform != "win32" or not hwnd:
         return False
@@ -57,6 +90,8 @@ def focus_window(hwnd: int) -> bool:
         user32 = ctypes.windll.user32
         if not user32.IsWindow(hwnd):
             return False
+        if not allow_alt_fallback:
+            return bool(user32.SetForegroundWindow(hwnd)) and foreground_window() == hwnd
         my_tid = ctypes.windll.kernel32.GetCurrentThreadId()
         fg = user32.GetForegroundWindow()
         if fg == hwnd:
