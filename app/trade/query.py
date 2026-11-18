@@ -13,7 +13,7 @@ import ko2en
 from itemcheck import CLASS_NAMES
 from itemmodel import CORRUPT_FLAGS, EATER_FLAGS, EXARCH_FLAGS, ITEM_LEVEL_KEYS, SEP, ItemModel, badge, mod_en, parse
 from trade.config import OFFICIAL, validate_server
-from trade import items
+from trade import heist, items
 from trade.stats import Match, index
 
 WEAPONS = {"One Hand Sword", "Thrusting One Hand Sword", "One Hand Axe", "One Hand Mace",
@@ -23,7 +23,8 @@ ARMOUR = {"Helmet", "Body Armour", "Gloves", "Boots", "Shield"}
 EXTRA_CLASSES = {"Jewels": "Jewel", "주얼": "Jewel", "Abyss Jewels": "Abyss Jewel",
                  "어비스 주얼": "Abyss Jewel", "심연 주얼": "Abyss Jewel",
                  "Fishing Rods": "Fishing Rod", "낚싯대": "Fishing Rod"}
-SUPPORTED = WEAPONS | ARMOUR | {"Ring", "Amulet", "Belt", "Quiver", "Jewel", "Abyss Jewel"}
+GEAR = WEAPONS | ARMOUR | {"Ring", "Amulet", "Belt", "Quiver", "Jewel", "Abyss Jewel"}
+SUPPORTED = GEAR | heist.CATEGORIES.keys()
 NUMBERS = re.compile(r"[+-]?\d+(?:\.\d+)?")
 INFLUENCE_LABELS = {"Shaper": "쉐이퍼", "Elder": "엘더", "Crusader": "십자군",
                     "Redeemer": "대속자", "Hunter": "사냥꾼", "Warlord": "전쟁군주"}
@@ -54,6 +55,7 @@ class TradeItem:
     identity: items.Identity | None = None
     blocked_reason: str = ""
     equipment_category: str = ""
+    heist: heist.Heist | None = None
 
     @property
     def message(self) -> str:
@@ -84,12 +86,12 @@ def item_info(model: ItemModel | None, server: str = OFFICIAL) -> TradeItem:
         return info
     validate_server(server, model.lang)
     info.class_label = field(model.head, ("Item Class:", "아이템 종류:"))
-    cls = CLASS_NAMES.get(info.class_label, EXTRA_CLASSES.get(info.class_label, ""))
+    cls = heist.CLASSES.get(info.class_label, CLASS_NAMES.get(info.class_label, EXTRA_CLASSES.get(info.class_label, "")))
     info.category = "WEAPON" if cls in WEAPONS else "ARMOUR" if cls in ARMOUR else cls
     info.rarity = field(model.head, ("Rarity:", "아이템 희귀도:"))
     info.rarity = ko2en.RARITY.get(info.rarity, info.rarity)
     info.base, info.name = model.base, model.name
-    legacy = cls in SUPPORTED and info.rarity == "Unique"
+    legacy = cls in GEAR and info.rarity == "Unique"
     if legacy and model.lang == "ko" and server == OFFICIAL:
         info.base = ko2en.translate_base(model.base) or ""
         if info.rarity == "Unique":
@@ -110,11 +112,31 @@ def item_info(model: ItemModel | None, server: str = OFFICIAL) -> TradeItem:
     info.supported = bool(cls in SUPPORTED and info.rarity in ("Rare", "Unique") and info.base
                           and (info.rarity != "Unique" or info.name)
                           and not {"Unidentified", "미확인"}.intersection(model.flags))
+    if cls in heist.CATEGORIES:
+        info.supported = False
+        try:
+            info.identity = items.resolve_heist(model, cls, info.rarity, server)
+            info.base, info.name = info.identity.base, info.identity.name
+            if info.rarity != "Unique":
+                info.heist = heist.read(model.head, model.lang, cls)
+                if cls == heist.CONTRACT and not info.heist.job:
+                    raise ValueError("강탈 계약의 필요 직업 또는 레벨을 확인할 수 없습니다")
+                if cls == heist.BLUEPRINT:
+                    if not info.heist.wings:
+                        raise ValueError("도면의 공개·전체 구역 수를 확인할 수 없습니다")
+                    if any(c.kind == "enchant" and not c.match.id for c in conditions(info)):
+                        raise ValueError("도면 인챈트를 거래소 옵션과 맞추지 못했습니다")
+                    if not index().enchant_count_id:
+                        raise ValueError("도면 인챈트 개수 ID를 확인할 수 없습니다")
+            info.supported = True
+        except ValueError as error:
+            info.blocked_reason = str(error)
+        return info
     if not legacy:
         label = ko2en._dict().classes.get(info.class_label, info.class_label) if model.lang == "ko" else info.class_label
         category = ("Map" if label == "Maps" else "Flask" if label in items.FLASK_CLASSES
                     else "Gem" if label in items.GEM_CLASSES else "")
-        equipment = cls in SUPPORTED and info.rarity in ("Normal", "Magic", "Rare")
+        equipment = cls in GEAR and info.rarity in ("Normal", "Magic", "Rare")
         if equipment:
             category = ("One-Handed Sword" if cls == "Thrusting One Hand Sword" else
                         cls.replace("One Hand ", "One-Handed ").replace("Two Hand ", "Two-Handed "))
@@ -153,10 +175,32 @@ def default_minimum(text: str, ratio: float = 0.9) -> float | None:
     return int(rounded) if quantum == Decimal("1") else float(rounded)
 
 
+def heist_conditions(info: TradeItem) -> list[StatCondition]:
+    data = info.heist
+    if data is None:
+        return []
+    rows = []
+    if info.category == heist.CONTRACT:
+        rows.append(StatCondition(data.job_text or "필요 직업", "heist_job",
+                                  Match("heist_" + data.job, reason="") if data.job else Match(reason=info.message),
+                                  bool(data.job), data.job_level))
+        if data.priceless:
+            rows.append(StatCondition("목표물 가치: " + heist.PRICELESS["ko"], "heist_option",
+                                      Match("heist_objective_value", reason=""), True))
+    elif data.wings:
+        for label, key, count in zip(("공개 구역", "전체 구역"), ("heist_wings", "heist_max_wings"), data.wings):
+            rows.append(StatCondition(label, "heist_range", Match(key, reason=""), True, count, count))
+        if not any(mod.kind == "enchant" for mod in info.model.mods) and index().enchant_count_id:
+            rows.append(StatCondition("인챈트 없음", "heist_not", Match(index().enchant_count_id, reason=""), True))
+    if data.area is not None and heist.area_enabled(info.category):
+        rows.append(StatCondition("지역 레벨", "heist_area", Match("area_level", reason=""), False, data.area))
+    return rows
+
+
 def conditions(info: TradeItem, ratio: float = 0.9) -> list[StatCondition]:
     if not info.model:
         return []
-    result = []
+    result = heist_conditions(info)
     for mod in info.model.mods:
         if info.identity and (info.identity.gem_level is not None or
                               (info.identity.tier is not None and mod.text in items.map_identity_lines(info.model.lang))):
@@ -165,17 +209,18 @@ def conditions(info: TradeItem, ratio: float = 0.9) -> list[StatCondition]:
         matched = index().match(english, mod.kind, info.category) if english else Match()
         if mod.kind == "implicit" and mod.sub == "eldritch":
             matched = Match(reason="총주교·포식자 옵션의 출처가 모호합니다")
+        blueprint_enchant = info.heist is not None and info.category == heist.BLUEPRINT and mod.kind == "enchant"
         result.append(StatCondition(mod.text, mod.kind, matched,
-                                   bool(matched.id and ((info.rarity == "Rare" and mod.kind in ("explicit", "fractured"))
+                                   bool(matched.id and (blueprint_enchant or (info.rarity == "Rare" and mod.kind in ("explicit", "fractured"))
                                                         or (info.rarity == "Magic" and mod.kind == "explicit"))),
-                                   default_minimum(english, ratio) if english else None,
+                                   default_minimum(english, ratio) if english and not blueprint_enchant else None,
                                    badge=badge(mod) or mod.kind))
     return result
 
 
 def build_query(info: TradeItem, stats: list[StatCondition], *, ilvl: bool = False,
                 links: bool = True, corrupted: bool = True,
-                influences: set[str] | None = None, exact_base: bool = False) -> dict:
+                influences: set[str] | None = None, exact_base: bool | None = None) -> dict:
     if not info.supported:
         raise ValueError(info.message)
     filters = {}
@@ -187,7 +232,9 @@ def build_query(info: TradeItem, stats: list[StatCondition], *, ilvl: bool = Fal
         filters["socket_filters"] = {"filters": {"links": {"min": info.links}}}
     identity = info.identity
     if identity:
-        if info.rarity in ("Normal", "Magic"):
+        if info.heist:
+            filters["type_filters"] = {"filters": {"rarity": {"option": "nonunique"}}}
+        elif info.rarity in ("Normal", "Magic"):
             filters["type_filters"] = {"filters": {"rarity": {"option": info.rarity.lower()}}}
         elif identity.gem_level is None and info.rarity == "Rare":
             filters["type_filters"] = {"filters": {"rarity": {"option": "nonunique"}}}
@@ -200,8 +247,31 @@ def build_query(info: TradeItem, stats: list[StatCondition], *, ilvl: bool = Fal
             filters.setdefault("misc_filters", {"filters": {}})["filters"].update(
                 gem_level={"min": identity.gem_level}, quality={"min": identity.quality})
     selected = []
+    not_enchanted = []
     for condition in stats:
         if not condition.checked or not condition.match.id:
+            continue
+        if info.heist and condition.kind.startswith("heist_"):
+            key = condition.match.id
+            if condition.kind == "heist_not":
+                not_enchanted.append({"id": key, "value": {}, "disabled": False})
+                continue
+            if condition.kind == "heist_area" and not heist.area_enabled(info.category):
+                continue
+            group = "map_filters" if condition.kind == "heist_area" else "heist_filters"
+            if condition.kind == "heist_option":
+                value = {"option": "priceless"}
+            else:
+                bounds = {"min": condition.minimum}
+                if condition.kind != "heist_job":
+                    bounds["max"] = condition.maximum
+                if any(not math.isfinite(n) or n < 0 or int(n) != n for n in bounds.values() if n is not None):
+                    raise ValueError("강탈 조건은 0 이상의 정수로 입력하세요")
+                value = {bound: int(n) for bound, n in bounds.items() if n is not None}
+                if condition.kind == "heist_job" and not value.get("min"):
+                    raise ValueError("필요 직업의 최소 레벨을 입력하세요")
+            if value:
+                filters.setdefault(group, {"filters": {}})["filters"][key] = value
             continue
         values = {}
         for key, value in (("min", condition.minimum), ("max", condition.maximum)):
@@ -217,6 +287,11 @@ def build_query(info: TradeItem, stats: list[StatCondition], *, ilvl: bool = Fal
         selected.extend({"id": stat_id} for stat_id in identity.map_ids)
     query = {"status": {"option": "securable"}, "type": info.base,
              "stats": [{"type": "and", "filters": selected}], "filters": filters}
+    if not_enchanted:
+        query["stats"].append({"type": "not", "filters": not_enchanted})
+    if info.heist and not (exact_base if exact_base is not None else info.category == heist.BLUEPRINT):
+        del query["type"]
+        filters["type_filters"]["filters"]["category"] = {"option": heist.CATEGORIES[info.category]}
     if info.equipment_category and not exact_base:
         del query["type"]
         kinds = filters.setdefault("type_filters", {"filters": {}})["filters"]

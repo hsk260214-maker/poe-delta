@@ -22,6 +22,7 @@ class StatIndex:
         self.entries = data["entries"]
         self.groups = data["groups"]
         self.influences = data["influences"]
+        self.enchant_count_id = data.get("enchant_count_id", "")
         self.by_skeleton: dict[str, list[dict]] = {}
         self.by_group: dict[int, list[int]] = {}
         for i, entry in enumerate(self.entries):

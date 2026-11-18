@@ -132,6 +132,8 @@ def parse(text: str) -> ItemModel | None:
     rarity = next((x.split(":", 1)[1].strip() for x in (sections[0] if sections else [])
                    if x.startswith(("Rarity:", "아이템 희귀도:"))), "")
     unique = rarity in ("Unique", "고유")
+    blueprint = bool(sections and sections[0] and sections[0][0].partition(":")[2].strip()
+                     in {"Blueprints", "Heist Blueprints", "도면"})
     try:
         import ko2en
 
@@ -178,7 +180,7 @@ def parse(text: str) -> ItemModel | None:
                 sec.append(Mod(ln, k, sub=sub if k == "implicit" else "", base_vals=advanced,
                                unscalable=unscalable, affix=affix))
         sec = _merge_multiline(sec, lang)
-        if sec and _is_flavour(sec, lang, unique):
+        if sec and not (blueprint and any(m.kind == "enchant" for m in sec)) and _is_flavour(sec, lang, unique):
             continue
         model.mods.extend(sec)
     classify_implicits(model)

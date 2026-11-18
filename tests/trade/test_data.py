@@ -63,7 +63,8 @@ def test_build_license_metadata_stays_in_cache(tmp_path, monkeypatch):
     monkeypatch.setattr(dict_builder, "apt_ndjson", lambda *args, **kwargs: [
         {"ref": f"Has {name} Influence", "trade": {"ids": {"pseudo": [stat_id]}}, "matchers": []}
         for name, stat_id in module.INFLUENCE_IDS.items()
-    ])
+    ] + [{"ref": "# Enchant Modifiers",
+          "trade": {"ids": {"pseudo": ["pseudo.pseudo_number_of_enchant_mods"]}}, "matchers": []}])
 
     def fake_download(url, path, refresh):
         assert path.is_relative_to(cache)

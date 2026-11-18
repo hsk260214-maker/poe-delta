@@ -15,7 +15,7 @@ import winutil
 from asyncjob import run_async
 from itemmodel import ItemModel, parse
 from theme import build_qss
-from trade import browser, config, focus_log
+from trade import browser, config, focus_log, heist
 from trade.query import INFLUENCE_LABELS, build_query, conditions, item_info, league_for, result_rows, summary
 
 
@@ -145,9 +145,9 @@ class TradeWindow(QWidget):
         self.links.setText(f"링크 ≥ {self.info.links}")
         self.corrupted.setChecked(True)
         self.corrupted.setText("타락" if self.info.corrupted else "타락 아님")
-        self.base_button.setChecked(False)
-        self.base_button.setVisible(bool(self.info.supported and self.info.equipment_category))
-        self.stats = conditions(self.info, trade.get("min_ratio", 0.9)) if self.info.supported else []
+        self.base_button.setChecked(bool(self.info.heist and self.info.category == heist.BLUEPRINT))
+        self.base_button.setVisible(bool(self.info.supported and (self.info.equipment_category or self.info.heist)))
+        self.stats = conditions(self.info, trade.get("min_ratio", 0.9)) if self.info.supported or self.info.heist else []
         self.inputs = []
         self.influence_inputs = {}
         while self.stat_layout.count():
@@ -155,6 +155,9 @@ class TradeWindow(QWidget):
             widget.hide()
             widget.setParent(None)
             widget.deleteLater()
+        if self.info.heist and self.info.heist.area is not None and not heist.area_enabled(self.info.category):
+            self.stat_layout.addWidget(QLabel(
+                f"지역 레벨 {self.info.heist.area} · 지역 레벨 조건은 아직 지원하지 않습니다"))
         if self.info.influences or self.info.eldritch_sources:
             influence_box = QWidget()
             influence_row = QHBoxLayout(influence_box)
@@ -198,6 +201,8 @@ class TradeWindow(QWidget):
                 box.setMaximumWidth(85)
                 box.setText("" if value is None else f"{value:g}")
                 box.setEnabled(bool(condition.match.id))
+                if condition.kind in ("heist_option", "heist_not") or (condition.kind == "heist_job" and box is maximum):
+                    box.hide()
                 box.textChanged.connect(self._validate)
             if not condition.match.id:
                 row.setStyleSheet("QLabel, QCheckBox { color: #777777; }")
@@ -216,7 +221,7 @@ class TradeWindow(QWidget):
             check.toggled.connect(self._validate)
             sections[condition.kind == "implicit"].addWidget(row)
             self.inputs.append((check, minimum, maximum))
-        self.search_button.setVisible(self.info.supported)
+        self.search_button.setVisible(bool(self.info.supported or self.info.heist))
         self._validate()
 
     def _switch_kind(self, condition, badge) -> None:

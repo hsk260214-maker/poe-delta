@@ -117,6 +117,22 @@ def _number(lines, keys, pattern):
     return values[0] if values else None
 
 
+def resolve_heist(model, category, rarity, server):
+    if {"Unidentified", "미확인"}.intersection([*model.head, *model.flags]):
+        raise ValueError("미확인 품목은 검색할 수 없습니다")
+    if rarity not in {"Normal", "Magic", "Rare", "Unique"}:
+        raise ValueError("지원하지 않는 품목 등급입니다")
+    target = "en" if server == OFFICIAL else "ko"
+    base = _lookup(model.lang, "ITEM", category, model.base, rarity == "Magic")
+    name = ""
+    if rarity == "Unique":
+        unique = _lookup(model.lang, "UNIQUE", category, model.name)
+        if unique[5] != base[1]:
+            raise ValueError("고유 이름과 베이스를 함께 확인할 수 없습니다")
+        name = _localized(unique, target)
+    return Identity(_localized(base, target), name, base[4])
+
+
 def resolve(model, category, rarity, server, *, equipment=False):
     lang = model.lang
     target = "en" if server == OFFICIAL else "ko"

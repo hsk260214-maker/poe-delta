@@ -27,7 +27,7 @@ def extract(lang):
             records.append((ns, ref, name, "Gem", disc, bool(gem.get("vaal") or gem.get("transfigured"))))
         elif ns == "UNIQUE":
             base = row["unique"]["base"]
-            for category in sorted(bases.get(base, set()) & {"Map", "Flask"}):
+            for category in sorted(bases.get(base, set()) & {"Map", "Flask", "Heist Contract", "Heist Blueprint"}):
                 records.append((ns, ref, name, category, disc, base))
     stats = dict_builder.apt_ndjson(f"{lang}/stats.ndjson", False, base=BASE)
     identity = {}

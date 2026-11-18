@@ -16,11 +16,13 @@ KINDS = ("explicit", "implicit", "crafted", "fractured", "enchant")
 STRATEGIES = {"select", "trivial-merge", "percent-merge", "flag-merge"}
 INFLUENCE_IDS = {name: f"pseudo.pseudo_has_{name.lower()}_influence"
                  for name in ("Shaper", "Elder", "Crusader", "Redeemer", "Hunter", "Warlord")}
+ENCHANT_COUNT_ID = "pseudo.pseudo_number_of_enchant_mods"
 
 
 def convert(rows: list[dict]) -> dict:
     entries, groups, matchers = [], [], []
     influences = {}
+    enchant_count_id = ""
     influence_refs = {f"Has {name} Influence": name for name in INFLUENCE_IDS}
     for row in rows:
         group = None
@@ -33,6 +35,11 @@ def convert(rows: list[dict]) -> dict:
         else:
             stats = [row]
         for i, stat in enumerate(stats):
+            if stat["ref"] == "# Enchant Modifiers":
+                ids = stat["trade"]["ids"].get("pseudo", [])
+                if ids != [ENCHANT_COUNT_ID] or enchant_count_id:
+                    raise ValueError("APT 인챈트 개수 ID 불일치")
+                enchant_count_id = ids[0]
             if name := influence_refs.get(stat["ref"]):
                 ids = stat["trade"]["ids"].get("pseudo", [])
                 if ids != [INFLUENCE_IDS[name]] or name in influences:
@@ -54,7 +61,8 @@ def convert(rows: list[dict]) -> dict:
                     "entry": entry,
                 })
     return {"source": {"project": "SnosMe/awakened-poe-trade", "commit": COMMIT},
-            "entries": entries, "groups": groups, "matchers": matchers, "influences": influences}
+            "entries": entries, "groups": groups, "matchers": matchers, "influences": influences,
+            "enchant_count_id": enchant_count_id}
 
 
 def main() -> None:
@@ -67,6 +75,8 @@ def main() -> None:
     result = convert(dict_builder.apt_ndjson("en/stats.ndjson", args.refresh, base=BASE, flatten=False))
     if result["influences"] != INFLUENCE_IDS:
         raise ValueError("고정 APT 자료에 전통 영향력 ID 6개가 모두 있어야 합니다")
+    if not result["enchant_count_id"]:
+        raise ValueError("고정 APT 자료에 인챈트 개수 ID가 있어야 합니다")
     args.out.mkdir(parents=True, exist_ok=True)
     (args.out / "trade_stats.json").write_text(json.dumps(result, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     license_cache = args.cache / f"apt_{COMMIT}_LICENSE"
