@@ -52,6 +52,33 @@ def test_nightmare_map_title_matches_exact_payload(app, fixtures):
     window.close()
 
 
+@pytest.mark.parametrize("mode", ["api", "browser"])
+def test_conqueror_map_with_ellipses_retains_exact_identity_and_monster_level(app, fixtures, mode):
+    config.save(server=config.KAKAO, mode=mode, league="Standard")
+    text = (fixtures / "conqueror_map_ko.txt").read_text(encoding="utf-8")
+    window = TradeWindow()
+    try:
+        window.load(text)
+        assert window.info.supported, window.info.message
+        assert all("시타델" not in condition.text and "몬스터 레벨:" not in condition.text for condition in window.stats)
+        assert not window.monster_level.isHidden() and not window.monster_level.isChecked()
+        assert window.monster_level.text() == "몬스터 레벨 = 83"
+        assert "area_level" not in window._query()["query"]["filters"]["map_filters"]["filters"]
+        window.monster_level.click()
+        query = window._query()["query"]
+        assert query["type"] == {"option": "지도", "discriminator": "map"}
+        assert query["filters"]["map_filters"]["filters"]["area_level"] == {"min": 83, "max": 83}
+        assert query["filters"]["map_filters"]["filters"]["map_tier"] == {"min": 16, "max": 16}
+        assert "ilvl" not in query["filters"]["misc_filters"]["filters"]
+        assert [s for s in query["stats"][0]["filters"] if s["id"].startswith("implicit.")] == [
+            {"id": "implicit.stat_2563183002|2"},
+        ]
+        window.load(text.replace("베리타니아", "미확인 정복자"))
+        assert not window.info.supported
+    finally:
+        window.close()
+
+
 def test_trade_window_keeps_copied_option_order_including_unmatched_rows(app):
     config.save(server=config.KAKAO, mode="api", league="Standard")
     window = TradeWindow()

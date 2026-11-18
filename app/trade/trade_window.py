@@ -153,6 +153,7 @@ class TradeWindow(QWidget):
         control_layout.addLayout(league_row)
         header = QHBoxLayout()
         self.ilvl = QCheckBox("아이템 레벨")
+        self.monster_level = QCheckBox("몬스터 레벨")
         self.links = QCheckBox("링크")
         self.corrupted = QCheckBox("타락 여부")
         self.base_button = _ScopeButton("정확한 베이스")
@@ -162,7 +163,7 @@ class TradeWindow(QWidget):
         self.base_button.hide()
         self.base_button.toggled.connect(self._base_changed)
         control_layout.addWidget(self.base_button)
-        for widget in (self.ilvl, self.links, self.corrupted):
+        for widget in (self.ilvl, self.monster_level, self.links, self.corrupted):
             header.addWidget(widget)
             widget.toggled.connect(self._conditions_changed)
         header.addStretch(1)
@@ -331,6 +332,10 @@ class TradeWindow(QWidget):
         self.ilvl.setChecked(tome and self.info.can_filter_ilvl)
         self.ilvl.setVisible(self.info.can_filter_ilvl)
         self.ilvl.setText(f"아이템 레벨 ≥ {self.info.ilvl}")
+        level = self.info.monster_level
+        self.monster_level.setChecked(False)
+        self.monster_level.setVisible(level is not None)
+        self.monster_level.setText(f"몬스터 레벨 = {level}" if level is not None else "몬스터 레벨")
         self.links.setChecked(self.info.links >= 5)
         self.links.setVisible(self.info.links >= 5)
         self.links.setText(f"링크 ≥ {self.info.links}")
@@ -483,6 +488,7 @@ class TradeWindow(QWidget):
                 raise ValueError("최소값은 최대값보다 클 수 없습니다")
         return build_query(self.info, self.stats, ilvl=self.ilvl.isChecked(),
                            links=self.links.isChecked(), corrupted=self.corrupted.isChecked(),
+                           monster_level=self.monster_level.isChecked(),
                            exact_base=self.base_button.isChecked(),
                            influences={name for name, check in self.influence_inputs.items() if check.isChecked()})
 

@@ -28,6 +28,7 @@ SUPPORTED = GEAR | heist.CATEGORIES.keys()
 FORBIDDEN_TOME = "Forbidden Tome"
 TOME_COPY_NAMES = {"ko": ("성역 연구", "금지된 책"), "en": ("Sanctum Research", FORBIDDEN_TOME)}
 NUMBERS = re.compile(r"[+-]?\d+(?:\.\d+)?")
+MONSTER_LEVEL_KEYS = ("몬스터 레벨:", "Monster Level:")
 FASTER_ATTACKS_KO = re.compile(r"장착된 젬에 ([1-9][0-9]*)레벨 공격 속도 증가( 보조)? 보조 효과 적용")
 FASTER_ATTACKS_EN = re.compile(r"Socketed Gems are Supported by Level ([1-9][0-9]*) \u200b?Faster Attacks( Support)?")
 INFLUENCE_LABELS = {"Shaper": "쉐이퍼", "Elder": "엘더", "Crusader": "십자군",
@@ -64,6 +65,18 @@ class TradeItem:
     @property
     def can_filter_ilvl(self) -> bool:
         return self.supported and self.ilvl > 0
+
+    @property
+    def monster_level(self) -> int | None:
+        if not self.supported or not self.identity or self.identity.apt_category != "Map" or not self.model:
+            return None
+        lines = (*self.model.head, *(mod.text for mod in self.model.mods))
+        levels = {line.partition(":")[2].strip() for line in lines if line.startswith(MONSTER_LEVEL_KEYS)}
+        if len(levels) == 1:
+            value = next(iter(levels))
+            if re.fullmatch(r"[1-9][0-9]*", value):
+                return int(value)
+        return None
 
     @property
     def message(self) -> str:
@@ -233,7 +246,7 @@ def conditions(info: TradeItem, ratio: float = 0.9) -> list[StatCondition]:
     result = heist_conditions(info)
     for mod in info.model.mods:
         if (info.identity and info.identity.apt_category == "Map"
-                and mod.text in items.map_identity_lines(info.model.lang)):
+                and (mod.text.startswith(MONSTER_LEVEL_KEYS) or items.map_identity_id(info.model.lang, mod.text))):
             continue
         support = _faster_attacks(mod.text)
         english = support[0] if support else mod_en(info.model, mod)
@@ -318,7 +331,8 @@ def search_target(info: TradeItem, exact_base: bool | None = None) -> SearchTarg
 
 def build_query(info: TradeItem, stats: list[StatCondition], *, ilvl: bool = False,
                 links: bool = True, corrupted: bool = True,
-                influences: set[str] | None = None, exact_base: bool | None = None) -> dict:
+                influences: set[str] | None = None, exact_base: bool | None = None,
+                monster_level: bool = False) -> dict:
     if not info.supported:
         raise ValueError(info.message)
     filters = {}
@@ -340,6 +354,8 @@ def build_query(info: TradeItem, stats: list[StatCondition], *, ilvl: bool = Fal
             map_filters = {}
             if identity.tier is not None:
                 map_filters["map_tier"] = {"min": identity.tier, "max": identity.tier}
+            if monster_level and (area_level := info.monster_level) is not None:
+                map_filters["area_level"] = {"min": area_level, "max": area_level}
             map_filters["map_blighted"] = {"option": "false"}
             filters["map_filters"] = {"filters": map_filters}
         if identity.gem_level is not None:

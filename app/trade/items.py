@@ -75,6 +75,18 @@ def map_identity_lines(lang):
     return {text: stat_id for stat_id, texts in catalog()["map_identity"][lang].items() for text in texts}
 
 
+def map_identity_id(lang, text):
+    known = map_identity_lines(lang)
+    if stat_id := known.get(text):
+        return stat_id
+    if lang == "ko":
+        normalized = re.sub(r"\((?:\.\.\.|…)\)(?= 등장$)", "", text, count=1)
+        stat_id = known.get(normalized, "")
+        if stat_id.startswith("implicit.stat_2563183002|"):
+            return stat_id
+    return ""
+
+
 class BaseNotFound(ValueError):
     pass
 
@@ -220,9 +232,9 @@ def resolve(model, category, rarity, server, *, equipment=False):
         unique_name = _localized(unique, target)
     map_ids = ()
     if category == "Map":
-        known = map_identity_lines(lang)
-        map_ids = tuple(dict.fromkeys(known[line] for line in lines if line in known))
-        unresolved = {line for line in lines if UNKNOWN_MAP.search(line) and line not in known}
+        identities = {line: map_identity_id(lang, line) for line in lines}
+        map_ids = tuple(dict.fromkeys(stat_id for stat_id in identities.values() if stat_id))
+        unresolved = {line for line, stat_id in identities.items() if UNKNOWN_MAP.search(line) and not stat_id}
         ordinary_implicits = {
             mod.text for mod in model.mods
             if mod.text in unresolved and mod.kind == "implicit"
