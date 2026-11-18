@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 import dict_builder
+import pytest
 
 
 def test_pytest_cache_is_isolated(pytestconfig):
@@ -47,6 +48,10 @@ def test_data_provenance_and_converter():
     assert result["entries"][1]["test"] == "ARMOUR"
     assert result["entries"][1]["inverted"]
     assert result["matchers"][1] == {"skeleton": "# armour", "negate": True, "has_value": True, "advanced": True, "entry": 1}
+    wrong_influence = {"ref": "Has Shaper Influence",
+                       "trade": {"ids": {"pseudo": ["pseudo.pseudo_has_elder_influence"]}}, "matchers": []}
+    with pytest.raises(ValueError, match="APT 영향력 ID 불일치"):
+        module.convert([wrong_influence])
 
 
 def test_build_license_metadata_stays_in_cache(tmp_path, monkeypatch):
@@ -55,7 +60,10 @@ def test_build_license_metadata_stays_in_cache(tmp_path, monkeypatch):
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     cache, output = tmp_path / "cache", tmp_path / "output"
-    monkeypatch.setattr(dict_builder, "apt_ndjson", lambda *args, **kwargs: [])
+    monkeypatch.setattr(dict_builder, "apt_ndjson", lambda *args, **kwargs: [
+        {"ref": f"Has {name} Influence", "trade": {"ids": {"pseudo": [stat_id]}}, "matchers": []}
+        for name, stat_id in module.INFLUENCE_IDS.items()
+    ])
 
     def fake_download(url, path, refresh):
         assert path.is_relative_to(cache)

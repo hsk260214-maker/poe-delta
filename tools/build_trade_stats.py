@@ -14,10 +14,14 @@ COMMIT = "803d188d1359c4d5b1e3826da5dc680ea74a158f"
 BASE = f"https://raw.githubusercontent.com/SnosMe/awakened-poe-trade/{COMMIT}/renderer/public/data/"
 KINDS = ("explicit", "implicit", "crafted", "fractured", "enchant")
 STRATEGIES = {"select", "trivial-merge", "percent-merge", "flag-merge"}
+INFLUENCE_IDS = {name: f"pseudo.pseudo_has_{name.lower()}_influence"
+                 for name in ("Shaper", "Elder", "Crusader", "Redeemer", "Hunter", "Warlord")}
 
 
 def convert(rows: list[dict]) -> dict:
     entries, groups, matchers = [], [], []
+    influences = {}
+    influence_refs = {f"Has {name} Influence": name for name in INFLUENCE_IDS}
     for row in rows:
         group = None
         if "stats" in row:
@@ -29,6 +33,11 @@ def convert(rows: list[dict]) -> dict:
         else:
             stats = [row]
         for i, stat in enumerate(stats):
+            if name := influence_refs.get(stat["ref"]):
+                ids = stat["trade"]["ids"].get("pseudo", [])
+                if ids != [INFLUENCE_IDS[name]] or name in influences:
+                    raise ValueError(f"APT 영향력 ID 불일치: {name}")
+                influences[name] = ids[0]
             entry = len(entries)
             entries.append({
                 "ids": {k: stat["trade"]["ids"][k] for k in KINDS if k in stat["trade"]["ids"]},
@@ -45,7 +54,7 @@ def convert(rows: list[dict]) -> dict:
                     "entry": entry,
                 })
     return {"source": {"project": "SnosMe/awakened-poe-trade", "commit": COMMIT},
-            "entries": entries, "groups": groups, "matchers": matchers}
+            "entries": entries, "groups": groups, "matchers": matchers, "influences": influences}
 
 
 def main() -> None:
@@ -56,6 +65,8 @@ def main() -> None:
     args = parser.parse_args()
     dict_builder.CACHE = args.cache
     result = convert(dict_builder.apt_ndjson("en/stats.ndjson", args.refresh, base=BASE, flatten=False))
+    if result["influences"] != INFLUENCE_IDS:
+        raise ValueError("고정 APT 자료에 전통 영향력 ID 6개가 모두 있어야 합니다")
     args.out.mkdir(parents=True, exist_ok=True)
     (args.out / "trade_stats.json").write_text(json.dumps(result, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     license_cache = args.cache / f"apt_{COMMIT}_LICENSE"
