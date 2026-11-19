@@ -321,12 +321,18 @@ def main() -> int:
         # ---------- 클립보드 → 옵션 조정 창 ----------
         def _on_clipboard(self, attempt: int = 0, destination=None) -> None:
             """게임에서 Ctrl+C → 옵션 조정 창(장착 시 DPS/EHP 변화)을 바로 띄운다."""
+            from map_regex import CLIPBOARD_MIME
+
+            clipboard = QApplication.clipboard()
+            data = clipboard.mimeData()
+            if data is not None and data.hasFormat(CLIPBOARD_MIME):
+                return
             if attempt == 0:
                 live, hwnd = self.trade_hotkey.pending.consume()
                 destination = ("trade", hwnd) if live else ("existing", 0)
                 if not live and not self.watch_clipboard:
                     return
-            text = QApplication.clipboard().text()
+            text = clipboard.text()
             if not text.strip() and attempt < 5:
                 # 게임이 아직 클립보드를 잡고 있으면 빈 값이 옴 → 조금 뒤 다시 읽기 (첫 Ctrl+C 가 씹히던 문제)
                 QTimer.singleShot((60, 120, 250, 400, 700)[attempt], lambda: self._on_clipboard(attempt + 1, destination))

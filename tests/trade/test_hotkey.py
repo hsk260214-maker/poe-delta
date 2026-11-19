@@ -2,6 +2,8 @@ import ast
 from pathlib import Path
 from types import SimpleNamespace
 
+import pytest
+
 from trade import config
 from trade.hotkey import PendingCopy, TradeHotkey
 
@@ -56,7 +58,8 @@ def test_pending_expiry():
     assert pending.consume() == (False, 0)
 
 
-def test_clipboard_retry_keeps_destination(monkeypatch):
+@pytest.mark.parametrize("regex_during_retry", [False, True], ids=["game_copy", "regex_copy"])
+def test_clipboard_retry_keeps_destination(regex_during_retry):
     # main()의 지역 클래스 전체를 띄우면 업데이트·PoB가 시작되므로 실제 메서드 AST만 실행한다.
     root = Path(__file__).resolve().parents[2]
     tree = ast.parse((root / "app" / "main.py").read_text(encoding="utf-8"))
@@ -65,17 +68,34 @@ def test_clipboard_retry_keeps_destination(monkeypatch):
     pending = PendingCopy(lambda: now[0])
     pending.arm(777)
     clipboard = [""]
+    formats = set()
     timers, routed = [], []
     qt = SimpleNamespace(singleShot=lambda delay, callback: timers.append((delay, callback)))
-    qapp = SimpleNamespace(clipboard=lambda: SimpleNamespace(text=lambda: clipboard[0]))
+    mime = SimpleNamespace(hasFormat=lambda name: name in formats)
+    qapp = SimpleNamespace(clipboard=lambda: SimpleNamespace(text=lambda: clipboard[0], mimeData=lambda: mime))
     namespace = {"QTimer": qt, "QApplication": qapp}
     exec(compile(ast.Module(body=[method], type_ignores=[]), str(root / "app" / "main.py"), "exec"), namespace)
     callback = namespace["_on_clipboard"]
     host = SimpleNamespace(watch_clipboard=False, trade_hotkey=SimpleNamespace(pending=pending),
                            _show_trade=lambda text, hwnd: routed.append((text, hwnd)))
     host._on_clipboard = lambda attempt=0, destination=None: callback(host, attempt, destination)
+    from map_regex import CLIPBOARD_MIME
+
+    formats.add(CLIPBOARD_MIME)
+    host._on_clipboard()
+    assert not timers and not routed
+    formats.clear()
     host._on_clipboard()
     assert not pending.consume()[0]
+    if regex_during_retry:
+        clipboard[0] = '"!에너지 보호막 재생 불가"'
+        formats.add(CLIPBOARD_MIME)
+        host._on_clipboard()
+        assert len(timers) == 1 and not routed
+        timers.pop(0)[1]()
+        assert not timers and not routed
+        return
+
     for i in range(4):
         now[0] += timers[0][0] / 1000
         timers.pop(0)[1]()

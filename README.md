@@ -124,6 +124,7 @@ python -m pip install -r requirements-dev.txt; python -m pytest tests   # 테스
 ### POE Delta의 거래소 검색에서 쓰거나 참고한 것
 
 - **POE Delta가 더 쓰는 외부 자료:** [Awakened PoE Trade](https://github.com/SnosMe/awakened-poe-trade)(MIT)의 오프라인 거래소 stat 데이터 (고정 커밋 `803d188d1359c4d5b1e3826da5dc680ea74a158f`, `data/LICENSE-awakened-poe-trade.txt`)
+- **지도 정규식 조각 출처:** [POE Regex KR 지도 생성기](https://poeregexkr.web.app/map/). 한글·영문 조각은 해당 사이트의 데이터이며, POE Delta는 비선호 지도 탭의 언어 선택·미리보기·복사 기능을 추가했습니다. 외부 데이터 파일은 이 저장소에 포함하지 않습니다. 파일 위치는 [설치 안내](docs/INSTALL.md)를 참고하세요.
 - **3.30 살덩이 단계 자료:** [PoEDB 살덩이 목록](https://poedb.tw/kr/Viscera)의 단계별 공식 거래소 링크(이름·부위·거래소 ID·범위)를 `tools/build_viscera.py`로 정리한 `data/viscera.json`
 - **이름이 바뀐 한글 옵션 대응표:** 카카오 거래소에서 확인한 항목만 `data/ko_aliases.json`에 기록합니다(예: `지역에 허상 등장`).
 - 기능 아이디어만 참고하고 코드는 가져오지 않은 프로그램:
