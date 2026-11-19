@@ -54,7 +54,7 @@ PoB에서 만든 빌드 코드나 pobb.in 같은 링크를 붙여 넣습니다. 
 - 옵션을 끄거나 수치를 바꾸거나 implicit을 붙여 보면서 바로 다시 계산할 수 있습니다.
 - 지도에 `Ctrl+C`를 누르면, 캐릭터 화면 "비선호 지도" 탭에서 골라 둔 위험 옵션이 있는지 알려 줍니다.
 - 같은 탭의 **보관함 정규식**은 체크한 옵션을 피하는 검색식을 만듭니다. 목록은 한글로 유지되며 `한글 정규식`과 `English 정규식`은 출력과 복사에만 적용됩니다. 선택한 언어의 게임 보관함 검색칸에 붙여 넣으세요. 실제 게임 동작은 아직 확인하지 않았습니다.
-- [POE Regex KR](https://poeregexkr.web.app/map/)의 로컬 내보내기 파일 `poeregexkr-poe1-map-options.json`과 `poeregexkr-poe1-map-options-en.json`을 사용합니다. 소스 실행 시 프로젝트 상위의 `design/`, 패키지 실행 시 `%LOCALAPPDATA%\PoeDelta`에 둡니다. 두 파일은 앱에 동봉되지 않습니다.
+- 로컬 데이터 파일 `poeregexkr-poe1-map-options.json`과 `poeregexkr-poe1-map-options-en.json`을 사용합니다. 소스 실행 시 프로젝트 상위의 `design/`, 패키지 실행 시 `%LOCALAPPDATA%\PoeDelta`에 둡니다. 두 파일은 앱에 동봉되지 않습니다.
 - 미지원 옵션이 하나라도 체크되어 있거나 결과가 250자를 넘으면 정규식을 복사할 수 없어요. 검색이나 티어 필터로 숨겨진 체크 항목도 정규식에 포함됩니다. 지도 `Ctrl+C` 경고에는 영향이 없습니다.
 
 메뉴(☰)의 "게임 Ctrl+C 감지"로 이 기능을 끄고 켤 수 있습니다.
