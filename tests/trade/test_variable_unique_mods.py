@@ -68,8 +68,8 @@ def test_real_advanced_monarch_pair_keeps_parser_boundaries_and_is_closed(monkey
 
 
 @pytest.mark.parametrize("file,joined", [("dark_monarch_ko.txt", ADVANCED),
-    ("dark_monarch_normal_apt_derived_ko.txt", NORMAL)])
-def test_monarch_advanced_and_apt_derived_normal_send_one_id(app, fixtures, monkeypatch, file, joined):
+    ("dark_monarch_normal_ko.txt", NORMAL)])
+def test_monarch_real_advanced_and_normal_copies_send_one_id(app, fixtures, monkeypatch, file, joined):
     monkeypatch.setattr(unique_mods, "LIVING_BROWSER_VERIFIED", True)
     config.save(mode="browser", server=config.KAKAO, league="Covens")
     window = TradeWindow()

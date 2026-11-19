@@ -16,3 +16,6 @@ tools/.cache/
 *.log
 .DS_Store
 Thumbs.db
+
+# 참고용 외부 프로그램(재배포 금지, 저장소에 올리지 않음)
+rep/
