@@ -1,50 +1,23 @@
-"""Offline bilingual stash search from the user's POE Regex KR exports."""
+"""Offline bilingual stash search using bundled regex fragments."""
 from collections.abc import Sequence
 from dataclasses import dataclass
 import json
-from pathlib import Path
-import sys
 
-from mapcheck import skel
+from data import resource_path
 
 
 LIMIT = 250
 CLIPBOARD_MIME = "application/x-poe-delta-map-regex"
-FILE_STEM = "poeregexkr-poe1-map-options"
 Patterns = dict[str, list[tuple[str, str]]]
 
 
-def load_patterns(catalog: list[dict], directory: Path | None = None) -> Patterns:
-    if directory is None:
-        if getattr(sys, "frozen", False):
-            from paths import LOCAL
-
-            directory = LOCAL
-        else:
-            directory = Path(__file__).resolve().parents[2] / "design"
-    by_text = {(row["key"], row["ko_sk"]): row["key"] for row in catalog}
-    out: Patterns = {}
+def load_patterns(catalog: list[dict]) -> Patterns:
+    keys = {row["key"] for row in catalog}
     try:
-        source = json.loads((directory / f"{FILE_STEM}.json").read_text(encoding="utf-8"))["groups"]
-        english = json.loads((directory / f"{FILE_STEM}-en.json").read_text(encoding="utf-8"))["groups"]
-        for kind in ("prefix", "suffix"):
-            ko_rows = source[kind]["rows"]
-            en_rows = english[kind]["rows"]
-            by_number = {row["no"]: row for row in en_rows}
-            if len(ko_rows) != len(en_rows) or len(by_number) != len(en_rows):
-                return {}
-            for row in ko_rows:
-                en = by_number[row["no"]]
-                if (en["lv"], en["mod"], en["regex"]) != (row["lv"], row["engMod"], row["engRegex"]):
-                    return {}
-                key = by_text.get((skel(en["mod"]), skel(row["mod"])))
-                if key:
-                    pair = (row["regex"], en["regex"])
-                    if all(term and not any(char in term for char in '"\r\n') for term in pair):
-                        out.setdefault(key, []).append(pair)
-    except (OSError, ValueError, KeyError, TypeError):
+        rows = json.loads(resource_path("data/map_regex_fragments.json").read_text(encoding="utf-8"))
+        return {key: [(ko, en) for ko, en in pairs] for key, pairs in rows.items() if key in keys}
+    except (OSError, ValueError, TypeError, AttributeError):
         return {}
-    return out
 
 
 @dataclass(frozen=True)
@@ -67,12 +40,12 @@ def build(selected: Sequence[str], catalog: list[dict], patterns: Patterns, lang
     if not selected:
         return Result(issue="피하려는 지도 옵션을 골라 주세요.")
     if not patterns:
-        return Result(issue="POE Regex KR 한글·영문 옵션 파일을 불러오지 못했어요.")
+        return Result(issue="앱에 내장된 지도 정규식 데이터를 읽을 수 없어요.")
     labels = {row["key"]: row["ko"] for row in catalog}
     unsupported = set(selected) - patterns.keys()
     if unsupported:
         names = ", ".join(labels.get(key, key) for key in sorted(unsupported))
-        return Result(issue=f"사이트 옵션과 정확히 연결되지 않은 항목: {names}")
+        return Result(issue=f"정규식이 지원되지 않는 옵션: {names}")
     column = 1 if language == "en" else 0
     terms: dict[str, None] = {}
     for key in selected:

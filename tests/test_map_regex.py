@@ -1,3 +1,5 @@
+import sys
+
 import pytest
 from PySide6.QtCore import Qt
 from PySide6.QtTest import QTest
@@ -26,10 +28,11 @@ def test_unknown_selection_blocks_an_otherwise_valid_result():
     assert "missing key" in result.issue
 
 
-def test_map_panel_filters_preserve_selection_and_invalid_state_cannot_copy(app, monkeypatch):
+def test_map_panel_copies_bundled_patterns_without_local_files(app, monkeypatch, tmp_path):
+    monkeypatch.setattr(sys, "frozen", True, raising=False)
+    monkeypatch.setattr("paths.LOCAL", tmp_path)
     monkeypatch.setattr(map_avoid_panel, "load_settings", lambda: {"map_avoid": [REGEN]})
     monkeypatch.setattr(map_avoid_panel, "save_settings", lambda _: None)
-    monkeypatch.setattr(map_regex, "load_patterns", lambda _: PATTERNS)
     host = QWidget()
     card = map_avoid_panel.MapAvoidCard(host, QVBoxLayout(host))
     clipboard = QApplication.clipboard()
