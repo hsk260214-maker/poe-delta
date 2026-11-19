@@ -124,6 +124,7 @@ def test_r4_count_empty_uses_roll_not_edited_bounds(monkeypatch, minimum, maximu
 
 def test_r2_is_gated_and_korean_representative_has_unresolved_mismatch(monkeypatch):
     monkeypatch.setattr(stats, "BROWSER_VERIFIED", frozenset())
+    monkeypatch.setattr(stats, "BLOCK_BROWSER_VERIFIED", frozenset())
     en = "20% Chance to Block Attack Damage"
     ko = "공격 피해 막기 확률 +20%"
     assert not index().match(en, "explicit", "ARMOUR").id

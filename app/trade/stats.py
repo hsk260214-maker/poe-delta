@@ -74,6 +74,7 @@ class Match:
     ambiguous: bool = False
     ref: str = ""
     candidate_refs: frozenset[str] = frozenset()
+    verified_korean_block_id: str = ""
 
     @property
     def meaning(self):
@@ -92,6 +93,10 @@ def _count_rule(match: Match, kind: str) -> str:
 
 
 def option_gate(match: Match, kind: str) -> str:
+    if match.verified_korean_block_id:
+        if (kind != "explicit" or match.ids or match.id != match.verified_korean_block_id
+                or match.id not in BLOCK_SUPPORTED_IDS or match.id not in BLOCK_BROWSER_VERIFIED):
+            return "이 옵션 종류의 막기 ID는 아직 확인되지 않았습니다"
     if not match.ids:
         return ""
     rule = _count_rule(match, kind)
@@ -126,6 +131,39 @@ def _korean_aliases() -> dict:
     return json.loads(resource_path("data/ko_aliases.json").read_text(encoding="utf-8"))
 
 
+BLOCK_MATCHERS = {
+    "#%의 확률로 공격 피해를 막아냄": ("#% Chance to Block Attack Damage", "", "2530372417", "1702195217"),
+    "공격 피해 막기 확률 #%": ("#% Chance to Block Attack Damage", "+", "1702195217", "2530372417"),
+    "#%의 확률로 주문 피해를 막아냄": ("#% Chance to Block Spell Damage", "", "561307714", "19803471"),
+    "주문 피해 막기 확률 #%": ("#% Chance to Block Spell Damage", "+", "19803471", "561307714"),
+}
+BLOCK_STAT_NUMBERS = frozenset(row[2] for row in BLOCK_MATCHERS.values())
+BLOCK_SUPPORTED_IDS = frozenset({"explicit.stat_561307714", "explicit.stat_1702195217"})
+# 2026-11-19 머성: 방패 주문 막기(min 13)·지팡이 공격 막기(min 18) 카카오 링크에서 해당 옵션 매물 확인.
+# 같은 번호의 제작·고정·분열과 나머지 두 막기 번호는 확인하지 않아 계속 닫는다.
+BLOCK_BROWSER_VERIFIED = frozenset({"explicit.stat_561307714", "explicit.stat_1702195217"})
+
+
+def _korean_block_match(text, english, kind, korean, translated):
+    for phrase, rolls in _variants(text):
+        if phrase in BLOCK_MATCHERS:
+            break
+    else:
+        if korean.id.removeprefix(kind + ".stat_") in BLOCK_STAT_NUMBERS:
+            return Match(reason="한국어·번역 연결 불일치", ambiguous=True)
+        return None
+    en_phrase, ref_prefix, primary, other = BLOCK_MATCHERS[phrase]
+    stat_id = "explicit.stat_" + primary
+    if (kind == "explicit" and stat_id in BLOCK_SUPPORTED_IDS and stat_id in BLOCK_BROWSER_VERIFIED
+            and not (korean.ambiguous or translated.ambiguous or korean.ids)
+            and korean.id == stat_id and korean.ref == ref_prefix + en_phrase and korean.rolls == rolls
+            and english and any(p == en_phrase for p, _ in _variants(_normalize(english)))
+            and len(translated.ids) == 2 and frozenset(translated.ids) == {stat_id, "explicit.stat_" + other}
+            and korean.invert == translated.invert and korean.meaning[1:] == translated.meaning[1:]):
+        return replace(korean, verified_korean_block_id=stat_id)
+    return Match(reason="한국어·번역 연결 불일치", ambiguous=True)
+
+
 class StatIndex:
     def __init__(self, data: dict):
         self.entries = data["entries"]
@@ -157,8 +195,10 @@ class StatIndex:
         if alias and not english:
             english = alias["ref"]
         translated = self.resolve(english, kind, category) if english else Match()
-        result = (translated if english and _resistance_collision(text, english, kind, korean, translated)
-                  else choose_match(korean, translated))
+        result = _korean_block_match(text, english, kind, korean, translated)
+        if result is None:
+            result = (translated if english and _resistance_collision(text, english, kind, korean, translated)
+                      else choose_match(korean, translated))
         candidates = korean.candidate_refs | translated.candidate_refs
         if alias and not result.ambiguous and (
                 result.ids or (kind, result.id, result.ref) != (alias["kind"], alias["id"], alias["ref"])):

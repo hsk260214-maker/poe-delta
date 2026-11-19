@@ -17,6 +17,7 @@ from asyncjob import run_async
 from itemmodel import ItemModel, parse
 from theme import build_qss
 from trade import browser, config, focus_log, heist, resistance
+from trade.stats import option_gate
 from trade.query import (FORBIDDEN_TOME, INFLUENCE_LABELS, SearchTarget, build_query, conditions, item_info,
                          league_for, resistance_rows, result_rows, search_target, summary)
 
@@ -533,6 +534,12 @@ class TradeWindow(QWidget):
 
     def _switch_kind(self, condition, badge) -> None:
         condition.switch_kind()
+        if condition.match.verified_korean_block_id:
+            check, lo, hi = self.inputs[self.stats.index(condition)]
+            reason = option_gate(condition.match, condition.kind)
+            check.setToolTip("\n".join(part for part in (condition.text, reason) if part))
+            for widget in (check, lo, hi):
+                widget.setEnabled(not reason)
         badge.setText("일반" if condition.badge == "explicit" else condition.badge)
         badge.setProperty("kind", condition.kind)
         badge.style().unpolish(badge)
@@ -542,7 +549,8 @@ class TradeWindow(QWidget):
     def _query(self) -> dict:
         for condition, (check, minimum, maximum) in zip(self.stats, self.inputs):
             condition.checked = check.isChecked()
-            if resistance.excluded(condition, self.total_resistance):
+            if resistance.excluded(condition, self.total_resistance) or (
+                    condition.match.verified_korean_block_id and option_gate(condition.match, condition.kind)):
                 continue
             if condition.kind in ("gem_filter", "viscera_tier"):
                 if condition.checked:
