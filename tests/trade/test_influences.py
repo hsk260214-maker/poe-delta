@@ -129,8 +129,13 @@ def test_window_both_modes_send_same_selected_query(app, fixtures, monkeypatch, 
         window.load(text)
         assert [check.text() for check in window.influence_inputs.values()] == ["쉐이퍼", "엘더"]
         assert all(check.isChecked() for check in window.influence_inputs.values())
+        window.resistance_button.click()
+        assert not window.total_resistance
         window.influence_inputs["Shaper"].setChecked(False)
         for condition, (check, minimum, maximum) in zip(window.stats, window.inputs):
+            if condition.match.id == "pseudo.pseudo_total_elemental_resistance":
+                assert check.parentWidget().isHidden()
+                continue
             section = check.parentWidget().parentWidget()
             assert section.objectName() == f"{condition.kind}Options"
             check.setChecked(condition.match.id == "implicit.stat_2250533757")

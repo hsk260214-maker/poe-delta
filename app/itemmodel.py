@@ -80,6 +80,10 @@ class Mod:
     base_vals: bool = False  # 수치가 퀄리티 적용 전 값 (고급 복사 원문 · 새로 추가한 줄) → 촉매 퀄리티를 곱해서 계산
     unscalable: bool = False  # '— 변경이 불가능한 값' (퀄리티 영향 없음)
     affix: str = ""       # prefix / suffix (고급 복사 머리줄; 좌·우 촉매용)
+    copy_section: int | None = None
+    copy_block: int | None = None
+    copy_line: int | None = None
+    copy_parts: tuple["Mod", "Mod"] | None = None
 
 
 @dataclass
@@ -147,11 +151,12 @@ def parse(text: str) -> ItemModel | None:
     except Exception:  # noqa: BLE001
         pass
     advanced = any(x.startswith("{") for s in sections[lvl_idx + 1:] for x in s)
-    for s in sections[lvl_idx + 1:]:
+    for section_no, s in enumerate(sections[lvl_idx + 1:], start=lvl_idx + 1):
         kind, sub, affix = "explicit", "", ""
+        block_no = 0
         sec: list[Mod] = []
         reminder = False
-        for raw in s:
+        for line_no, raw in enumerate(s):
             # 설명문 '("동결"은 ... )' — 여러 줄에 걸칠 수 있음
             if reminder:
                 reminder = not raw.endswith(")")
@@ -160,6 +165,7 @@ def parse(text: str) -> ItemModel | None:
                 reminder = not raw.endswith(")")
                 continue
             if raw.startswith("{"):
+                block_no += 1
                 kind = _header_kind(raw)
                 sub = _header_sub(raw) if kind == "implicit" else ""
                 hl = raw.lower()
@@ -184,7 +190,8 @@ def parse(text: str) -> ItemModel | None:
             if ln and any(ch.isalnum() for ch in ln):
                 # 고급 복사의 수치는 퀄리티 적용 전 값 (PoB 주석: values won't have catalyst applied)
                 sec.append(Mod(ln, k, sub=sub if k == "implicit" else "", base_vals=advanced,
-                               unscalable=unscalable, affix=affix))
+                               unscalable=unscalable, affix=affix, copy_section=section_no,
+                               copy_block=block_no, copy_line=line_no))
         sec = _merge_multiline(sec, lang)
         keep_identity = ((blueprint and any(m.kind == "enchant" for m in sec))
                          or (map_item and any(m.kind == "implicit" for m in sec)))
@@ -205,7 +212,10 @@ def _merge_multiline(sec: list[Mod], lang: str) -> list[Mod]:
             a = sec[i]
             if i + 1 < len(sec) and sec[i + 1].kind == a.kind and ko2en.joins(a.text, sec[i + 1].text, lang):
                 a = Mod(a.text + "\n" + sec[i + 1].text, a.kind, sub=a.sub, base_vals=a.base_vals,
-                        unscalable=a.unscalable or sec[i + 1].unscalable, affix=a.affix)
+                        unscalable=a.unscalable or sec[i + 1].unscalable, affix=a.affix,
+                        copy_section=a.copy_section, copy_line=a.copy_line,
+                        copy_block=a.copy_block if a.copy_block == sec[i + 1].copy_block else None,
+                        copy_parts=(a, sec[i + 1]))
                 i += 2
             else:
                 i += 1

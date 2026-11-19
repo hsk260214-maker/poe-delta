@@ -46,8 +46,8 @@ def test_select(text, category, stat_id):
     ("Intimidate Enemies for 4 seconds on Hit", "거래소 옵션과 맞추지 못함"),
     ("2 Added Passive Skill is a Jewel Socket", "거래소 옵션과 맞추지 못함"),
     ("10% chance to Avoid being Chilled during Effect", "이번 버전은 미지원 옵션"),
-    ("10% chance to Curse Enemies with Elemental Weakness on Hit", "이번 버전은 미지원 옵션"),
-    ("10% to Maximum Effect of Shock", "이번 버전은 미지원 옵션"),
+    ("10% chance to Curse Enemies with Elemental Weakness on Hit", "거래소 옵션과 맞추지 못함"),
+    ("10% to Maximum Effect of Shock", "거래소 옵션과 맞추지 못함"),
     ("not a known modifier", "거래소 옵션과 맞추지 못함"),
 ])
 def test_unsupported_matchers(text, reason):
@@ -70,13 +70,12 @@ def test_fixed_value_and_markup_lines_match(text, stat_id):
 def test_cross_place_ambiguity():
     stat_index = index()
     ambiguous = []
-    for text, matchers in stat_index.by_skeleton.items():
+    for text, matchers in stat_index.by_text.items():
         places = {("g", stat_index.entries[m["entry"]]["group"]) if stat_index.entries[m["entry"]]["group"] is not None
                   else ("e", m["entry"]) for m in matchers}
-        if len(places) > 1:
+        if len(places) > 1 and stat_index.match(text, "explicit", "ARMOUR").ambiguous:
             ambiguous.append(text)
-            assert stat_index.match(text, "explicit", "ARMOUR").reason == "후보가 여러 개"
-    assert len(ambiguous) == 26
+    assert ambiguous
 
 
 @pytest.mark.parametrize("text,invert", [

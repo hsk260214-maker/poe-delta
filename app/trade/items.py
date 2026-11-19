@@ -21,7 +21,9 @@ GUARDIAN_NAMES = {"Lair of the Hydra Map",
 # 쉐이퍼 수호자 지도: 2026-11-19 머성이 카카오 거래소(Covens) 브라우저 링크로 수호자 지도만 나오는 것을 확인.
 # 공식 거래소는 확인하지 않았다(카카오 사용자 기준 출시 결정).
 MAP_BASES = {"Map", "Nightmare Map", "Vaal Temple Map", "Shaper Guardian Map"}
-TIERLESS_MAP_BASES = {"Nightmare Map", "Shaper Guardian Map"}
+TIERLESS_MAP_BASES = {"Nightmare Map", "Shaper Guardian Map", "Vaal Temple Map"}
+# 2026-11-19 머성: 앱이 만든 바알 사원 지도(타락) 카카오 링크에서 바알 사원 지도만 나오는 것을 확인.
+VAAL_TEMPLE_BROWSER_VERIFIED = True
 FLASK_CLASSES = {"Life Flasks", "Mana Flasks", "Hybrid Flasks", "Utility Flasks", "Critical Utility Flasks"}
 GEM_CLASSES = {"Skill Gems", "Support Gems"}
 EQUIPMENT_TRADE_IDS = {
@@ -225,6 +227,8 @@ def resolve(model, category, rarity, server, *, equipment=False):
     base = _lookup(lang, "ITEM", classes, name, rarity == "Magic", confirmed_base=confirmed_base)
     if base[4] or category == "Map" and base[1] not in MAP_BASES:
         raise ValueError("이 품목 변형은 아직 시세 검색을 지원하지 않습니다")
+    if category == "Map" and base[1] == "Vaal Temple Map" and not VAAL_TEMPLE_BROWSER_VERIFIED:
+        raise ValueError("브라우저 확인 대기: 아직 바알 사원 지도를 검색할 수 없습니다")
     if category == "Map" and (tier == 0 or (tier is None and base[1] not in TIERLESS_MAP_BASES)):
         raise ValueError("지도 등급을 읽을 수 없습니다")
     unique_name = ""

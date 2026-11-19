@@ -4,7 +4,7 @@ from __future__ import annotations
 import math
 import re
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from functools import lru_cache
 from datetime import datetime, timezone
 from decimal import Decimal, ROUND_FLOOR
@@ -15,8 +15,8 @@ from itemcheck import CLASS_NAMES
 from itemmodel import (CORRUPT_FLAGS, EATER_FLAGS, EXARCH_FLAGS, ITEM_LEVEL_KEYS, SEP, ItemModel, badge, mod_en,
                        parse, skeleton)
 from trade.config import OFFICIAL, validate_server
-from trade import heist, items, viscera
-from trade.stats import Match, index
+from trade import heist, items, resistance, unique_mods, viscera
+from trade.stats import Match, index, option_gate
 
 WEAPONS = {"One Hand Sword", "Thrusting One Hand Sword", "One Hand Axe", "One Hand Mace",
            "Sceptre", "Claw", "Dagger", "Rune Dagger", "Wand", "Two Hand Sword", "Two Hand Axe",
@@ -97,13 +97,14 @@ class StatCondition:
     minimum: float | None = None
     maximum: float | None = None
     badge: str = ""
+    detail: str = ""
 
     def switch_kind(self) -> None:
         if self.kind not in ("explicit", "fractured") or not self.match.alternate_id:
             return
         self.kind = "fractured" if self.kind == "explicit" else "explicit"
         self.badge = "분열" if self.kind == "fractured" else "explicit"
-        self.match = Match(self.match.alternate_id, self.match.invert, "", self.match.id)
+        self.match = replace(self.match, id=self.match.alternate_id, alternate_id=self.match.id)
 
 
 def item_info(model: ItemModel | None, server: str = OFFICIAL) -> TradeItem:
@@ -276,6 +277,18 @@ def _granted_gem(text: str) -> tuple[str, int] | None:
     return (line, int(level)) if line else None
 
 
+def _option_english(info: TradeItem, mod, support: tuple[str, int] | None) -> str | None:
+    english = support[0] if support else mod_en(info.model, mod)
+    if (support and info.model.lang == "ko" and info.rarity != "Unique"
+            and info.category in GEAR | {"ARMOUR", "WEAPON"} and GRANTS_KO.fullmatch(mod.text)):
+        gear_line = english.replace("\u200b", "") + " Skill"
+        # 같은 종류의 매처가 모호하면 기존 부여 형식으로 우회하지 않는다.
+        preferred = index().resolve(gear_line, mod.kind, info.category)
+        if preferred.id or preferred.ambiguous or preferred.reason != Match().reason:
+            return gear_line
+    return english
+
+
 def conditions(info: TradeItem, ratio: float = 0.9) -> list[StatCondition]:
     if not info.model or info.category == FORBIDDEN_TOME:
         return []
@@ -300,24 +313,68 @@ def conditions(info: TradeItem, ratio: float = 0.9) -> list[StatCondition]:
                           info.identity.quality, badge="젬"),
         ]
     result = heist_conditions(info)
-    for mod in info.model.mods:
+    unique = unique_mods.unique_ref(info.model, info.rarity)
+    mods = info.model.mods
+    skip = None
+    for pos, mod in enumerate(mods):
+        if pos == skip:
+            continue
+        if unique == unique_mods.MONARCH and (mod.copy_parts or pos + 1 < len(mods)):
+            first, following = mod.copy_parts or (mod, mods[pos + 1])
+            paired = unique_mods.living_pair(info.model, first, following)
+            if paired is not None:
+                if paired.id:
+                    result.append(StatCondition(first.text, first.kind, paired, True, badge=badge(first) or first.kind,
+                                                detail=first.text + "\n" + following.text))
+                else:
+                    for line in (first, following):
+                        result.append(StatCondition(line.text, line.kind, paired, badge=badge(line) or line.kind))
+                if not mod.copy_parts:
+                    skip = pos + 1
+                continue
         if (info.identity and info.identity.apt_category == "Map"
                 and (mod.text.startswith(MONSTER_LEVEL_KEYS) or items.map_identity_id(info.model.lang, mod.text))):
             continue
+        stat_index = index()
         support = _granted_gem(mod.text)
-        english = support[0] if support else mod_en(info.model, mod)
-        matched = index().match(english, mod.kind, info.category) if english else Match()
+        english = _option_english(info, mod, support)
+        matched = (stat_index.bilingual(mod.text, english, mod.kind, info.category) if info.model.lang == "ko"
+                   else stat_index.match(english, mod.kind, info.category) if english else Match())
+        if unique == unique_mods.MONARCH and matched.id.startswith(unique_mods.MONARCH_PREFIX):
+            matched = Match(reason="허용된 소환수 블록을 확인할 수 없습니다", candidate_refs=matched.candidate_refs)
         if mod.kind == "implicit" and mod.sub == "eldritch":
-            matched = Match(reason="총주교·포식자 옵션의 출처가 모호합니다")
+            matched = Match(reason="총주교·포식자 옵션의 출처가 모호합니다",
+                            candidate_refs=matched.candidate_refs)
         blueprint_enchant = info.heist is not None and info.category == heist.BLUEPRINT and mod.kind == "enchant"
-        minimum = (support[1] if support else matched.value if matched.value is not None
-                   else default_minimum(english, ratio)) if english and not blueprint_enchant else None
+        minimum = None
+        if matched.id and not blueprint_enchant:
+            if support:
+                minimum = support[1]
+            elif matched.value is not None:
+                minimum = matched.value
+            elif not re.search(r"\b(reduced|less)\b", english or ""):
+                minimum = default_minimum(" ".join(matched.rolls), ratio)
+        destiny = (unique == unique_mods.DESTINY and mod.kind == "explicit" and not matched.ids
+                   and (matched.ref, matched.id) in unique_mods.destiny_pool())
         result.append(StatCondition(mod.text, mod.kind, matched,
                                    bool(matched.id and (blueprint_enchant or (info.rarity == "Rare" and mod.kind in ("explicit", "fractured"))
-                                                        or (info.rarity == "Magic" and mod.kind == "explicit"))),
+                                                        or (info.rarity == "Magic" and mod.kind == "explicit") or destiny)),
                                    minimum,
                                    badge=badge(mod) or mod.kind))
     return result
+
+
+def resistance_rows(info, rows, ratio=0.9):
+    if (not resistance.BROWSER_VERIFIED or not info.supported
+            or info.category not in GEAR | {"ARMOUR", "WEAPON"} or not index().total_resistance_id):
+        return rows, ""
+    first, total, reason = resistance.copied_total(rows)
+    if first is None:
+        return rows, reason
+    row = StatCondition(f"총 원소 저항 {total:+g}%", resistance.ROW_KIND,
+                        Match(index().total_resistance_id, reason=""), True,
+                        resistance.minimum(total, ratio), badge="합산")
+    return [*rows[:first], row, *rows[first:]], ""
 
 
 def _gem_filters(identity: items.Identity, stats: list[StatCondition]) -> dict:
@@ -404,7 +461,7 @@ def search_target(info: TradeItem, exact_base: bool | None = None) -> SearchTarg
 def build_query(info: TradeItem, stats: list[StatCondition], *, ilvl: bool = False,
                 links: bool = True, corrupted: bool = True,
                 influences: set[str] | None = None, exact_base: bool | None = None,
-                monster_level: bool = False) -> dict:
+                monster_level: bool = False, total_resistance: bool = False) -> dict:
     if not info.supported:
         raise ValueError(info.message)
     filters = {}
@@ -435,9 +492,22 @@ def build_query(info: TradeItem, stats: list[StatCondition], *, ilvl: bool = Fal
             if gem_filters:
                 filters.setdefault("misc_filters", {"filters": {}})["filters"].update(gem_filters)
     selected = []
+    total_mode = (total_resistance and resistance.BROWSER_VERIFIED and info.category in GEAR | {"ARMOUR", "WEAPON"}
+                  and any(row.kind == resistance.ROW_KIND and row.match.id == index().total_resistance_id
+                          for row in stats)
+                  and resistance.copied_total(stats)[0] is not None)
+    count_groups = []
     not_enchanted = []
+    monarch = unique_mods.unique_ref(info.model, info.rarity) == unique_mods.MONARCH
     for condition in stats:
+        if resistance.excluded(condition, total_mode):
+            continue
         if condition.kind in ("gem_filter", "viscera_tier") or not condition.checked or not condition.match.id:
+            continue
+        if monarch and condition.match.id.startswith(unique_mods.MONARCH_PREFIX):
+            if (unique_mods.LIVING_BROWSER_VERIFIED and condition.match.id == unique_mods.LIVING_ID
+                    and condition.match.ref == unique_mods.LIVING_REF and condition.detail):
+                selected.append({"id": condition.match.id})
             continue
         if info.heist and condition.kind.startswith("heist_"):
             key = condition.match.id
@@ -461,13 +531,33 @@ def build_query(info: TradeItem, stats: list[StatCondition], *, ilvl: bool = Fal
             if value:
                 filters.setdefault(group, {"filters": {}})["filters"][key] = value
             continue
+        if option_gate(condition.match, condition.kind):
+            continue
         values = {}
         for key, value in (("min", condition.minimum), ("max", condition.maximum)):
             if value is not None:
                 if not math.isfinite(value):
                     raise ValueError("최소·최대값은 유한한 숫자로 입력하세요")
                 values[("max" if key == "min" else "min") if condition.match.invert else key] = -value if condition.match.invert else value
-        selected.append({"id": condition.match.id, **({"value": values} if values else {})})
+        if condition.match.ids:
+            members = []
+            roll = condition.match.value
+            if roll is None and condition.match.rolls:
+                nums = tuple(map(float, condition.match.rolls))
+                roll = sum(nums[:2]) / min(len(nums), 2)
+                if condition.match.negate:
+                    roll = -roll
+            for stat_id in condition.match.ids:
+                prefix, brace, raw_id = stat_id.partition("}")
+                member_values = values
+                if prefix == "{empty_if_100" and roll == 100:
+                    member_values = {}
+                elif prefix == "{div_by_100":
+                    member_values = {key: bound / 100 for key, bound in values.items()}
+                members.append({"id": raw_id if brace else stat_id, "value": member_values, "disabled": False})
+            count_groups.append({"type": "count", "value": {"min": 1}, "disabled": False, "filters": members})
+        else:
+            selected.append({"id": condition.match.id, **({"value": values} if values else {})})
     if info.viscera:
         selected.append(_viscera_filter(info, stats))
     if info.influences:
@@ -477,7 +567,7 @@ def build_query(info: TradeItem, stats: list[StatCondition], *, ilvl: bool = Fal
         selected.extend({"id": stat_id} for stat_id in identity.map_ids)
     target = search_target(info, exact_base)
     query = {"status": {"option": "securable"}, "type": target.base,
-             "stats": [{"type": "and", "filters": selected}], "filters": filters}
+             "stats": [{"type": "and", "filters": selected}, *count_groups], "filters": filters}
     if not_enchanted:
         query["stats"].append({"type": "not", "filters": not_enchanted})
     if target.category:

@@ -260,16 +260,22 @@ def test_shared_window_query_in_both_modes(app, monkeypatch, text, server):
         window.load(text)
         assert window.search_button.isEnabled(), window.hint.text()
         if "Topaz Ring" in text:
-            assert [(row.kind, row.checked) for row in window.stats] == [("explicit", True), ("implicit", False)]
-            for row, (check, _, _) in zip(window.stats, window.inputs):
-                check.setChecked(row.kind == "implicit")
+            assert window.total_resistance
+            assert [(check.text(), check.isEnabled(), check.isChecked()) for check, _, _ in window.inputs] == [
+                ("+30 to maximum Life", True, True),
+                ("총 원소 저항 +12%", True, True),
+                ("+12% to Lightning Resistance", False, False),
+            ]
+            window.inputs[0][0].setChecked(False)
         assert not sent
         window.search()
     assert len(opened) == len(sent) == 1
     assert sent[0][:2] == ("POST", server + "/api/trade/search/Standard")
     assert sent[0][2] == json.loads(parse_qs(urlsplit(opened[0]).query)["q"][0])
     if "Topaz Ring" in text:
-        assert [row["id"].split(".")[0] for row in sent[0][2]["query"]["stats"][0]["filters"]] == ["implicit"]
+        assert sent[0][2]["query"]["stats"][0]["filters"] == [
+            {"id": "pseudo.pseudo_total_elemental_resistance", "value": {"min": 10}},
+        ]
     assert "검색 결과가 없습니다" in window.result_summary.text()
     window.close()
 

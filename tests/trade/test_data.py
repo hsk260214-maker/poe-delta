@@ -47,7 +47,7 @@ def test_data_provenance_and_converter():
     result = module.convert([sample])
     assert result["entries"][1]["test"] == "ARMOUR"
     assert result["entries"][1]["inverted"]
-    assert result["matchers"][1] == {"skeleton": "# armour", "negate": True, "has_value": True, "value": 1,
+    assert result["matchers"][1] == {"string": "# Armour", "negate": True, "has_value": True, "value": 1,
                                      "advanced": True, "entry": 1}
     wrong_influence = {"ref": "Has Shaper Influence",
                        "trade": {"ids": {"pseudo": ["pseudo.pseudo_has_elder_influence"]}}, "matchers": []}
@@ -65,7 +65,9 @@ def test_build_license_metadata_stays_in_cache(tmp_path, monkeypatch):
         {"ref": f"Has {name} Influence", "trade": {"ids": {"pseudo": [stat_id]}}, "matchers": []}
         for name, stat_id in module.INFLUENCE_IDS.items()
     ] + [{"ref": "# Enchant Modifiers",
-          "trade": {"ids": {"pseudo": ["pseudo.pseudo_number_of_enchant_mods"]}}, "matchers": []}])
+          "trade": {"ids": {"pseudo": ["pseudo.pseudo_number_of_enchant_mods"]}}, "matchers": []},
+         {"ref": "+#% total Elemental Resistance",
+          "trade": {"ids": {"pseudo": ["pseudo.pseudo_total_elemental_resistance"]}}, "matchers": []}])
 
     def fake_download(url, path, refresh):
         assert path.is_relative_to(cache)

@@ -30,6 +30,8 @@ with patch('requests.Session.request', denied), patch.object(socket.socket,'conn
     window=TradeWindow()
     window.load(Path('tests/trade/fixtures/rare_en.txt').read_text())
     window.base_button.setChecked(True)
+    window.resistance_button.click()
+    assert not window.total_resistance
     assert window.search_button.isEnabled()
     assert window.table.isHidden()
     window.search()
@@ -218,6 +220,8 @@ def test_kakao_blocks_english_with_action_and_keeps_korean_search(app, fixtures,
     window.load((fixtures / "rare_ko.txt").read_text(encoding="utf-8"))
     assert window.search_button.isEnabled()
     window.base_button.setChecked(True)
+    window.resistance_button.click()
+    assert not window.total_resistance
     window.search()
     expected = json.loads((fixtures / "browser_links.json").read_text(encoding="utf-8"))
     assert opened == [expected["rare_ko_kakao"]]

@@ -17,12 +17,14 @@ STRATEGIES = {"select", "trivial-merge", "percent-merge", "flag-merge"}
 INFLUENCE_IDS = {name: f"pseudo.pseudo_has_{name.lower()}_influence"
                  for name in ("Shaper", "Elder", "Crusader", "Redeemer", "Hunter", "Warlord")}
 ENCHANT_COUNT_ID = "pseudo.pseudo_number_of_enchant_mods"
+TOTAL_RESISTANCE_ID = "pseudo.pseudo_total_elemental_resistance"
 
 
 def convert(rows: list[dict]) -> dict:
     entries, groups, matchers = [], [], []
     influences = {}
     enchant_count_id = ""
+    total_resistance_id = ""
     influence_refs = {f"Has {name} Influence": name for name in INFLUENCE_IDS}
     for row in rows:
         group = None
@@ -35,6 +37,11 @@ def convert(rows: list[dict]) -> dict:
         else:
             stats = [row]
         for i, stat in enumerate(stats):
+            if stat["ref"] == "+#% total Elemental Resistance":
+                ids = stat["trade"]["ids"].get("pseudo", [])
+                if ids != [TOTAL_RESISTANCE_ID] or total_resistance_id:
+                    raise ValueError("APT 총 원소 저항 ID 불일치")
+                total_resistance_id = ids[0]
             if stat["ref"] == "# Enchant Modifiers":
                 ids = stat["trade"]["ids"].get("pseudo", [])
                 if ids != [ENCHANT_COUNT_ID] or enchant_count_id:
@@ -47,6 +54,7 @@ def convert(rows: list[dict]) -> dict:
                 influences[name] = ids[0]
             entry = len(entries)
             entries.append({
+                "ref": stat["ref"],
                 "ids": {k: stat["trade"]["ids"][k] for k in KINDS if k in stat["trade"]["ids"]},
                 "inverted": bool(stat["trade"].get("inverted")),
                 "group": group,
@@ -54,16 +62,16 @@ def convert(rows: list[dict]) -> dict:
             })
             for matcher in stat["matchers"]:
                 matchers.append({
-                    "skeleton": dict_builder._skel(matcher["string"]),
+                    "string": matcher["string"],
                     "negate": bool(matcher.get("negate")),
                     "has_value": "value" in matcher,
                     "value": matcher.get("value"),
-                    "advanced": bool(matcher.get("advanced")),
+                    "advanced": matcher.get("advanced"),
                     "entry": entry,
                 })
     return {"source": {"project": "SnosMe/awakened-poe-trade", "commit": COMMIT},
             "entries": entries, "groups": groups, "matchers": matchers, "influences": influences,
-            "enchant_count_id": enchant_count_id}
+            "enchant_count_id": enchant_count_id, "total_resistance_id": total_resistance_id}
 
 
 def main() -> None:
@@ -74,10 +82,14 @@ def main() -> None:
     args = parser.parse_args()
     dict_builder.CACHE = args.cache
     result = convert(dict_builder.apt_ndjson("en/stats.ndjson", args.refresh, base=BASE, flatten=False))
+    korean = convert(dict_builder.apt_ndjson("ko/stats.ndjson", args.refresh, base=BASE, flatten=False))
+    result["ko"] = {key: korean[key] for key in ("entries", "groups", "matchers")}
     if result["influences"] != INFLUENCE_IDS:
         raise ValueError("고정 APT 자료에 전통 영향력 ID 6개가 모두 있어야 합니다")
     if not result["enchant_count_id"]:
         raise ValueError("고정 APT 자료에 인챈트 개수 ID가 있어야 합니다")
+    if not result["total_resistance_id"]:
+        raise ValueError("고정 APT 자료에 총 원소 저항 ID가 있어야 합니다")
     args.out.mkdir(parents=True, exist_ok=True)
     (args.out / "trade_stats.json").write_text(json.dumps(result, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     license_cache = args.cache / f"apt_{COMMIT}_LICENSE"

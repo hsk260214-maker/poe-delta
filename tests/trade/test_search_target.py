@@ -110,8 +110,9 @@ def test_trade_window_keeps_copied_option_order_including_unmatched_rows(app):
         checks = sorted((check for check, _, _ in window.inputs),
                         key=lambda check: check.mapTo(window, QPoint()).y())
         assert [check.text() for check in checks] == [
-            "생명력 최대치 +30", "번개 저항 +20%", "지원하지 않는 옵션 17% 증가",
+            "생명력 최대치 +30", "총 원소 저항 +20%", "번개 저항 +20%", "지원하지 않는 옵션 17% 증가",
         ]
+        assert checks[1].isChecked() and not checks[2].isEnabled()
         assert not checks[-1].isEnabled()
     finally:
         window.close()
@@ -201,7 +202,8 @@ def test_bulk_actions_only_change_enabled_option_checks(app, fixtures, monkeypat
     opened = []
     monkeypatch.setattr(browser, "open_url", opened.append)
     config.save(server=config.KAKAO, mode="browser", league="Standard")
-    text = RING if fixture is None else (fixtures / fixture).read_text(encoding="utf-8")
+    text = (RING.replace("생명력 최대치 +30", "생명력 최대치 +30\n화염 저항 +30% (crafted)")
+            if fixture is None else (fixtures / fixture).read_text(encoding="utf-8"))
     window = TradeWindow()
     window.load(text)
     enabled = [check for check, _, _ in window.inputs if check.isEnabled()]

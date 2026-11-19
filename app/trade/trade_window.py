@@ -16,9 +16,9 @@ import winutil
 from asyncjob import run_async
 from itemmodel import ItemModel, parse
 from theme import build_qss
-from trade import browser, config, focus_log, heist
+from trade import browser, config, focus_log, heist, resistance
 from trade.query import (FORBIDDEN_TOME, INFLUENCE_LABELS, SearchTarget, build_query, conditions, item_info,
-                         league_for, result_rows, search_target, summary)
+                         league_for, resistance_rows, result_rows, search_target, summary)
 
 TRADE_WINDOW_STYLE = """
 QWidget#TradeHero {
@@ -109,6 +109,7 @@ class TradeWindow(QWidget):
         self._result_link = ""
         self.stats = []
         self.inputs = []
+        self.total_resistance = False
         self.influence_inputs = {}
         layout = QVBoxLayout(self)
         self.mode_label = _wrapped_label()
@@ -183,6 +184,10 @@ class TradeWindow(QWidget):
             button.hide()
             options_header.addWidget(button)
         layout.addLayout(options_header)
+        self.resistance_button = QPushButton()
+        self.resistance_button.clicked.connect(self._toggle_resistance)
+        self.resistance_button.hide()
+        layout.addWidget(self.resistance_button)
         scroll = QScrollArea()
         scroll.setAccessibleName("검색 옵션")
         scroll.setMinimumHeight(84)
@@ -287,23 +292,61 @@ class TradeWindow(QWidget):
         self.base_button.setAccessibleName(f"검색 범위: {label}")
         self.base_button.setToolTip(label)
 
-    def _enabled_options(self) -> list[QCheckBox]:
-        return [check for check, _, _ in self.inputs if check.isEnabled()]
+    def _enabled_options(self, *, selecting=False) -> list[QCheckBox]:
+        return [check for row, (check, _, _) in zip(self.stats, self.inputs)
+                if check.isEnabled() and not (selecting and self.total_resistance and resistance.role(row) == "hybrid")]
 
     def _update_bulk_buttons(self) -> None:
         checks = self._enabled_options()
         self.select_all.setVisible(bool(checks))
         self.clear_all.setVisible(bool(checks))
-        self.select_all.setEnabled(any(not check.isChecked() for check in checks))
+        self.select_all.setEnabled(any(not check.isChecked() for check in self._enabled_options(selecting=True)))
         self.clear_all.setEnabled(any(check.isChecked() for check in checks))
 
     def _set_all_options(self, checked: bool) -> None:
-        changed = [check for check in self._enabled_options() if check.isChecked() != checked]
+        changed = [check for check in self._enabled_options(selecting=checked) if check.isChecked() != checked]
         for check in changed:
             with QSignalBlocker(check):
                 check.setChecked(checked)
         if changed:
             self._conditions_changed()
+
+    def _resistance_state(self):
+        return {i: (check.isChecked(), lo.text(), hi.text())
+                for i, (row, (check, lo, hi)) in enumerate(zip(self.stats, self.inputs))
+                if resistance.role(row) in ("elemental", "hybrid", "total")}
+
+    def _apply_resistance_mode(self) -> None:
+        label = "총합으로 검색" if self.total_resistance else "줄마다 검색"
+        self.resistance_button.setText(f"저항: {label}")
+        for i, (checked, minimum, maximum) in self._resistance_states[self.total_resistance].items():
+            row = self.stats[i]
+            check, lo, hi = self.inputs[i]
+            badge, switch = self._resistance_widgets[i]
+            role = resistance.role(row)
+            excluded = resistance.excluded(row, self.total_resistance)
+            with QSignalBlocker(check), QSignalBlocker(lo), QSignalBlocker(hi):
+                check.setChecked(checked and not excluded)
+                lo.setText(minimum)
+                hi.setText(maximum)
+            for widget in (check, lo, hi):
+                widget.setEnabled(not excluded)
+            if switch:
+                switch.setEnabled(not excluded and bool(row.match.alternate_id))
+            hint = resistance.INCLUDED if excluded else (
+                resistance.HYBRID_HINT if self.total_resistance and role == "hybrid" else "")
+            check.setToolTip("\n".join(part for part in (row.text, hint) if part))
+            badge.setText("포함" if excluded and role == "elemental" else
+                          "혼합" if hint == resistance.HYBRID_HINT else
+                          "일반" if row.badge == "explicit" else row.badge)
+            if role == "total":
+                check.parentWidget().setVisible(not excluded)
+
+    def _toggle_resistance(self) -> None:
+        self._resistance_states[self.total_resistance] = self._resistance_state()
+        self.total_resistance = not self.total_resistance
+        self._apply_resistance_mode()
+        self._conditions_changed()
 
     def load(self, item: ItemModel | str | None, hwnd: int = 0) -> None:
         self._loading = True
@@ -351,6 +394,10 @@ class TradeWindow(QWidget):
         self.base_button.setVisible(scoped)
         self.stats = (conditions(self.info, trade.get("min_ratio", 0.9))
                       if self.info.supported or self.info.heist or self.info.viscera else [])
+        self.stats, resistance_note = resistance_rows(self.info, self.stats, trade.get("min_ratio", 0.9))
+        self.total_resistance = any(row.kind == resistance.ROW_KIND for row in self.stats)
+        self.resistance_button.setVisible(self.total_resistance)
+        self._resistance_widgets = {}
         self.inputs = []
         self.influence_inputs = {}
         while self.stat_layout.count():
@@ -358,6 +405,10 @@ class TradeWindow(QWidget):
             widget.hide()
             widget.setParent(None)
             widget.deleteLater()
+        if resistance_note:
+            note = _wrapped_label()
+            note.setText(resistance_note)
+            self.stat_layout.addWidget(note)
         if self.info.heist and self.info.heist.area is not None and not heist.area_enabled(self.info.category):
             area_note = _wrapped_label()
             area_note.setText(f"지역 레벨 {self.info.heist.area} · 지역 레벨 조건은 아직 지원하지 않습니다")
@@ -385,8 +436,8 @@ class TradeWindow(QWidget):
             "gem_filter": "젬 조건",
             "viscera_tier": "단계 구분 (필수)",
         }
-        for condition in self.stats:
-            kind = condition.kind
+        for i, condition in enumerate(self.stats):
+            kind = self.stats[i + 1].kind if condition.kind == resistance.ROW_KIND else condition.kind
             section_kind = kind if kind in section_titles else "other"
             if section_kind != previous_kind:
                 if previous_kind is not None:
@@ -418,7 +469,7 @@ class TradeWindow(QWidget):
             mandatory = condition.kind == "viscera_tier"
             check.setEnabled(bool(condition.match.id) and not mandatory)
             reason = "단계를 구분하는 필수 조건이라 끌 수 없습니다" if mandatory else condition.match.reason
-            check.setToolTip("\n".join(part for part in (condition.text, reason) if part))
+            check.setToolTip("\n".join(part for part in (condition.detail or condition.text, reason) if part))
             check.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
             check.setMinimumWidth(64)
             badge = QLabel("일반" if condition.badge == "explicit" else condition.badge)
@@ -438,7 +489,8 @@ class TradeWindow(QWidget):
                 box.setAccessibleName(f"{condition.text} {placeholder}")
                 box.setText("" if value is None else f"{value:g}")
                 box.setEnabled(bool(condition.match.id))
-                if condition.kind in ("heist_option", "heist_not") or (condition.kind == "heist_job" and box is maximum):
+                if (condition.detail or condition.kind in ("heist_option", "heist_not")
+                        or (condition.kind == "heist_job" and box is maximum)):
                     box.hide()
                 box.textChanged.connect(self._conditions_changed)
             if not condition.match.id:
@@ -446,6 +498,7 @@ class TradeWindow(QWidget):
                 row.setToolTip(condition.match.reason)
             form.addWidget(check, 1)
             form.addWidget(badge)
+            switch = None
             if condition.kind in ("explicit", "fractured"):
                 switch = QPushButton("종류 전환")
                 switch.setAccessibleName(f"{condition.text} 종류 전환")
@@ -459,6 +512,16 @@ class TradeWindow(QWidget):
             check.toggled.connect(self._conditions_changed)
             section_layout.addWidget(row)
             self.inputs.append((check, minimum, maximum))
+            if self.total_resistance and resistance.role(condition) in ("elemental", "hybrid", "total"):
+                self._resistance_widgets[i] = badge, switch
+        if self.total_resistance:
+            per_row = self._resistance_state()
+            self._resistance_states = {
+                False: per_row,
+                True: {i: (checked if resistance.role(self.stats[i]) == "total" else False, lo, hi)
+                       for i, (checked, lo, hi) in per_row.items()},
+            }
+            self._apply_resistance_mode()
         if not self.inputs:
             self.stat_layout.addWidget(QLabel("표시할 검색 옵션이 없습니다"))
         elif not self._enabled_options():
@@ -479,6 +542,8 @@ class TradeWindow(QWidget):
     def _query(self) -> dict:
         for condition, (check, minimum, maximum) in zip(self.stats, self.inputs):
             condition.checked = check.isChecked()
+            if resistance.excluded(condition, self.total_resistance):
+                continue
             if condition.kind in ("gem_filter", "viscera_tier"):
                 if condition.checked:
                     try:
@@ -499,6 +564,7 @@ class TradeWindow(QWidget):
         return build_query(self.info, self.stats, ilvl=self.ilvl.isChecked(),
                            links=self.links.isChecked(), corrupted=self.corrupted.isChecked(),
                            monster_level=self.monster_level.isChecked(),
+                           total_resistance=self.total_resistance,
                            exact_base=self.base_button.isChecked(),
                            influences={name for name, check in self.influence_inputs.items() if check.isChecked()})
 

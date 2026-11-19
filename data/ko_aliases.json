@@ -1,0 +1,10 @@
+{
+  "지역에 허상 등장": {
+    "apt_ko": "지역에 신기루 등장",
+    "ref": "Area contains a Mirage",
+    "kind": "explicit",
+    "id": "explicit.stat_2436559047",
+    "verified_on": "2026-11-19",
+    "verification": "머성이 카카오 거래소에서 악몽 지도와 해당 ID로 검색해 매물의 문구를 확인"
+  }
+}

@@ -169,7 +169,7 @@ def test_select_does_not_borrow_from_other_record():
             {"group": 0, "test": "WEAPON", "inverted": True, "ids": {"explicit": ["explicit.local"]}},
         ],
         "groups": [{"strat": "select"}],
-        "matchers": [{"entry": n, "skeleton": "# damage", "negate": False, "has_value": False} for n in (0, 1)],
+        "matchers": [{"entry": n, "string": "# damage", "negate": False, "value": None} for n in (0, 1)],
     })
     local = fixture.match("10 damage", "explicit", "WEAPON")
     assert local.id == "explicit.local" and local.invert and not local.alternate_id
