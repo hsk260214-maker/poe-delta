@@ -26,7 +26,8 @@ WINGS = {"en": "Wings Revealed: ", "ko": "부속 건물 드러남: "}
 AREA = {"en": "Area Level: ", "ko": "지역 레벨: "}
 AREA_API_VERIFIED = frozenset({BLUEPRINT, CONTRACT})
 # 2026-11-18 머성이 카카오 Standard 도면: 대저택 링크로 지역 레벨 83~83을 확인했다.
-AREA_BROWSER_VERIFIED = frozenset({BLUEPRINT})
+# 2026-11-19 머성이 지역 레벨 75~75 도면·계약(벙커) 카카오 링크에서 해당 지역 레벨만 나오는 것을 확인했다.
+AREA_BROWSER_VERIFIED = frozenset({BLUEPRINT, CONTRACT})
 
 
 @dataclass(frozen=True)

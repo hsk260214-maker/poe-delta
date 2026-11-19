@@ -88,7 +88,9 @@ def test_kakao_contract_advanced_clipboard(fixtures):
     query = build_query(info, rows)["query"]
     assert query["filters"]["heist_filters"]["filters"] == {"heist_engineering": {"min": 5}}
     assert heist.read(model.head, "ko", heist.CONTRACT).area == 83
-    assert not any(row.kind == "heist_area" for row in rows)
+    area, = [row for row in rows if row.kind == "heist_area"]
+    assert not area.checked and area.minimum == 83
+    assert "area_level" not in query["filters"].get("map_filters", {}).get("filters", {})
     assert build_query(info, rows, exact_base=True)["query"]["type"] == "계약: 벙커"
     explicit = [row for row in rows if row.kind == "explicit"]
     assert [row.text for row in explicit] == [

@@ -354,6 +354,9 @@ def conditions(info: TradeItem, ratio: float = 0.9) -> list[StatCondition]:
                 minimum = matched.value
             elif not re.search(r"\b(reduced|less)\b", english or ""):
                 minimum = default_minimum(" ".join(matched.rolls), ratio)
+                if (minimum is not None and matched.rolls in (("1",), ("+1",))
+                        and not (matched.invert or matched.inverted or matched.negate or matched.ids or info.heist)):
+                    minimum = max(minimum, 1)
         destiny = (unique == unique_mods.DESTINY and mod.kind == "explicit" and not matched.ids
                    and (matched.ref, matched.id) in unique_mods.destiny_pool())
         result.append(StatCondition(mod.text, mod.kind, matched,
