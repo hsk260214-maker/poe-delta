@@ -67,3 +67,40 @@ def test_length_includes_quote_negation_and_separator(length):
     result = map_regex.fit(text)
     assert result.length == length
     assert result.text == (text if length <= 250 else "")
+
+
+@pytest.mark.parametrize("language,expected", [
+    ("ko", r'"!동.속.*증|배율.+4\d|배율.+7\d|의.방어력"'),
+    ("en", '"!r at|tip|lier|efe"'),
+])
+def test_bundled_multiline_options_keep_site_fragments(language, expected):
+    catalog = mapcheck.catalog()
+    selected = [
+        "#% increased monster attack speed",
+        "#% increased monster cast speed",
+        "#% to monster critical strike multiplier",
+        "players have #% less defences",
+    ]
+    assert map_regex.build(selected, catalog, map_regex.load_patterns(catalog), language).text == expected
+
+
+def test_maven_only_option_without_site_match_blocks_partial_regex():
+    catalog = mapcheck.catalog()
+    result = map_regex.build([REGEN, "maven releases all bosses at once"], catalog, map_regex.load_patterns(catalog))
+    assert result.text == ""
+    assert "메이븐이 모든 보스를 한꺼번에 내보냄" in result.issue
+
+
+def test_maven_checkbox_is_disabled_and_old_selection_does_not_block_copy(app, monkeypatch):
+    maven = "maven releases all bosses at once"
+    settings = {"map_avoid": [maven, REGEN]}
+    saved = []
+    monkeypatch.setattr(map_avoid_panel, "load_settings", lambda: settings.copy())
+    monkeypatch.setattr(map_avoid_panel, "save_settings", saved.append)
+    host = QWidget()
+    card = map_avoid_panel.MapAvoidCard(host, QVBoxLayout(host))
+    checkbox, = [box for row, box in card.boxes if row["key"] == maven]
+    assert not checkbox.isEnabled() and not checkbox.isChecked()
+    assert saved == [{"map_avoid": [REGEN]}]
+    assert card.regex_copy.isEnabled() and card.regex_text.text() == '"!재생"'
+    host.close()

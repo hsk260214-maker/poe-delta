@@ -13,6 +13,7 @@ import map_regex
 from storage import load_settings, save_settings
 
 T17 = "#d77fe0"
+MAVEN_ALL_BOSSES = "maven releases all bosses at once"
 
 
 class RegexOutput(QLineEdit):
@@ -34,7 +35,12 @@ class RegexOutput(QLineEdit):
 class MapAvoidCard:
     def __init__(self, page, v):
         self.page = page
-        self.avoid = dict.fromkeys(load_settings().get("map_avoid") or [])
+        settings = load_settings()
+        self.avoid = dict.fromkeys(settings.get("map_avoid") or [])
+        if MAVEN_ALL_BOSSES in self.avoid:
+            del self.avoid[MAVEN_ALL_BOSSES]
+            settings["map_avoid"] = list(self.avoid)
+            save_settings(settings)
         info = QLabel("지도에 Ctrl+C 하면 여기서 체크한 옵션이 붙어 있는지 바로 알려줘요. "
                       "티어마다 수치만 다른 옵션은 하나로 묶여 있어서, 하나만 체크해도 모든 티어(17티어 포함)에 걸려요.")
         info.setObjectName("SectionLabel")
@@ -112,8 +118,12 @@ class MapAvoidCard:
                 cb.setStyleSheet(f"QCheckBox {{ color: {T17}; }}")
             where = " · ".join(mapcheck.TIER_KO[t] for t in e["tiers"])
             cb.setToolTip(f"{e['en']}\n나오는 곳: {where}")
-            cb.setChecked(e["key"] in self.avoid)
-            cb.toggled.connect(lambda on, k=e["key"]: self._toggled(k, on))
+            if e["key"] == MAVEN_ALL_BOSSES:
+                cb.setText(f"{e['ko']} (정규식 미지원)")
+                cb.setEnabled(False)
+            else:
+                cb.setChecked(e["key"] in self.avoid)
+                cb.toggled.connect(lambda on, k=e["key"]: self._toggled(k, on))
             self.boxes.append((e, cb))
         self._layout()
         self.regex_language.currentIndexChanged.connect(self._update_regex)
