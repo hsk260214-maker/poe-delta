@@ -57,6 +57,7 @@ def convert(rows: list[dict]) -> dict:
                     "skeleton": dict_builder._skel(matcher["string"]),
                     "negate": bool(matcher.get("negate")),
                     "has_value": "value" in matcher,
+                    "value": matcher.get("value"),
                     "advanced": bool(matcher.get("advanced")),
                     "entry": entry,
                 })

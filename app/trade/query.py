@@ -5,15 +5,17 @@ import math
 import re
 from collections import Counter
 from dataclasses import dataclass
+from functools import lru_cache
 from datetime import datetime, timezone
 from decimal import Decimal, ROUND_FLOOR
 from statistics import median
 
 import ko2en
 from itemcheck import CLASS_NAMES
-from itemmodel import CORRUPT_FLAGS, EATER_FLAGS, EXARCH_FLAGS, ITEM_LEVEL_KEYS, SEP, ItemModel, badge, mod_en, parse
+from itemmodel import (CORRUPT_FLAGS, EATER_FLAGS, EXARCH_FLAGS, ITEM_LEVEL_KEYS, SEP, ItemModel, badge, mod_en,
+                       parse, skeleton)
 from trade.config import OFFICIAL, validate_server
-from trade import heist, items
+from trade import heist, items, viscera
 from trade.stats import Match, index
 
 WEAPONS = {"One Hand Sword", "Thrusting One Hand Sword", "One Hand Axe", "One Hand Mace",
@@ -29,8 +31,10 @@ FORBIDDEN_TOME = "Forbidden Tome"
 TOME_COPY_NAMES = {"ko": ("성역 연구", "금지된 책"), "en": ("Sanctum Research", FORBIDDEN_TOME)}
 NUMBERS = re.compile(r"[+-]?\d+(?:\.\d+)?")
 MONSTER_LEVEL_KEYS = ("몬스터 레벨:", "Monster Level:")
-FASTER_ATTACKS_KO = re.compile(r"장착된 젬에 ([1-9][0-9]*)레벨 공격 속도 증가( 보조)? 보조 효과 적용")
-FASTER_ATTACKS_EN = re.compile(r"Socketed Gems are Supported by Level ([1-9][0-9]*) \u200b?Faster Attacks( Support)?")
+SUPPORTED_BY_KO = re.compile(r"장착된 젬에 ([1-9][0-9]*)레벨 (.+) 보조 효과 적용")
+SUPPORTED_BY_EN = re.compile(r"Socketed Gems are Supported by Level ([1-9][0-9]*) \u200b?(.+)", re.I)
+GRANTS_KO = re.compile(r"([1-9][0-9]*)레벨 (.+) 스킬 사용 가능")
+GRANTS_EN = re.compile(r"Grants Level ([1-9][0-9]*) \u200b?(.+?)(?: Skill)?")
 INFLUENCE_LABELS = {"Shaper": "쉐이퍼", "Elder": "엘더", "Crusader": "십자군",
                     "Redeemer": "대속자", "Hunter": "사냥꾼", "Warlord": "전쟁군주"}
 
@@ -61,6 +65,7 @@ class TradeItem:
     blocked_reason: str = ""
     equipment_category: str = ""
     heist: heist.Heist | None = None
+    viscera: viscera.Viscera | None = None
 
     @property
     def can_filter_ilvl(self) -> bool:
@@ -127,6 +132,26 @@ def item_info(model: ItemModel | None, server: str = OFFICIAL) -> TradeItem:
         info.base = FORBIDDEN_TOME if server == OFFICIAL else TOME_COPY_NAMES["ko"][1]
         info.name = ""
         info.supported = True
+        return info
+    if info.class_label in viscera.CLASSES:
+        info.category = viscera.CATEGORY
+        row = viscera.find(model.base, {skeleton(mod.text) for mod in model.mods})
+        if row is None or row.slot not in model.head:
+            info.blocked_reason = "아직 지원하지 않는 살덩이입니다"
+            return info
+        info.viscera = row
+        info.base = row.type_en if server == OFFICIAL else row.name
+        info.name = ""
+        values = [NUMBERS.findall(mod.text) for mod in model.mods if skeleton(mod.text) == row.skeleton]
+        if row.blocked:
+            info.blocked_reason = f"이 살덩이는 검색할 수 없습니다: {row.blocked}"
+        elif (len(values) != 1 or len(values[0]) <= row.value_index
+              or not row.low <= float(values[0][row.value_index]) <= row.high):
+            info.blocked_reason = "살덩이 단계를 확인할 수 없습니다"
+        elif row.tier not in viscera.VERIFIED_TIERS:
+            info.blocked_reason = "아직 확인되지 않은 살덩이 종류입니다"
+        else:
+            info.supported = True
         return info
     sockets = field(model.head, property_keys("Sockets"))
     info.links = max((len(group.split("-")) for group in sockets.split()), default=0)
@@ -224,18 +249,49 @@ def heist_conditions(info: TradeItem) -> list[StatCondition]:
     return rows
 
 
-def _faster_attacks(text: str) -> tuple[str, int] | None:
-    match = FASTER_ATTACKS_KO.fullmatch(text) or FASTER_ATTACKS_EN.fullmatch(text)
-    if not match:
+@lru_cache(maxsize=1)
+def _gem_names() -> dict[str, str]:
+    return {row[2]: row[1] for row in items.catalog()["items"]["ko"] if row[0] == "GEM"}
+
+
+def _granted_gem(text: str) -> tuple[str, int] | None:
+    """보조 젬·스킬 부여 줄을 거래소 영문 형식(레벨 수치 포함)으로 바꾼다."""
+    gems = _gem_names()
+    if match := SUPPORTED_BY_KO.fullmatch(text):
+        level, name = match.groups()
+        # 'X 보조 보조 효과'는 젬 이름 'X 보조' 그대로, 'X 보조 효과'는 무작위 보조 형식(Support 없음)이다.
+        english = gems.get(name) or gems.get(name + " 보조", "").removesuffix(" Support")
+        line = f"Socketed Gems are Supported by Level {level} \u200b{english}" if english else ""
+    elif match := SUPPORTED_BY_EN.fullmatch(text):
+        level, name = match.groups()
+        line = f"Socketed Gems are Supported by Level {level} \u200b{name}"
+    elif match := GRANTS_KO.fullmatch(text):
+        level, name = match.groups()
+        line = f"Grants Level {level} \u200b{gems[name]}" if name in gems else ""
+    elif match := GRANTS_EN.fullmatch(text):
+        level, name = match.groups()
+        line = f"Grants Level {level} \u200b{name}"
+    else:
         return None
-    level = int(match[1])
-    suffix = " Support" if match[2] else ""
-    return f"Socketed Gems are Supported by Level {level} \u200bFaster Attacks{suffix}", level
+    return (line, int(level)) if line else None
 
 
 def conditions(info: TradeItem, ratio: float = 0.9) -> list[StatCondition]:
     if not info.model or info.category == FORBIDDEN_TOME:
         return []
+    if info.viscera:
+        rows = []
+        for mod in info.model.mods:
+            if skeleton(mod.text) == info.viscera.skeleton:
+                rows.append(StatCondition(mod.text, "viscera_tier", Match(info.viscera.stat_id, reason=""), True,
+                                          info.viscera.low, info.viscera.high, badge="필수"))
+                continue
+            english = mod_en(info.model, mod)
+            matched = index().match(english, mod.kind, viscera.CATEGORY) if english else Match()
+            rows.append(StatCondition(mod.text, mod.kind, matched, False,
+                                      default_minimum(english, ratio) if english else None,
+                                      badge=badge(mod) or mod.kind))
+        return rows
     if info.identity and info.identity.gem_level is not None:
         return [
             StatCondition("젬 레벨", "gem_filter", Match("gem_level", reason=""), True,
@@ -248,13 +304,14 @@ def conditions(info: TradeItem, ratio: float = 0.9) -> list[StatCondition]:
         if (info.identity and info.identity.apt_category == "Map"
                 and (mod.text.startswith(MONSTER_LEVEL_KEYS) or items.map_identity_id(info.model.lang, mod.text))):
             continue
-        support = _faster_attacks(mod.text)
+        support = _granted_gem(mod.text)
         english = support[0] if support else mod_en(info.model, mod)
         matched = index().match(english, mod.kind, info.category) if english else Match()
         if mod.kind == "implicit" and mod.sub == "eldritch":
             matched = Match(reason="총주교·포식자 옵션의 출처가 모호합니다")
         blueprint_enchant = info.heist is not None and info.category == heist.BLUEPRINT and mod.kind == "enchant"
-        minimum = (support[1] if support else default_minimum(english, ratio)) if english and not blueprint_enchant else None
+        minimum = (support[1] if support else matched.value if matched.value is not None
+                   else default_minimum(english, ratio)) if english and not blueprint_enchant else None
         result.append(StatCondition(mod.text, mod.kind, matched,
                                    bool(matched.id and (blueprint_enchant or (info.rarity == "Rare" and mod.kind in ("explicit", "fractured"))
                                                         or (info.rarity == "Magic" and mod.kind == "explicit"))),
@@ -287,6 +344,21 @@ def _gem_filters(identity: items.Identity, stats: list[StatCondition]) -> dict:
     return filters
 
 
+def _viscera_filter(info: TradeItem, stats: list[StatCondition]) -> dict:
+    row = info.viscera
+    condition = next((c for c in stats if c.kind == "viscera_tier"), None)
+    bounds = []
+    for value, edge in ((condition.minimum if condition else None, row.low),
+                        (condition.maximum if condition else None, row.high)):
+        value = edge if value is None else value
+        if not math.isfinite(value) or int(value) != value or not row.low <= value <= row.high:
+            raise ValueError(f"단계 범위는 {row.low}~{row.high} 사이의 정수로 입력하세요")
+        bounds.append(int(value))
+    if bounds[0] > bounds[1]:
+        raise ValueError("최소값은 최대값보다 클 수 없습니다")
+    return {"id": row.stat_id, "value": {"min": bounds[0], "max": bounds[1]}}
+
+
 CATEGORY_LABELS = {
     "accessory.amulet": "목걸이", "accessory.belt": "허리띠", "accessory.ring": "반지",
     "armour.boots": "장화", "armour.chest": "갑옷", "armour.gloves": "장갑",
@@ -316,7 +388,7 @@ class SearchTarget:
 
 
 def search_target(info: TradeItem, exact_base: bool | None = None) -> SearchTarget:
-    if not info.supported:
+    if not info.supported and not info.viscera:
         return SearchTarget()
     if info.heist:
         if exact_base is None:
@@ -338,7 +410,7 @@ def build_query(info: TradeItem, stats: list[StatCondition], *, ilvl: bool = Fal
     filters = {}
     if ilvl and info.can_filter_ilvl:
         filters.setdefault("misc_filters", {"filters": {}})["filters"]["ilvl"] = {"min": info.ilvl}
-    if corrupted and info.category != FORBIDDEN_TOME:
+    if corrupted and info.category not in (FORBIDDEN_TOME, viscera.CATEGORY):
         filters.setdefault("misc_filters", {"filters": {}})["filters"]["corrupted"] = {"option": "true" if info.corrupted else "false"}
     if links and info.links >= 5:
         filters["socket_filters"] = {"filters": {"links": {"min": info.links}}}
@@ -365,7 +437,7 @@ def build_query(info: TradeItem, stats: list[StatCondition], *, ilvl: bool = Fal
     selected = []
     not_enchanted = []
     for condition in stats:
-        if condition.kind == "gem_filter" or not condition.checked or not condition.match.id:
+        if condition.kind in ("gem_filter", "viscera_tier") or not condition.checked or not condition.match.id:
             continue
         if info.heist and condition.kind.startswith("heist_"):
             key = condition.match.id
@@ -396,6 +468,8 @@ def build_query(info: TradeItem, stats: list[StatCondition], *, ilvl: bool = Fal
                     raise ValueError("최소·최대값은 유한한 숫자로 입력하세요")
                 values[("max" if key == "min" else "min") if condition.match.invert else key] = -value if condition.match.invert else value
         selected.append({"id": condition.match.id, **({"value": values} if values else {})})
+    if info.viscera:
+        selected.append(_viscera_filter(info, stats))
     if info.influences:
         ids = index().influences
         selected.extend({"id": ids[name]} for name in info.influences if influences is None or name in influences)

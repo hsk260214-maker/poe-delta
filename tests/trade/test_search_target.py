@@ -79,6 +79,27 @@ def test_conqueror_map_with_ellipses_retains_exact_identity_and_monster_level(ap
         window.close()
 
 
+@pytest.mark.parametrize("server,base", [(config.KAKAO, "쉐이퍼 수호자 지도"), (config.OFFICIAL, "Shaper Guardian Map")])
+def test_shaper_guardian_map_matches_verified_kakao_query(app, fixtures, server, base):
+    config.save(server=server, mode="browser", league="Standard")
+    window = TradeWindow()
+    try:
+        window.load((fixtures / "shaper_guardian_map_ko.txt").read_text(encoding="utf-8"))
+        assert window.info.supported, window.info.message
+        assert window.title.text() == base
+        assert all("쉐이퍼의 영향" not in condition.text for condition in window.stats)
+        query = window._query()["query"]
+        assert query["type"] == base
+        assert query["filters"]["type_filters"]["filters"] == {"rarity": {"option": "nonunique"}}
+        assert query["filters"]["map_filters"]["filters"] == {"map_blighted": {"option": "false"}}
+        identity = [s for s in query["stats"][0]["filters"] if s["id"].startswith("implicit.")]
+        assert identity == [{"id": "implicit.stat_1792283443|1"}]
+        window.monster_level.click()
+        assert window._query()["query"]["filters"]["map_filters"]["filters"]["area_level"] == {"min": 83, "max": 83}
+    finally:
+        window.close()
+
+
 def test_trade_window_keeps_copied_option_order_including_unmatched_rows(app):
     config.save(server=config.KAKAO, mode="api", league="Standard")
     window = TradeWindow()

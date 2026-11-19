@@ -28,6 +28,7 @@ FLAG_LINES = {
     "세계 포식자 아이템", "작열의 총주교 아이템",
 }
 KIND_KO = {"implicit": "고정", "explicit": "", "crafted": "제작", "fractured": "분열", "enchant": "인챈트"}
+VISCERA_CLASSES = {"살덩이"}
 SUB_KO = {"exarch": "총주교", "eater": "포식자", "eldritch": "총주교/포식자", "corrupted": "바알(타락)"}
 PRESENCE_RE = re.compile(r"^(While a (Unique Enemy|Pinnacle Atlas Boss) is in your Presence, |"
                          r"(고유 적|최종 아틀라스 보스)(이|가) 접근해 있는 동안, )", re.IGNORECASE)
@@ -125,9 +126,11 @@ def parse(text: str) -> ItemModel | None:
         if head:
             head.append(SEP)
         head.extend(s)
-    names = []
-    for x in sections[0][2:] if sections else []:
-        names.append(x)
+    # 살덩이 복사본에는 희귀도 줄이 없어 이름이 두 번째 줄에 온다.
+    rarity_less = bool(sections and len(sections[0]) > 1
+                       and sections[0][0].partition(":")[2].strip() in VISCERA_CLASSES
+                       and not sections[0][1].startswith(("Rarity:", "아이템 희귀도:")))
+    names = list(sections[0][1 if rarity_less else 2:]) if sections else []
     model = ItemModel(lang, head, name=names[0] if names else "", base=names[-1] if names else "")
     rarity = next((x.split(":", 1)[1].strip() for x in (sections[0] if sections else [])
                    if x.startswith(("Rarity:", "아이템 희귀도:"))), "")
@@ -165,6 +168,8 @@ def parse(text: str) -> ItemModel | None:
             if raw in FLAG_LINES:
                 model.flags.append(raw)
                 continue
+            if raw.startswith(("Note:", "메모:")):
+                continue  # 사용자가 붙인 가격 메모
             unscalable = bool(UNSCALABLE_RE.search(raw))
             ln = UNSCALABLE_RE.sub("", raw)
             ln = RANGE_RE.sub("", ln)

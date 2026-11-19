@@ -47,7 +47,8 @@ def test_data_provenance_and_converter():
     result = module.convert([sample])
     assert result["entries"][1]["test"] == "ARMOUR"
     assert result["entries"][1]["inverted"]
-    assert result["matchers"][1] == {"skeleton": "# armour", "negate": True, "has_value": True, "advanced": True, "entry": 1}
+    assert result["matchers"][1] == {"skeleton": "# armour", "negate": True, "has_value": True, "value": 1,
+                                     "advanced": True, "entry": 1}
     wrong_influence = {"ref": "Has Shaper Influence",
                        "trade": {"ids": {"pseudo": ["pseudo.pseudo_has_elder_influence"]}}, "matchers": []}
     with pytest.raises(ValueError, match="APT 영향력 ID 불일치"):

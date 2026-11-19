@@ -277,6 +277,9 @@ class TradeWindow(QWidget):
         suffix = " · 검색에 사용하지 않음" if unused else ""
         self.copied_item.setText(f"복사한 이름: {copied}{suffix}")
         self.copied_item.setVisible(distinct)
+        if self.info.viscera:
+            self.copied_item.setText(f"{self.info.viscera.tier_label} · {self.info.viscera.slot}")
+            self.copied_item.setVisible(True)
         category = search_target(self.info, False) if scope else SearchTarget()
         label = (f"정확한 베이스로 전환: {exact.label}" if target.category
                  else f"{category.label} 전체로 전환")
@@ -340,13 +343,14 @@ class TradeWindow(QWidget):
         self.links.setVisible(self.info.links >= 5)
         self.links.setText(f"링크 ≥ {self.info.links}")
         self.corrupted.setChecked(True)
-        self.corrupted.setVisible(not tome)
+        self.corrupted.setVisible(not (tome or self.info.viscera))
         self.corrupted.setText("타락" if self.info.corrupted else "타락 아님")
         scoped = not self._error and search_target(self.info, True) != search_target(self.info, False)
         self.base_button.setChecked(scoped and not search_target(self.info).category)
         self._update_target()
         self.base_button.setVisible(scoped)
-        self.stats = conditions(self.info, trade.get("min_ratio", 0.9)) if self.info.supported or self.info.heist else []
+        self.stats = (conditions(self.info, trade.get("min_ratio", 0.9))
+                      if self.info.supported or self.info.heist or self.info.viscera else [])
         self.inputs = []
         self.influence_inputs = {}
         while self.stat_layout.count():
@@ -379,6 +383,7 @@ class TradeWindow(QWidget):
             "implicit": "고정 옵션", "explicit": "일반 옵션", "crafted": "제작 옵션",
             "fractured": "분열 옵션", "enchant": "인챈트",
             "gem_filter": "젬 조건",
+            "viscera_tier": "단계 구분 (필수)",
         }
         for condition in self.stats:
             kind = condition.kind
@@ -410,8 +415,10 @@ class TradeWindow(QWidget):
             form.setContentsMargins(0, 3, 0, 3)
             check = _OptionCheck(condition.text)
             check.setChecked(condition.checked)
-            check.setEnabled(bool(condition.match.id))
-            check.setToolTip("\n".join(part for part in (condition.text, condition.match.reason) if part))
+            mandatory = condition.kind == "viscera_tier"
+            check.setEnabled(bool(condition.match.id) and not mandatory)
+            reason = "단계를 구분하는 필수 조건이라 끌 수 없습니다" if mandatory else condition.match.reason
+            check.setToolTip("\n".join(part for part in (condition.text, reason) if part))
             check.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
             check.setMinimumWidth(64)
             badge = QLabel("일반" if condition.badge == "explicit" else condition.badge)
@@ -419,11 +426,14 @@ class TradeWindow(QWidget):
             badge.setProperty("kind", condition.kind)
             minimum, maximum = QLineEdit(), QLineEdit()
             for box, value, placeholder in ((minimum, condition.minimum, "최소"), (maximum, condition.maximum, "최대")):
-                if condition.kind != "gem_filter":
+                if condition.kind not in ("gem_filter", "viscera_tier"):
                     validator = QDoubleValidator(box)
                     validator.setLocale(QLocale.c())
                     box.setValidator(validator)
                 box.setPlaceholderText(placeholder)
+                if mandatory:
+                    edge = self.info.viscera.low if box is minimum else self.info.viscera.high
+                    box.setPlaceholderText(str(edge))
                 box.setFixedWidth(52)
                 box.setAccessibleName(f"{condition.text} {placeholder}")
                 box.setText("" if value is None else f"{value:g}")
@@ -469,7 +479,7 @@ class TradeWindow(QWidget):
     def _query(self) -> dict:
         for condition, (check, minimum, maximum) in zip(self.stats, self.inputs):
             condition.checked = check.isChecked()
-            if condition.kind == "gem_filter":
+            if condition.kind in ("gem_filter", "viscera_tier"):
                 if condition.checked:
                     try:
                         condition.minimum, condition.maximum = (

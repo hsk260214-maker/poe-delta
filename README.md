@@ -118,6 +118,7 @@ python -m pip install -r requirements-dev.txt; python -m pytest tests   # 테스
 ### POE Delta의 거래소 검색에서 쓰거나 참고한 것
 
 - **POE Delta가 더 쓰는 외부 자료:** [Awakened PoE Trade](https://github.com/SnosMe/awakened-poe-trade)(MIT)의 오프라인 거래소 stat 데이터 (고정 커밋 `803d188d1359c4d5b1e3826da5dc680ea74a158f`, `data/LICENSE-awakened-poe-trade.txt`)
+- **3.30 살덩이 단계 자료:** [PoEDB 살덩이 목록](https://poedb.tw/kr/Viscera)의 단계별 공식 거래소 링크(이름·부위·거래소 ID·범위)를 `tools/build_viscera.py`로 정리한 `data/viscera.json`
 - 기능 아이디어만 참고하고 코드는 가져오지 않은 프로그램:
   - [Awakened PoE Trade](https://github.com/SnosMe/awakened-poe-trade): `Ctrl+D` 시세 확인, 옵션 체크·최소값 조정
   - [PoE Overlay Community Fork](https://github.com/PoE-Overlay-Community/PoE-Overlay-Community-Fork): 거래소 결과 요약, 클릭으로 조건 켜고 끄기

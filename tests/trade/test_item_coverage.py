@@ -213,7 +213,7 @@ def test_map_gate_is_exact_and_identity_cannot_be_removed(monkeypatch, family, t
 
 
 @pytest.mark.parametrize("kind,rarity,name", [
-    ("Maps", "Magic", "Chilled Shaper Guardian Map (Tier 16)"),
+    ("Maps", "Magic", "Chilled Forge of the Phoenix Map (Tier 16)"),
     ("Maps", "Magic", "Chilled Lair of the Hydra Map (Tier 16)"),
     ("Maps", "Rare", "Foo\nBlight-ravaged Map (Tier 16)"),
     ("Skill Gems", "Gem", "Vaal Fireball"),

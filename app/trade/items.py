@@ -15,10 +15,13 @@ VARIANT = re.compile(r"^(?:Synthesised|Foulborn|Vestigial|결합된|삿된|흔�
 UNKNOWN_MAP = re.compile(r"occupied by|influenced by|citadel|시타델|성채|점령|영향을 받|손에 넘어", re.I)
 ORIGINATOR_MEMORIES_ID = "implicit.stat_2696470877"
 REQUIREMENTS = {"Requirements:", "요구 사항:", "요구사항:"}
-GUARDIAN_NAMES = {"Shaper Guardian Map", "쉐이퍼 수호자 지도", "Lair of the Hydra Map",
+GUARDIAN_NAMES = {"Lair of the Hydra Map",
                   "Pit of the Chimera Map", "Maze of the Minotaur Map", "Forge of the Phoenix Map",
                   "히드라의 소굴 지도", "키메라의 구덩이 지도", "미노타우로스의 미로 지도", "불사조의 대장간 지도"}
-MAP_BASES = {"Map", "Nightmare Map", "Vaal Temple Map"}
+# 쉐이퍼 수호자 지도: 2026-11-19 머성이 카카오 거래소(Covens) 브라우저 링크로 수호자 지도만 나오는 것을 확인.
+# 공식 거래소는 확인하지 않았다(카카오 사용자 기준 출시 결정).
+MAP_BASES = {"Map", "Nightmare Map", "Vaal Temple Map", "Shaper Guardian Map"}
+TIERLESS_MAP_BASES = {"Nightmare Map", "Shaper Guardian Map"}
 FLASK_CLASSES = {"Life Flasks", "Mana Flasks", "Hybrid Flasks", "Utility Flasks", "Critical Utility Flasks"}
 GEM_CLASSES = {"Skill Gems", "Support Gems"}
 EQUIPMENT_TRADE_IDS = {
@@ -222,7 +225,7 @@ def resolve(model, category, rarity, server, *, equipment=False):
     base = _lookup(lang, "ITEM", classes, name, rarity == "Magic", confirmed_base=confirmed_base)
     if base[4] or category == "Map" and base[1] not in MAP_BASES:
         raise ValueError("이 품목 변형은 아직 시세 검색을 지원하지 않습니다")
-    if category == "Map" and (tier == 0 or (tier is None and base[1] != "Nightmare Map")):
+    if category == "Map" and (tier == 0 or (tier is None and base[1] not in TIERLESS_MAP_BASES)):
         raise ValueError("지도 등급을 읽을 수 없습니다")
     unique_name = ""
     if rarity == "Unique":

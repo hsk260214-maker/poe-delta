@@ -44,7 +44,7 @@ def test_select(text, category, stat_id):
 
 @pytest.mark.parametrize("text,reason", [
     ("Intimidate Enemies for 4 seconds on Hit", "거래소 옵션과 맞추지 못함"),
-    ("1 Added Passive Skill is a Jewel Socket", "거래소 옵션과 맞추지 못함"),
+    ("2 Added Passive Skill is a Jewel Socket", "거래소 옵션과 맞추지 못함"),
     ("10% chance to Avoid being Chilled during Effect", "이번 버전은 미지원 옵션"),
     ("10% chance to Curse Enemies with Elemental Weakness on Hit", "이번 버전은 미지원 옵션"),
     ("10% to Maximum Effect of Shock", "이번 버전은 미지원 옵션"),
@@ -54,6 +54,17 @@ def test_unsupported_matchers(text, reason):
     result = index().match(text, "explicit", "WEAPON")
     assert not result.id
     assert result.reason == reason
+
+
+@pytest.mark.parametrize("text,stat_id", [
+    ("Projectiles Pierce an additional Target", "explicit.stat_2067062068"),
+    ("Ignites you inflict deal Damage 12% [DamageFaster|Faster]", None),
+])
+def test_fixed_value_and_markup_lines_match(text, stat_id):
+    result = index().match(text, "explicit", "Quiver")
+    assert result.id.startswith("explicit.")
+    if stat_id:
+        assert (result.id, result.value) == (stat_id, 1)
 
 
 def test_cross_place_ambiguity():
