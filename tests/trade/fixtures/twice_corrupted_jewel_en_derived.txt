@@ -1,0 +1,14 @@
+Item Class: Jewels
+Rarity: Rare
+Celestial Eye
+Cobalt Jewel
+--------
+Item Level: 83
+--------
+Corrupted Blood cannot be inflicted on you (implicit)
+--------
+7% increased Trap Throwing Speed
+--------
+Twice Corrupted
+--------
+Note: ~b/o 2 divine

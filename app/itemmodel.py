@@ -20,10 +20,10 @@ UNSCALABLE_RE = re.compile(r"\s*[—-]+\s*(변경이 불가능한 값|Unscalable
 REMINDER_NOT_RE = re.compile(r"\(\s*-?\d|\((implicit|crafted|fractured|enchant)\)", re.IGNORECASE)
 ITEM_LEVEL_KEYS = ("Item Level:", "아이템 레벨:")
 FLAG_LINES = {
-    "Corrupted", "Mirrored", "Split", "Unidentified", "Synthesised Item", "Fractured Item",
+    "Corrupted", "Twice Corrupted", "Mirrored", "Split", "Unidentified", "Synthesised Item", "Fractured Item",
     "Shaper Item", "Elder Item", "Crusader Item", "Hunter Item", "Redeemer Item", "Warlord Item",
     "Searing Exarch Item", "Eater of Worlds Item",
-    "타락", "복제", "분할됨", "미확인", "결합된 아이템", "분열된 아이템",
+    "타락", "두 번 타락", "복제", "분할됨", "미확인", "결합된 아이템", "분열된 아이템",
     "쉐이퍼 아이템", "엘더 아이템", "십자군 아이템", "사냥꾼 아이템", "대속자 아이템", "전쟁군주 아이템",
     "세계 포식자 아이템", "작열의 총주교 아이템",
 }
@@ -34,7 +34,7 @@ PRESENCE_RE = re.compile(r"^(While a (Unique Enemy|Pinnacle Atlas Boss) is in yo
                          r"(고유 적|최종 아틀라스 보스)(이|가) 접근해 있는 동안, )", re.IGNORECASE)
 EXARCH_FLAGS = ("Searing Exarch Item", "작열의 총주교 아이템")
 EATER_FLAGS = ("Eater of Worlds Item", "세계 포식자 아이템")
-CORRUPT_FLAGS = ("Corrupted", "타락")
+CORRUPT_FLAGS = ("Corrupted", "Twice Corrupted", "타락", "두 번 타락")
 
 
 def badge(m: "Mod") -> str:
@@ -242,7 +242,8 @@ def classify_implicits(model: ItemModel) -> None:
     flags = set(model.flags)
     exarch = any(f in flags for f in EXARCH_FLAGS)
     eater = any(f in flags for f in EATER_FLAGS)
-    corrupt = any(f in flags for f in CORRUPT_FLAGS)
+    corrupt = bool({"Corrupted", "타락"} & flags)
+    twice_corrupted = bool({"Twice Corrupted", "두 번 타락"} & flags)
     try:
         import ko2en
 
@@ -271,7 +272,7 @@ def classify_implicits(model: ItemModel) -> None:
             m.sub = "eater"
         elif presence or (exarch or eater) and ("exarch" in cand or "eater" in cand):
             m.sub = "eldritch"
-        elif corrupt and "corrupted" in cand:
+        elif (corrupt or (twice_corrupted and m.copy_block == 0)) and "corrupted" in cand:
             m.sub = "corrupted"
 
 
@@ -374,7 +375,8 @@ def compose_en(model: ItemModel, mods: list[Mod] | None = None) -> tuple[str, li
         flags = [ko2en.FLAGS.get(f, f) for f in model.flags]
     else:
         head = "\n".join(model.head)
-        flags = list(model.flags)
+        flags = ["Corrupted" if flag == "Twice Corrupted" else flag for flag in model.flags]
+    flags = [flag for i, flag in enumerate(flags) if flag != "Corrupted" or "Corrupted" not in flags[:i]]
     out = []
     for m in mods:
         en = mod_en(model, m)

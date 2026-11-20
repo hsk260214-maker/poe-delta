@@ -18,6 +18,7 @@ from itemmodel import ItemModel, parse
 from theme import build_qss
 from trade import browser, combine, config, focus_log, heist, resistance, templates
 from trade.stats import option_gate
+from trade.results import ResultSession
 from trade.query import (FORBIDDEN_TOME, INFLUENCE_LABELS, SearchTarget, build_query, conditions, item_info,
                          default_minimum, league_for, resistance_rows, result_rows, search_target, summary)
 
@@ -102,6 +103,7 @@ class TradeWindow(QWidget):
         self._open_id = ""
         self._close_intent = None
         self._busy = False
+        self._results: ResultSession | None = None
         self._loading = False
         self._generation = 0
         self._until = 0.0
@@ -216,6 +218,10 @@ class TradeWindow(QWidget):
         self.table.setHorizontalHeaderLabels(["가격", "판매자", "등록", "아이템 레벨"])
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+        self.table.installEventFilter(self)
+        self.table.viewport().installEventFilter(self)
+        scrollbar = self.table.verticalScrollBar()
+        scrollbar.actionTriggered.connect(self._scrollbar_action)
         layout.addWidget(self.table, 1)
         footer = QHBoxLayout()
         self.search_button = QPushButton()
@@ -245,10 +251,21 @@ class TradeWindow(QWidget):
         self.table.setRowCount(0)
         self.result_summary.setText(message)
 
+    def _invalidate_results(self) -> None:
+        self._generation += 1
+        self._results = None
+        self._busy = False
+        self._until = 0.0
+
+    def _routing_changed(self) -> bool:
+        return (config.routing_revision() != self._routing_revision
+                or config.mode() != self.current_mode
+                or config.settings().get("server", config.default_server()) != self.server)
+
     def _conditions_changed(self) -> None:
         if self._loading or not hasattr(self, "info"):
             return
-        self._generation += 1
+        self._invalidate_results()
         self._update_bulk_buttons()
         self._clear_results("조건이 바뀌었습니다. 검색을 눌러 주세요")
         self._validate()
@@ -351,12 +368,13 @@ class TradeWindow(QWidget):
 
     def load(self, item: ItemModel | str | None, hwnd: int = 0) -> None:
         self._loading = True
-        self._generation += 1
+        self._invalidate_results()
         self.model = parse(item) if isinstance(item, str) else item
         self._prev_fg = hwnd
         trade = config.settings()
         self.server = trade.get("server", config.default_server())
         self.current_mode = config.mode()
+        self._routing_revision = config.routing_revision()
         self._error = ""
         try:
             self.info = item_info(self.model, self.server)
@@ -588,6 +606,9 @@ class TradeWindow(QWidget):
     def _validate(self) -> None:
         if not hasattr(self, "info"):
             return
+        if not self._loading and self._results is not None and self._routing_changed():
+            self.load(self.model, self._prev_fg)
+            return
         error = self._error
         if not self.info.supported:
             error = self.info.message
@@ -606,11 +627,11 @@ class TradeWindow(QWidget):
         self.search_button.setEnabled(not error)
 
     def search(self) -> None:
+        if hasattr(self, "info") and self._routing_changed():
+            self.load(self.model, self._prev_fg)
+            return
         self._validate()
         if not self.search_button.isEnabled() or not self.info.supported:
-            return
-        if config.mode() != self.current_mode:
-            self.load(self.model, self._prev_fg)
             return
         query = self._query()
         league, server, lang = self.league.currentText().strip(), self.server, self.model.lang
@@ -621,55 +642,153 @@ class TradeWindow(QWidget):
         from trade.api import TradeClient, TradeError
 
         client = TradeClient()
+        self._invalidate_results()
+        self._clear_results("검색 중입니다")
         generation = self._generation
+        session = self._results = ResultSession(config.result_count(config.settings().get("result_count")))
         self._busy = True
-        self.open_button.setEnabled(False)
         self._validate()
 
         def work():
             try:
                 leagues = client.leagues(server, lang)
                 chosen = league if league in leagues else leagues[0]
-                response = client.search(chosen, query, server, lang)
-                ids = response.get("result", [])[:20]
-                fetched = []
-                for start in range(0, len(ids), 10):
-                    fetched.extend(client.fetch(ids[start:start + 10], response["id"], server, lang).get("result", []))
-                return {"league": chosen, "leagues": leagues, "id": response["id"],
-                        "total": response.get("total", 0), "rows": result_rows({"result": fetched}),
-                        "wait": client.remaining(server)}
+                return {"league": chosen, "leagues": leagues, "response": client.search(chosen, query, server, lang)}
             except TradeError as error:
                 return {"error": str(error), "wait": error.retry_after}
 
         def complete(result):
-            self._busy = False
-            self._until = time.monotonic() + result.get("wait", 0)
-            if generation == self._generation:
-                if "error" in result:
-                    self.result_summary.setText(result["error"])
-                else:
-                    self.league.blockSignals(True)
-                    self.league.clear()
-                    self.league.addItems(result["leagues"])
-                    self.league.setCurrentText(result["league"])
-                    self.league.blockSignals(False)
-                    config.save(league=result["league"])
-                    self._result_link = browser.result_url(result["league"], result["id"], server, lang)
-                    self.open_button.setEnabled(True)
-                    prefix = f"리그를 {result['league']}(으)로 바꿨습니다 · " if result["league"] != league else ""
-                    self.result_summary.setText(prefix + summary(result["total"], result["rows"]))
-                    self.table.setRowCount(len(result["rows"]))
-                    for i, row in enumerate(result["rows"]):
-                        values = [f"{row['amount']:g} {row['currency']}" if row["amount"] is not None else "가격 없음",
-                                  row["seller"], row["age"], str(row["ilvl"])]
-                        for j, value in enumerate(values):
-                            self.table.setItem(i, j, QTableWidgetItem(value))
-            self._validate()
+            if not self._current_result(generation):
+                return
+            if "error" in result:
+                self._busy = False
+                self._until = time.monotonic() + result.get("wait", 0)
+                self.result_summary.setText(result["error"])
+                self._validate()
+                return
+            chosen, response = result["league"], result["response"]
+            with QSignalBlocker(self.league):
+                self.league.clear()
+                self.league.addItems(result["leagues"])
+                self.league.setCurrentText(chosen)
+            config.save(league=chosen)
+            session.query_id = response["id"]
+            session.ids = response.get("result", [])
+            session.total = response.get("total", 0)
+            if chosen != league:
+                session.prefix = f"리그를 {chosen}(으)로 바꿨습니다 · "
+            if session.query_id:
+                self._result_link = browser.result_url(chosen, session.query_id, server, lang)
+                self.open_button.setEnabled(True)
+            if session.ids:
+                self._fetch_results(session, client, generation, initial=True)
+            else:
+                self._finish_results(session, client.remaining(server), initial=True)
 
         def failed(_message):
             complete({"error": "거래소 검색을 완료하지 못했습니다. 다시 검색하세요"})
 
         self._job = run_async(work, complete, failed)
+
+    def _current_result(self, generation: int) -> bool:
+        return generation == self._generation and not self._routing_changed()
+
+    def _fetch_results(self, session, client, generation, *, initial):
+        from trade.api import TradeError
+
+        server, lang = self.server, self.model.lang
+        ids = session.ids[session.next:session.next + 10]
+        self._busy = True
+        self._validate()
+
+        def work():
+            try:
+                response = client.fetch(ids, session.query_id, server, lang)
+                entries = {row["id"]: row for row in response.get("result", [])}
+                rows = result_rows({"result": [entries[key] for key in ids if key in entries]})
+                return rows, "", client.remaining(server)
+            except TradeError as error:
+                return [], str(error), error.retry_after
+
+        def complete(result):
+            if not self._current_result(generation):
+                return
+            rows, error, wait = result
+            session.error = error
+            if not error:
+                session.next += len(ids)
+                self._append_result_rows(session, rows)
+            if initial and not error and session.next < min(len(session.ids), session.initial_count):
+                if wait:
+                    self._busy = False
+                    self._until = time.monotonic() + wait
+                    self.result_summary.setText(
+                        f"{session.prefix}초기 조회 대기 중 · 표시 {len(session.rows)} / 받은 {len(session.ids)}개"
+                    )
+                    self._validate()
+                else:
+                    self._fetch_results(session, client, generation, initial=True)
+                return
+            self._finish_results(session, wait, initial=initial)
+
+        self._job = run_async(work, complete, lambda _: complete(([], "매물을 불러오지 못했습니다", 0)))
+
+    def _append_result_rows(self, session, rows):
+        start = len(session.rows)
+        session.rows.extend(rows)
+        self.table.setRowCount(len(session.rows))
+        for i, row in enumerate(rows, start):
+            values = [f"{row['amount']:g} {row['currency']}" if row["amount"] is not None else "가격 없음",
+                      row["seller"], row["age"], str(row["ilvl"])]
+            for j, value in enumerate(values):
+                self.table.setItem(i, j, QTableWidgetItem(value))
+
+    def _finish_results(self, session, wait, *, initial):
+        self._busy = False
+        self._until = time.monotonic() + wait
+        if initial:
+            session.summary = summary(session.total, session.rows)
+        message = [session.prefix + session.summary, f"표시 {len(session.rows)} / 받은 {len(session.ids)}개"]
+        if session.error:
+            message.append(session.error)
+        if session.next == len(session.ids) and session.total > len(session.ids):
+            message.append("받은 100개 매물 ID를 모두 조회했습니다. 더 보려면 조건을 좁혀 다시 검색하세요."
+                           if len(session.ids) == 100 else "받은 매물 ID를 모두 조회했습니다.")
+        self.result_summary.setText(" · ".join(message))
+        self._validate()
+
+    def _load_more(self):
+        session = self._results
+        if (session is None or not session.query_id or self._busy or self._routing_changed()
+                or self._until > time.monotonic() or session.next >= len(session.ids)):
+            return
+        from trade.api import TradeClient
+
+        client = TradeClient()
+        if wait := client.remaining(self.server):
+            self._until = time.monotonic() + wait
+            self._validate()
+            return
+        self._fetch_results(session, client, self._generation, initial=session.summary is None)
+
+    def _scrollbar_action(self, action):
+        bar = self.table.verticalScrollBar()
+        if action and bar.maximum() > bar.minimum() and bar.sliderPosition() == bar.maximum():
+            self._load_more()
+
+    def eventFilter(self, watched, event):
+        if watched in (self.table, self.table.viewport()) and self._results is not None:
+            bar = self.table.verticalScrollBar()
+            if event.type() == QEvent.Type.Wheel and (event.angleDelta().y() < 0 or event.pixelDelta().y() < 0):
+                if bar.value() == bar.maximum():
+                    self._load_more()
+                    return True
+            if (event.type() == QEvent.Type.KeyPress and self.table.rowCount()
+                    and self.table.currentRow() == self.table.rowCount() - 1
+                    and event.key() in (Qt.Key.Key_Down, Qt.Key.Key_PageDown, Qt.Key.Key_End)):
+                self._load_more()
+                return True
+        return super().eventFilter(watched, event)
 
     def show_item(self, item, hwnd: int = 0) -> None:
         self._open_id = uuid4().hex
@@ -740,6 +859,8 @@ class TradeWindow(QWidget):
             if self._position_timer.isActive():
                 self._save_position()
             super().closeEvent(event)
+            if event.isAccepted():
+                self._invalidate_results()
             if open_id and event.isAccepted() and was_foreground and source != "code":
                 QTimer.singleShot(0, self, lambda: self._restore_after_close(open_id, game))
         finally:

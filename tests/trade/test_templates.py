@@ -107,8 +107,8 @@ def test_corrupted_condition_default_outside_area_templates(window, kind, rarity
     window.load(text)
     assert window.corrupted.isChecked() and window.corrupted.text() == "타락 아님"
     window.load(text + "\n--------\nCorrupted")
-    assert not window.corrupted.isChecked() and window.corrupted.text() == "타락"
-    assert "corrupted" not in window._query()["query"]["filters"].get("misc_filters", {}).get("filters", {})
+    assert window.corrupted.isChecked() and window.corrupted.text() == "타락"
+    assert window._query()["query"]["filters"]["misc_filters"]["filters"]["corrupted"] == {"option": "true"}
 
 
 @pytest.mark.parametrize("fixture", ["forbidden_tome_ko.txt", "viscera_lesser_blazing_skull_ko.txt"])

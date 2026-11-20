@@ -219,5 +219,5 @@ def test_area_gate_and_both_search_modes(app, monkeypatch):
     assert json.loads(parse_qs(urlsplit(opened[0]).query)["q"][0]) == sent[0]
     assert sent[0]["query"]["status"] == {"option": "securable"}
     assert sent[0]["query"]["filters"]["map_filters"]["filters"] == {"area_level": {"min": 83}}
-    assert window.result_summary.text() == "전체 0개 · 검색 결과가 없습니다"
+    assert window.result_summary.text() == "전체 0개 · 검색 결과가 없습니다 · 표시 0 / 받은 0개"
     window.close()

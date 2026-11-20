@@ -32,8 +32,7 @@ with patch('requests.Session.request', denied), patch.object(socket.socket,'conn
     window.base_button.setChecked(True)
     window.resistance_button.click()
     assert not window.total_resistance
-    assert not window.corrupted.isChecked()
-    window.corrupted.click()
+    assert window.corrupted.isChecked()
     assert window.search_button.isEnabled()
     assert window.table.isHidden()
     window.search()
@@ -224,8 +223,7 @@ def test_kakao_blocks_english_with_action_and_keeps_korean_search(app, fixtures,
     window.base_button.setChecked(True)
     window.resistance_button.click()
     assert not window.total_resistance
-    assert not window.corrupted.isChecked()
-    window.corrupted.click()
+    assert window.corrupted.isChecked()
     window.search()
     expected = json.loads((fixtures / "browser_links.json").read_text(encoding="utf-8"))
     assert opened == [expected["rare_ko_kakao"]]

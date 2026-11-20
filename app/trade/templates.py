@@ -17,5 +17,3 @@ def apply_defaults(info, stats, filters):
         for row, check in stats:
             if check.isEnabled():
                 check.setChecked(row.kind == "heist_area")
-    elif info.template and info.corrupted and not filters["corrupted"].isHidden():
-        filters["corrupted"].setChecked(False)

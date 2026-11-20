@@ -4,6 +4,12 @@ from storage import load_settings, save_settings
 OFFICIAL = "https://www.pathofexile.com"
 KAKAO = "https://poe.kakaogames.com"
 KAKAO_ENABLED = True
+RESULT_COUNTS = tuple(range(10, 101, 10))
+_routing_revision = 0
+
+
+def result_count(value: object) -> int:
+    return value if type(value) is int and value in RESULT_COUNTS else 20
 
 
 def settings() -> dict:
@@ -19,9 +25,18 @@ def default_server() -> str:
 
 
 def save(**changes) -> None:
+    global _routing_revision
     data = load_settings()
-    data["trade"] = {**data.get("trade", {}), **changes}
+    previous = data.get("trade", {})
+    current = data["trade"] = {**previous, **changes}
     save_settings(data)
+    if any(previous.get(key, default) != current.get(key, default)
+           for key, default in (("mode", "api"), ("server", default_server()))):
+        _routing_revision += 1
+
+
+def routing_revision() -> int:
+    return _routing_revision
 
 
 def validate_server(server: str, lang: str) -> None:

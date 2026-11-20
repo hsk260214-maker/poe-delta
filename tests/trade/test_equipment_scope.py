@@ -254,8 +254,9 @@ def test_condition_change_discards_previous_and_in_flight_results(app, monkeypat
     window.load(equipment("반지", "토파즈 반지", lang="ko", rarity="희귀", mods="최대 생명력 +30"))
 
     def finish_search():
-        work, done = pending.pop()
-        done(work())
+        while pending:
+            work, done = pending.pop(0)
+            done(work())
 
     window.search()
     finish_search()

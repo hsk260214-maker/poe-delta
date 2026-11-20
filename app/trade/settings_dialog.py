@@ -17,6 +17,12 @@ class SettingsDialog(QDialog):
         self.mode.addItem("게임 위 시세 모드 (기본)", "api")
         self.mode.setCurrentIndex(1 if config.mode() == "api" else 0)
         form.addRow("검색 방식", self.mode)
+        self.result_count = QComboBox()
+        for count in config.RESULT_COUNTS:
+            self.result_count.addItem(str(count), count)
+        self.result_count.setCurrentIndex(self.result_count.findData(config.result_count(trade.get("result_count"))))
+        self.result_count.currentIndexChanged.connect(lambda: config.save(result_count=self.result_count.currentData()))
+        form.addRow("처음 불러올 매물 수", self.result_count)
         self.server = QComboBox()
         self.server.addItem("공식", config.OFFICIAL)
         if config.KAKAO_ENABLED:
@@ -68,7 +74,7 @@ class SettingsDialog(QDialog):
 
     def _enable_api_fields(self) -> None:
         enabled = config.mode() == "api"
-        for widget in (self.cookie, self.delete, self.contact):
+        for widget in (self.cookie, self.delete, self.contact, self.result_count):
             widget.setEnabled(enabled)
 
     def _save_cookie(self) -> None:

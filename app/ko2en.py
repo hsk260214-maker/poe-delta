@@ -29,7 +29,7 @@ PROPS = {
     "레벨": "Level",
 }
 FLAGS = {
-    "타락": "Corrupted", "미확인": "Unidentified", "복제": "Mirrored", "분할됨": "Split",
+    "타락": "Corrupted", "두 번 타락": "Corrupted", "미확인": "Unidentified", "복제": "Mirrored", "분할됨": "Split",
     "쉐이퍼 아이템": "Shaper Item", "엘더 아이템": "Elder Item", "십자군 아이템": "Crusader Item",
     "사냥꾼 아이템": "Hunter Item", "대속자 아이템": "Redeemer Item", "전쟁군주 아이템": "Warlord Item",
     "결합된 아이템": "Synthesised Item", "세계 포식자 아이템": "Eater of Worlds Item",
