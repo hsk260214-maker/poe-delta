@@ -66,7 +66,7 @@ class MapWarn(QWidget):
         row.addStretch(1)
         self.set_btn = QPushButton("비선호 옵션 고르기")
         self.set_btn.setObjectName("OverlayEdit")
-        self.set_btn.setToolTip("메인 창의 '비선호 지도' 탭을 열어요")
+        self.set_btn.setToolTip("메인 창의 '지도 옵션' 탭을 열어요")
         self.set_btn.clicked.connect(lambda: (self.close(), self.settingsRequested.emit()))
         row.addWidget(self.set_btn)
         v.addLayout(row)
@@ -94,7 +94,7 @@ class MapWarn(QWidget):
             self._set("#86704a", f"<span style='color:{DIM}'>미확인 지도라 옵션을 볼 수 없어요. 감정한 뒤 다시 Ctrl+C 해 주세요.</span>")
         elif not avoid:
             self._set("#86704a", f"<span style='color:{DIM}'>아직 비선호 옵션을 안 골랐어요.<br>"
-                                 f"메인 창 캐릭터 화면 → <b>비선호 지도</b> 탭에서 피하고 싶은 옵션에 체크해 두면, "
+                                 f"메인 창 캐릭터 화면 → <b>지도 옵션</b> 탭에서 피하고 싶은 옵션을 비선호로 고르면, "
                                  f"지도에 Ctrl+C 할 때 바로 알려 드려요.</span>")
         else:
             hits = mapcheck.check(info, avoid)

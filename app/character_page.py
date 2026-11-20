@@ -434,7 +434,7 @@ class CharacterPage(QWidget):
                 "PoB Configuration (적 상태, 버프 등)",
                 "피하고 싶은 지도 옵션 고르기 → 지도에 Ctrl+C 하면 경고",
                 "부위별 DPS 최적 옵션 찾기 (실험 기능)")
-        for i, name in enumerate(("장비 · 주얼", "스킬 · 젬", "계산 설정", "비선호 지도", "옵션 최적화 (Beta)")):
+        for i, name in enumerate(("장비 · 주얼", "스킬 · 젬", "계산 설정", "지도 옵션", "옵션 최적화 (Beta)")):
             b = QPushButton(name)
             b.setObjectName("SubTab")
             b.setCheckable(True)
@@ -491,7 +491,7 @@ class CharacterPage(QWidget):
 
         from map_avoid_panel import MapAvoidCard
 
-        map_card, mv = card("비선호 지도  ·  지도에 Ctrl+C 하면 경고")
+        map_card, mv = card("지도 옵션")
         self.map_avoid = MapAvoidCard(self, mv)
         page_map.addWidget(map_card)
 

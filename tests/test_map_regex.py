@@ -8,6 +8,7 @@ from PySide6.QtWidgets import QApplication, QVBoxLayout, QWidget
 import map_avoid_panel
 import mapcheck
 import map_regex
+from map_presets import avoids
 
 
 REGEN = "players cannot regenerate life, mana or energy shield"
@@ -44,13 +45,13 @@ def test_map_panel_copies_bundled_patterns_without_local_files(app, monkeypatch,
     card.regex_language.setCurrentIndex(1)
     card.regex_copy.click()
     assert clipboard.text() == '"!gen"'
-    assert list(card.avoid) == [REGEN]
-    card._toggled(RESIST, True)
-    card._toggled(REGEN, False)
-    card._toggled(REGEN, True)
+    assert avoids(card.preset) == [REGEN]
+    card._pick(RESIST, "avoid")
+    card._pick(REGEN, "avoid")
+    card._pick(REGEN, "avoid")
     assert card.regex_text.text() == '"!o al|gen"'
 
-    card._toggled("missing key", True)
+    card._pick("missing key", "avoid")
     assert not card.regex_copy.isEnabled() and not card.regex_text.text()
     clipboard.setText("유지")
     card.regex_copy.click()
@@ -99,8 +100,8 @@ def test_maven_checkbox_is_disabled_and_old_selection_does_not_block_copy(app, m
     monkeypatch.setattr(map_avoid_panel, "save_settings", saved.append)
     host = QWidget()
     card = map_avoid_panel.MapAvoidCard(host, QVBoxLayout(host))
-    checkbox, = [box for row, box in card.boxes if row["key"] == maven]
-    assert not checkbox.isEnabled() and not checkbox.isChecked()
-    assert saved == [{"map_avoid": [REGEN]}]
+    (want, avoid), = [(want, avoid) for row, _, want, avoid in card.boxes if row["key"] == maven]
+    assert all(not button.isEnabled() and not button.isChecked() for button in (want, avoid))
+    assert len(saved) == 1 and saved[0]["map_avoid"] == [REGEN]
     assert card.regex_copy.isEnabled() and card.regex_text.text() == '"!재생"'
     host.close()

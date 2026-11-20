@@ -1,0 +1,5115 @@
+{
+  "eligible": 333,
+  "maxima": {
+    "drops": {
+      "prefix": [
+        19,
+        19,
+        19,
+        19
+      ],
+      "suffix": [
+        19,
+        19,
+        19,
+        19
+      ]
+    },
+    "rarity": {
+      "prefix": [
+        56,
+        56,
+        56,
+        56
+      ],
+      "suffix": [
+        56,
+        49,
+        36,
+        35
+      ]
+    },
+    "pack": {
+      "prefix": [
+        20,
+        20,
+        20,
+        20
+      ],
+      "suffix": [
+        20,
+        20,
+        20,
+        17
+      ]
+    },
+    "currency": {
+      "prefix": [
+        47,
+        47,
+        47,
+        47
+      ],
+      "suffix": [
+        64,
+        47,
+        45
+      ]
+    },
+    "map": {
+      "prefix": [
+        40,
+        35,
+        35,
+        35
+      ],
+      "suffix": [
+        35,
+        35,
+        35,
+        35
+      ]
+    }
+  },
+  "lines": [
+    "고유 몬스터가 무작위 성소 버프 1개 보유",
+    "고유 보스가 사로잡힘",
+    "고유 보스가 주는 피해 15% 증가",
+    "고유 보스가 주는 피해 20% 증가",
+    "고유 보스가 주는 피해 25% 증가",
+    "고유 보스의 공격 및 시전 속도 20% 증가",
+    "고유 보스의 공격 및 시전 속도 25% 증가",
+    "고유 보스의 공격 및 시전 속도 30% 증가",
+    "고유 보스의 생명력 25% 증가",
+    "고유 보스의 생명력 30% 증가",
+    "고유 보스의 생명력 35% 증가",
+    "고유 보스의 효과 범위 45% 증가",
+    "고유 보스의 효과 범위 55% 증가",
+    "고유 보스의 효과 범위 70% 증가",
+    "동료에게 영향을 주는 플레이어의 오라 스킬이 적에게도 영향을 줌",
+    "마법 몬스터 (20-30)% 증가",
+    "메이븐이 모든 보스를 한꺼번에 내보냄",
+    "메이븐이 플레이어를 방해함",
+    "모든 몬스터의 적중 피해가 항상 점화 유발",
+    "몬스터 기절 면역",
+    "몬스터 도발 면역",
+    "몬스터 피해 (14-17)% 증가",
+    "몬스터 피해 (18-21)% 증가",
+    "몬스터 피해 (22-25)% 증가",
+    "몬스터 피해 (30-40)% 증가",
+    "몬스터 피해가 15%의 원소 저항 관통",
+    "몬스터가 (50-69)%의 추가 물리 피해를 냉기 속성으로 가함",
+    "몬스터가 (50-69)%의 추가 물리 피해를 번개 속성으로 가함",
+    "몬스터가 (50-69)%의 추가 물리 피해를 화염 속성으로 가함",
+    "몬스터가 (70-89)%의 추가 물리 피해를 냉기 속성으로 가함",
+    "몬스터가 (70-89)%의 추가 물리 피해를 번개 속성으로 가함",
+    "몬스터가 (70-89)%의 추가 물리 피해를 화염 속성으로 가함",
+    "몬스터가 (90-110)%의 추가 물리 피해를 냉기 속성으로 가함",
+    "몬스터가 (90-110)%의 추가 물리 피해를 번개 속성으로 가함",
+    "몬스터가 (90-110)%의 추가 물리 피해를 화염 속성으로 가함",
+    "몬스터가 20%의 확률로 중독, 꿰뚫기, 출혈 회피",
+    "몬스터가 30%의 확률로 원소 상태 이상 긴급회피",
+    "몬스터가 35%의 확률로 중독, 꿰뚫기, 출혈 회피",
+    "몬스터가 50%의 확률로 원소 상태 이상 긴급회피",
+    "몬스터가 50%의 확률로 중독, 꿰뚫기, 출혈 회피",
+    "몬스터가 70%의 확률로 원소 상태 이상 긴급회피",
+    "몬스터가 공격 명중 시 힘줄 절단 유발",
+    "몬스터가 명중 시 15%의 확률로 점화, 동결, 감전 유발",
+    "몬스터가 명중 시 20%의 확률로 점화, 동결, 감전 유발",
+    "몬스터가 명중 시 2초 동안 위축 유발",
+    "몬스터가 명중 시 격분 충전 획득",
+    "몬스터가 명중 시 권능 충전 획득",
+    "몬스터가 명중 시 권능, 격분, 인내 충전 강탈",
+    "몬스터가 명중 시 실명 유발",
+    "몬스터가 명중 시 인내 충전 획득",
+    "몬스터가 명중 시 점화, 동결, 감전 유발",
+    "몬스터가 명중 시 탐욕스러운 덩굴 2개 유발",
+    "몬스터가 물리 피해의 (180-200)%를 추가 무작위 원소 피해로 획득",
+    "몬스터가 물리 피해의 (21-25)%를 추가 카오스 피해로 획득",
+    "몬스터가 물리 피해의 (31-35)%를 추가 카오스 피해로 획득",
+    "몬스터가 물리 피해의 (80-100)%를 추가 카오스 피해로 획득",
+    "몬스터가 사술 방지 보유",
+    "몬스터가 주는 모든 피해가 점화, 동결, 감전 유발 가능",
+    "몬스터가 최대 생명력의 (20-29)%를 추가 에너지 보호막 최대치로 획득",
+    "몬스터가 최대 생명력의 (30-39)%를 추가 에너지 보호막 최대치로 획득",
+    "몬스터가 최대 생명력의 (40-49)%를 추가 에너지 보호막 최대치로 획득",
+    "몬스터가 최대 생명력의 (70-80)%를 추가 에너지 보호막 최대치로 획득",
+    "몬스터가 치명타로 받는 추가 피해 (25-30)% 감소",
+    "몬스터가 치명타로 받는 추가 피해 (31-35)% 감소",
+    "몬스터가 치명타로 받는 추가 피해 (35-45)% 감소",
+    "몬스터가 치명타로 받는 추가 피해 (36-40)% 감소",
+    "몬스터가 투사체 2개 추가 발사",
+    "몬스터가 피격 시 인내 충전 획득",
+    "몬스터는 흡수 대상이 되지 않음",
+    "몬스터에게 걸리는 저주 효과 25% 감폭",
+    "몬스터에게 걸리는 저주 효과 40% 감폭",
+    "몬스터에게 걸리는 저주 효과 60% 감폭",
+    "몬스터에게 적용되는 디버프가 100% 더 빠르게 만료됨",
+    "몬스터의 격분 충전 최대치 +1",
+    "몬스터의 공격 명중 시 중독",
+    "몬스터의 공격 속도 (20-25)% 증가",
+    "몬스터의 공격 속도 (25-35)% 증가",
+    "몬스터의 공격 속도 (35-45)% 증가",
+    "몬스터의 공격 피해 막기 확률 +50%",
+    "몬스터의 공격이 명중 시 25%의 확률로 꿰뚫음",
+    "몬스터의 공격이 명중 시 40%의 확률로 꿰뚫음",
+    "몬스터의 공격이 명중 시 60%의 확률로 꿰뚫음",
+    "몬스터의 권능 충전 최대치 +1",
+    "몬스터의 동작 속도가 기본 수치 밑으로 내려가지 않음",
+    "몬스터의 모든 명중 피해가 중독 유발 가능",
+    "몬스터의 물리 피해 감소 +20%",
+    "몬스터의 물리 피해 감소 +30%",
+    "몬스터의 물리 피해 감소 +40%",
+    "몬스터의 물리 피해 감소 +50%",
+    "몬스터의 생명력 (15-19)% 증폭",
+    "몬스터의 생명력 (20-24)% 증폭",
+    "몬스터의 생명력 (20-29)% 증폭",
+    "몬스터의 생명력 (25-30)% 증폭",
+    "몬스터의 생명력 (30-39)% 증폭",
+    "몬스터의 생명력 (40-49)% 증폭",
+    "몬스터의 생명력 (90-100)% 증폭",
+    "몬스터의 스킬 2회 추가 연쇄",
+    "몬스터의 스킬 3회 추가 연쇄",
+    "몬스터의 시전 속도 (20-25)% 증가",
+    "몬스터의 시전 속도 (25-35)% 증가",
+    "몬스터의 시전 속도 (35-45)% 증가",
+    "몬스터의 원소 저항 +20%",
+    "몬스터의 원소 저항 +30%",
+    "몬스터의 원소 저항 +40%",
+    "몬스터의 원소 저항 +55%",
+    "몬스터의 이동 속도 (15-20)% 증가",
+    "몬스터의 이동 속도 (20-25)% 증가",
+    "몬스터의 이동 속도 (25-30)% 증가",
+    "몬스터의 이동 속도가 기본 수치 밑으로 내려가지 않음",
+    "몬스터의 인내 충전 최대치 +1",
+    "몬스터의 정확도 30% 증가",
+    "몬스터의 정확도 40% 증가",
+    "몬스터의 정확도 50% 증가",
+    "몬스터의 주문 명중 시 이동 방해 유발",
+    "몬스터의 주문 피해 억제 확률 +100%",
+    "몬스터의 주문 피해 억제 확률 +30%",
+    "몬스터의 주문 피해 억제 확률 +45%",
+    "몬스터의 주문 피해 억제 확률 +60%",
+    "몬스터의 중독 지속시간 100% 증가",
+    "몬스터의 치명타 피해 배율 +(30-35)%",
+    "몬스터의 치명타 피해 배율 +(36-40)%",
+    "몬스터의 치명타 피해 배율 +(41-45)%",
+    "몬스터의 치명타 피해 배율 +(70-75)%",
+    "몬스터의 치명타 확률 (160-200)% 증가",
+    "몬스터의 치명타 확률 (260-300)% 증가",
+    "몬스터의 치명타 확률 (360-400)% 증가",
+    "몬스터의 치명타 확률 (650-700)% 증가",
+    "몬스터의 카오스 저항 +15%",
+    "몬스터의 카오스 저항 +20%",
+    "몬스터의 카오스 저항 +25%",
+    "몬스터의 카오스 저항 +35%",
+    "몬스터의 투사체가 지형과 충돌 시 연쇄 가능",
+    "몬스터의 효과 범위 100% 증가",
+    "몬스터의 효과 범위 45% 증가",
+    "몬스터의 효과 범위 70% 증가",
+    "무리 규모 17% 증가",
+    "무리 규모 20% 증가",
+    "무리 규모 4% 증가",
+    "무리 규모 5% 증가",
+    "무리 규모 6% 증가",
+    "무리 규모 7% 증가",
+    "이 지역에서 발견하는 [AtlasDropScaling|아틀라스 획득물] 10% 증가",
+    "이 지역에서 발견하는 [AtlasDropScaling|아틀라스 획득물] 13% 증가",
+    "이 지역에서 발견하는 [AtlasDropScaling|아틀라스 획득물] 16% 증가",
+    "이 지역에서 발견하는 [AtlasDropScaling|아틀라스 획득물] 19% 증가",
+    "이 지역에서 발견하는 아이템 희귀도 11% 증가",
+    "이 지역에서 발견하는 아이템 희귀도 12% 증가",
+    "이 지역에서 발견하는 아이템 희귀도 25% 증가",
+    "이 지역에서 발견하는 아이템 희귀도 27% 증가",
+    "이 지역에서 발견하는 아이템 희귀도 28% 증가",
+    "이 지역에서 발견하는 아이템 희귀도 35% 증가",
+    "이 지역에서 발견하는 아이템 희귀도 36% 증가",
+    "이 지역에서 발견하는 아이템 희귀도 49% 증가",
+    "이 지역에서 발견하는 아이템 희귀도 56% 증가",
+    "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+    "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+    "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+    "지도 보스가 결합 보스 대동",
+    "지역 내 희귀 몬스터가 사망 시 일시적으로 부활",
+    "지역 내 희귀 몬스터가 쉐이퍼의 손길에 닿음",
+    "지역에 20%만큼 피해가 증가한 감전 지대 존재",
+    "지역에 35%만큼 피해가 증가한 감전 지대 존재",
+    "지역에 50%만큼 피해가 증가한 감전 지대 존재",
+    "지역에 [EvocatorBeidat|베이다트의 환기자] 1마리 등장",
+    "지역에 [EvocatorGhorr|고르의 환기자] 1마리 등장",
+    "지역에 [EvocatorKTash|크타쉬의 환기자] 1마리 등장",
+    "지역에 [Mirage|허상] 등장",
+    "지역에 고유 보스 2마리 등장",
+    "지역에 다수의 토템 존재",
+    "지역에 동물 서식",
+    "지역에 등장하는 몬스터 종류 증가",
+    "지역에 루나리스 광신도 거주",
+    "지역에 묻힌 거물 파수꾼 등장",
+    "지역에 묻힌 대혼란 파수꾼 등장",
+    "지역에 묻힌 추적자 파수꾼 등장",
+    "지역에 미궁 위해 요소 등장",
+    "지역에 바다 마녀 및 유충 서식",
+    "지역에 불안정한 촉수 마귀 등장",
+    "지역에 솔라리스 광신도 거주",
+    "지역에 신성화 지대 존재",
+    "지역에 악마 서식",
+    "지역에 언데드 서식",
+    "지역에 얼음 지대 존재",
+    "지역에 염소인간 서식",
+    "지역에 용암 지대 존재",
+    "지역에 움직이며 무작위 징표를 유발하는 징표 찍힌 지대 여러 개 등장",
+    "지역에 원거리형 몬스터 서식",
+    "지역에 인간형 적 서식",
+    "지역에 작열의 총주교의 룬 등장",
+    "지역에 질식의 구체 등장",
+    "지역에 취록의 야생림 등장",
+    "지역에 키타바 광신자 거주",
+    "지역에 해골 서식",
+    "지역에 혼 서식",
+    "지역에 환영의 거울 1개 등장",
+    "지역에 훼손된 지대 존재",
+    "지역에 흉물 서식",
+    "지역에서 발견하는 [Thread|실낱] 35% 증폭",
+    "지역에서 발견하는 [Thread|실낱] 36% 증폭",
+    "지역에서 발견하는 [Thread|실낱] 53% 증폭",
+    "지역에서 발견하는 [Thread|실낱] 60% 증폭",
+    "지역에서 발견하는 지도 35% 증폭",
+    "지역에서 발견하는 지도 40% 증폭",
+    "지역에서 발견하는 화폐 45% 증폭",
+    "지역에서 발견하는 화폐 47% 증폭",
+    "지역에서 발견하는 화폐 64% 증폭",
+    "플레이어가 노출 유발 불가",
+    "플레이어가 방지하는 억제된 주문 피해 -10%",
+    "플레이어가 방지하는 억제된 주문 피해 -15%",
+    "플레이어가 방지하는 억제된 주문 피해 -20%",
+    "플레이어가 비-저주 오라 스킬로 받는 효과 25% 감소",
+    "플레이어가 비-저주 오라 스킬로 받는 효과 40% 감소",
+    "플레이어가 비-저주 오라 스킬로 받는 효과 60% 감소",
+    "플레이어가 생명력, 마나 또는 에너지 보호막 재생 불가",
+    "플레이어가 쇠약화 저주에 걸림",
+    "플레이어가 시간의 사슬 저주에 걸림",
+    "플레이어가 원소 약화 저주에 걸림",
+    "플레이어가 취약성 저주에 걸림",
+    "플레이어가 플라스크 사용 시 유성의 대상이 됨",
+    "플레이어들이 피얼룩 톱날에 습격당함",
+    "플레이어에게 적용되는 버프가 100% 더 빠르게 만료됨",
+    "플레이어에게 적용되는 버프가 30% 더 빠르게 만료됨",
+    "플레이어에게 적용되는 버프가 50% 더 빠르게 만료됨",
+    "플레이어에게 적용되는 버프가 70% 더 빠르게 만료됨",
+    "플레이어에게 적용되는 플라스크 효과 40% 감폭",
+    "플레이어의 막기 확률 20% 감소",
+    "플레이어의 막기 확률 30% 감소",
+    "플레이어의 막기 확률 40% 감소",
+    "플레이어의 모든 저항 최대치 -(12-9)%",
+    "플레이어의 모든 저항 최대치 -(8-5)%",
+    "플레이어의 모든 저항 최대치 -20%",
+    "플레이어의 방어도 20% 감폭",
+    "플레이어의 방어도 25% 감폭",
+    "플레이어의 방어도 30% 감폭",
+    "플레이어의 방어력 (30-25)% 감폭",
+    "플레이어의 생명력 및 에너지 보호막 회복 속도 20% 감폭",
+    "플레이어의 생명력 및 에너지 보호막 회복 속도 40% 감폭",
+    "플레이어의 생명력 및 에너지 보호막 회복 속도 60% 감폭",
+    "플레이어의 재사용 대기시간 회복 속도 20% 감폭",
+    "플레이어의 재사용 대기시간 회복 속도 30% 감폭",
+    "플레이어의 재사용 대기시간 회복 속도 40% 감폭",
+    "플레이어의 정확도 15% 감폭",
+    "플레이어의 정확도 20% 감폭",
+    "플레이어의 정확도 25% 감폭",
+    "플레이어의 플라스크 충전량 30% 감소",
+    "플레이어의 플라스크 충전량 40% 감소",
+    "플레이어의 플라스크 충전량 50% 감소",
+    "플레이어의 효과 범위 (30-25)% 감폭",
+    "플레이어의 효과 범위 15% 감폭",
+    "플레이어의 효과 범위 20% 감폭",
+    "플레이어의 효과 범위 25% 감폭",
+    "흡수로 인한 플레이어의 초당 총 생명력, 마나, 에너지 보호막 회복량 최대치 (60-50)% 감소",
+    "희귀 몬스터 수 (20-30)% 증가",
+    "희귀 몬스터 수 (35-45)% 증가",
+    "희귀 몬스터가 각각 속성 1개 추가 보유",
+    "희귀 몬스터가 물리 가시를 보유하고 1500의 물리 피해 반사",
+    "희귀 몬스터가 물리 가시를 보유하고 400의 물리 피해 반사",
+    "희귀 몬스터가 물리 가시를 보유하고 600의 물리 피해 반사",
+    "희귀 몬스터가 물리 가시를 보유하고 800의 물리 피해 반사",
+    "희귀 몬스터가 사망 시 25%의 확률로 분쇄됨",
+    "희귀 몬스터가 원소 가시를 보유하고 1200의 원소 피해 반사",
+    "희귀 몬스터가 원소 가시를 보유하고 1500의 원소 피해 반사",
+    "희귀 몬스터가 원소 가시를 보유하고 2500의 원소 피해 반사",
+    "희귀 몬스터가 원소 가시를 보유하고 900의 원소 피해 반사",
+    "희귀 몬스터가 폭발성 중심부 보유"
+  ],
+  "mods": {
+    "MapBloodlinesModOnMagicsMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "마법 몬스터 (20-30)% 증가"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "(20-30)% increased Magic Monsters"
+      ]
+    },
+    "MapBossPossessedMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "고유 보스가 사로잡힘"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Unique Bosses are Possessed"
+      ]
+    },
+    "MapBurningGround1MapWorlds_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "지역에 용암 지대 존재"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Area has patches of Burning Ground"
+      ]
+    },
+    "MapBurningGround2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "지역에 용암 지대 존재"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Area has patches of Burning Ground"
+      ]
+    },
+    "MapBurningGround3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "지역에 용암 지대 존재"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Area has patches of Burning Ground"
+      ]
+    },
+    "MapBurningGround3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "지역에 용암 지대 존재"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "Area has patches of Burning Ground"
+      ]
+    },
+    "MapChilledGroundSuffix1MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "지역에 얼음 지대 존재"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Area has patches of Chilled Ground"
+      ]
+    },
+    "MapChilledGroundSuffix2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "지역에 얼음 지대 존재"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Area has patches of Chilled Ground"
+      ]
+    },
+    "MapChilledGroundSuffix3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "지역에 얼음 지대 존재"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "Area has patches of Chilled Ground"
+      ]
+    },
+    "MapChilledGroundSuffix3MapWorlds_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "지역에 얼음 지대 존재"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Area has patches of Chilled Ground"
+      ]
+    },
+    "MapConsecratedGround2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "지역에 신성화 지대 존재"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Area has patches of Consecrated Ground"
+      ]
+    },
+    "MapConsecratedGround3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "지역에 신성화 지대 존재"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "Area has patches of Consecrated Ground"
+      ]
+    },
+    "MapConsecratedGround3MapWorlds__": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "지역에 신성화 지대 존재"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Area has patches of Consecrated Ground"
+      ]
+    },
+    "MapConsecratedGroundMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "지역에 신성화 지대 존재"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Area has patches of Consecrated Ground"
+      ]
+    },
+    "MapContainsBeyondDemonFactionWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 크타쉬의 환기자 1마리 등장"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area contains an Evocator of K'Tash"
+      ]
+    },
+    "MapContainsBeyondFleshFactionWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 고르의 환기자 1마리 등장"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area contains an Evocator of Ghorr"
+      ]
+    },
+    "MapContainsBeyondPaleFactionWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 베이다트의 환기자 1마리 등장"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area contains an Evocator of Beidat"
+      ]
+    },
+    "MapContainsDeliriumMirrorWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 환영의 거울 1개 등장"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area contains a Mirror of Delirium"
+      ]
+    },
+    "MapContainsMirageWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 허상 등장"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area contains a Mirage"
+      ]
+    },
+    "MapContainsSentinelApexWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 묻힌 거물 파수꾼 등장"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area contains a buried Apex Sentinel"
+      ]
+    },
+    "MapContainsSentinelPandemoniumWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 묻힌 대혼란 파수꾼 등장"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area contains a buried Pandemonium Sentinel"
+      ]
+    },
+    "MapContainsSentinelStalkerWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 묻힌 추적자 파수꾼 등장"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area contains a buried Stalker Sentinel"
+      ]
+    },
+    "MapContainsWildwoodWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 취록의 야생림 등장"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area contains the Viridian Wildwood"
+      ]
+    },
+    "MapDangerousBoss1MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "고유 보스가 주는 피해 15% 증가",
+        "고유 보스의 공격 및 시전 속도 20% 증가"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Unique Boss deals 15% increased Damage",
+        "Unique Boss has 20% increased Attack and Cast Speed"
+      ]
+    },
+    "MapDangerousBoss2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "고유 보스가 주는 피해 20% 증가",
+        "고유 보스의 공격 및 시전 속도 25% 증가"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Unique Boss deals 20% increased Damage",
+        "Unique Boss has 25% increased Attack and Cast Speed"
+      ]
+    },
+    "MapDangerousBoss3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "고유 보스가 주는 피해 25% 증가",
+        "고유 보스의 공격 및 시전 속도 30% 증가"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Unique Boss deals 25% increased Damage",
+        "Unique Boss has 30% increased Attack and Cast Speed"
+      ]
+    },
+    "MapDangerousBoss3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "고유 보스가 주는 피해 25% 증가",
+        "고유 보스의 공격 및 시전 속도 30% 증가"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "Unique Boss deals 25% increased Damage",
+        "Unique Boss has 30% increased Attack and Cast Speed"
+      ]
+    },
+    "MapDesecratedGround1MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "지역에 훼손된 지대 존재"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Area has patches of desecrated ground"
+      ]
+    },
+    "MapDesecratedGround2MapWorlds__": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "지역에 훼손된 지대 존재"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Area has patches of desecrated ground"
+      ]
+    },
+    "MapDesecratedGround3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "지역에 훼손된 지대 존재"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Area has patches of desecrated ground"
+      ]
+    },
+    "MapDesecratedGround3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "지역에 훼손된 지대 존재"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "Area has patches of desecrated ground"
+      ]
+    },
+    "MapHexproofMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터가 사술 방지 보유"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters are Hexproof"
+      ]
+    },
+    "MapHexproofMapWorldsMaven_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "몬스터가 사술 방지 보유"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "Monsters are Hexproof"
+      ]
+    },
+    "MapMassiveBoss1MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "고유 보스의 생명력 25% 증가",
+        "고유 보스의 효과 범위 45% 증가"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Unique Boss has 25% increased Life",
+        "Unique Boss has 45% increased Area of Effect"
+      ]
+    },
+    "MapMassiveBoss2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "고유 보스의 생명력 30% 증가",
+        "고유 보스의 효과 범위 55% 증가"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Unique Boss has 30% increased Life",
+        "Unique Boss has 55% increased Area of Effect"
+      ]
+    },
+    "MapMassiveBoss3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "고유 보스의 생명력 35% 증가",
+        "고유 보스의 효과 범위 70% 증가"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Unique Boss has 35% increased Life",
+        "Unique Boss has 70% increased Area of Effect"
+      ]
+    },
+    "MapMassiveBoss3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "고유 보스의 생명력 35% 증가",
+        "고유 보스의 효과 범위 70% 증가"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "Unique Boss has 35% increased Life",
+        "Unique Boss has 70% increased Area of Effect"
+      ]
+    },
+    "MapMonsterAllBossesAtOnceMaven": {
+      "ko": [
+        "메이븐이 모든 보스를 한꺼번에 내보냄",
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가"
+      ],
+      "en": [
+        "Maven releases all Bosses at once",
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area"
+      ]
+    },
+    "MapMonsterAllBossesAtOnceMavenFeared": {
+      "ko": [
+        "메이븐이 모든 보스를 한꺼번에 내보냄",
+        "이 지역에서 발견하는 아틀라스 획득물 19% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 11% 증가"
+      ],
+      "en": [
+        "Maven releases all Bosses at once",
+        "19% increased Atlas Drops in this Area",
+        "11% increased Rarity of Items found in this Area"
+      ]
+    },
+    "MapMonsterAllBossesAtOnceMavenHidden": {
+      "ko": [
+        "메이븐이 모든 보스를 한꺼번에 내보냄",
+        "이 지역에서 발견하는 아틀라스 획득물 19% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 11% 증가"
+      ],
+      "en": [
+        "Maven releases all Bosses at once",
+        "19% increased Atlas Drops in this Area",
+        "11% increased Rarity of Items found in this Area"
+      ]
+    },
+    "MapMonsterAllBossesAtOnceMavenVoid": {
+      "ko": [
+        "메이븐이 모든 보스를 한꺼번에 내보냄",
+        "이 지역에서 발견하는 아틀라스 획득물 19% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 11% 증가"
+      ],
+      "en": [
+        "Maven releases all Bosses at once",
+        "19% increased Atlas Drops in this Area",
+        "11% increased Rarity of Items found in this Area"
+      ]
+    },
+    "MapMonsterAreaOfEffect2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터의 효과 범위 70% 증가"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Monsters have 70% increased Area of Effect"
+      ]
+    },
+    "MapMonsterAreaOfEffect3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터의 효과 범위 100% 증가"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Monsters have 100% increased Area of Effect"
+      ]
+    },
+    "MapMonsterAreaOfEffect3MapWorldsMaven__": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "몬스터의 효과 범위 100% 증가"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "Monsters have 100% increased Area of Effect"
+      ]
+    },
+    "MapMonsterAreaOfEffectMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터의 효과 범위 45% 증가"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Monsters have 45% increased Area of Effect"
+      ]
+    },
+    "MapMonsterCannotBeStunned2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터 기절 면역",
+        "몬스터의 생명력 (20-24)% 증폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Monsters cannot be Stunned",
+        "(20-24)% more Monster Life"
+      ]
+    },
+    "MapMonsterCannotBeStunned3MapWorldsMaven___": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "몬스터 기절 면역",
+        "몬스터의 생명력 (25-30)% 증폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "Monsters cannot be Stunned",
+        "(25-30)% more Monster Life"
+      ]
+    },
+    "MapMonsterCannotBeStunned3MapWorlds_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터 기절 면역",
+        "몬스터의 생명력 (25-30)% 증폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Monsters cannot be Stunned",
+        "(25-30)% more Monster Life"
+      ]
+    },
+    "MapMonsterCannotBeStunnedMapWorlds_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터 기절 면역",
+        "몬스터의 생명력 (15-19)% 증폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Monsters cannot be Stunned",
+        "(15-19)% more Monster Life"
+      ]
+    },
+    "MapMonsterChainMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터의 스킬 2회 추가 연쇄"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters' skills Chain 2 additional times"
+      ]
+    },
+    "MapMonsterChainMapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "몬스터의 스킬 2회 추가 연쇄"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "Monsters' skills Chain 2 additional times"
+      ]
+    },
+    "MapMonsterChaosDamage2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터가 물리 피해의 (21-25)%를 추가 카오스 피해로 획득",
+        "몬스터가 명중 시 2초 동안 위축 유발"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters gain (21-25)% of their Physical Damage as Extra Chaos Damage",
+        "Monsters Inflict Withered for 2 seconds on Hit"
+      ]
+    },
+    "MapMonsterChaosDamage3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터가 물리 피해의 (31-35)%를 추가 카오스 피해로 획득",
+        "몬스터가 명중 시 2초 동안 위축 유발"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters gain (31-35)% of their Physical Damage as Extra Chaos Damage",
+        "Monsters Inflict Withered for 2 seconds on Hit"
+      ]
+    },
+    "MapMonsterChaosDamage3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "몬스터가 물리 피해의 (31-35)%를 추가 카오스 피해로 획득",
+        "몬스터가 명중 시 2초 동안 위축 유발"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "Monsters gain (31-35)% of their Physical Damage as Extra Chaos Damage",
+        "Monsters Inflict Withered for 2 seconds on Hit"
+      ]
+    },
+    "MapMonsterColdDamage2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터가 (70-89)%의 추가 물리 피해를 냉기 속성으로 가함"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters deal (70-89)% extra Physical Damage as Cold"
+      ]
+    },
+    "MapMonsterColdDamage3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "몬스터가 (90-110)%의 추가 물리 피해를 냉기 속성으로 가함"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "Monsters deal (90-110)% extra Physical Damage as Cold"
+      ]
+    },
+    "MapMonsterColdDamage3MapWorlds_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터가 (90-110)%의 추가 물리 피해를 냉기 속성으로 가함"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters deal (90-110)% extra Physical Damage as Cold"
+      ]
+    },
+    "MapMonsterColdDamageMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터가 (50-69)%의 추가 물리 피해를 냉기 속성으로 가함"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters deal (50-69)% extra Physical Damage as Cold"
+      ]
+    },
+    "MapMonsterCriticalStrikesAndDamage2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터의 치명타 확률 (260-300)% 증가",
+        "몬스터의 치명타 피해 배율 +(36-40)%"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters have (260-300)% increased Critical Strike Chance",
+        "+(36-40)% to Monster Critical Strike Multiplier"
+      ]
+    },
+    "MapMonsterCriticalStrikesAndDamage3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터의 치명타 확률 (360-400)% 증가",
+        "몬스터의 치명타 피해 배율 +(41-45)%"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters have (360-400)% increased Critical Strike Chance",
+        "+(41-45)% to Monster Critical Strike Multiplier"
+      ]
+    },
+    "MapMonsterCriticalStrikesAndDamage3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "몬스터의 치명타 확률 (360-400)% 증가",
+        "몬스터의 치명타 피해 배율 +(41-45)%"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "Monsters have (360-400)% increased Critical Strike Chance",
+        "+(41-45)% to Monster Critical Strike Multiplier"
+      ]
+    },
+    "MapMonsterCriticalStrikesAndDamageMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터의 치명타 확률 (160-200)% 증가",
+        "몬스터의 치명타 피해 배율 +(30-35)%"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters have (160-200)% increased Critical Strike Chance",
+        "+(30-35)% to Monster Critical Strike Multiplier"
+      ]
+    },
+    "MapMonsterDamage2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 19% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 11% 증가",
+        "무리 규모 7% 증가",
+        "몬스터 피해 (18-21)% 증가"
+      ],
+      "en": [
+        "19% increased Atlas Drops in this Area",
+        "11% increased Rarity of Items found in this Area",
+        "7% increased Pack size",
+        "(18-21)% increased Monster Damage"
+      ]
+    },
+    "MapMonsterDamage3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 19% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 11% 증가",
+        "무리 규모 7% 증가",
+        "몬스터 피해 (22-25)% 증가"
+      ],
+      "en": [
+        "19% increased Atlas Drops in this Area",
+        "11% increased Rarity of Items found in this Area",
+        "7% increased Pack size",
+        "(22-25)% increased Monster Damage"
+      ]
+    },
+    "MapMonsterDamage3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 19% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 11% 증가",
+        "몬스터 피해 (22-25)% 증가"
+      ],
+      "en": [
+        "19% increased Atlas Drops in this Area",
+        "11% increased Rarity of Items found in this Area",
+        "(22-25)% increased Monster Damage"
+      ]
+    },
+    "MapMonsterDamageMapWorlds_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 19% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 11% 증가",
+        "무리 규모 7% 증가",
+        "몬스터 피해 (14-17)% 증가"
+      ],
+      "en": [
+        "19% increased Atlas Drops in this Area",
+        "11% increased Rarity of Items found in this Area",
+        "7% increased Pack size",
+        "(14-17)% increased Monster Damage"
+      ]
+    },
+    "MapMonsterElementalReflection2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "희귀 몬스터가 원소 가시를 보유하고 1200의 원소 피해 반사"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Rare Monsters have Elemental Thorns reflecting 1200 Elemental Damage"
+      ]
+    },
+    "MapMonsterElementalReflection3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "희귀 몬스터가 원소 가시를 보유하고 1500의 원소 피해 반사"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Rare Monsters have Elemental Thorns reflecting 1500 Elemental Damage"
+      ]
+    },
+    "MapMonsterElementalReflection3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "희귀 몬스터가 원소 가시를 보유하고 1500의 원소 피해 반사"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "Rare Monsters have Elemental Thorns reflecting 1500 Elemental Damage"
+      ]
+    },
+    "MapMonsterElementalReflectionMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "희귀 몬스터가 원소 가시를 보유하고 900의 원소 피해 반사"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Rare Monsters have Elemental Thorns reflecting 900 Elemental Damage"
+      ]
+    },
+    "MapMonsterFast2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 19% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 11% 증가",
+        "무리 규모 7% 증가",
+        "몬스터의 이동 속도 (20-25)% 증가",
+        "몬스터의 공격 속도 (25-35)% 증가",
+        "몬스터의 시전 속도 (25-35)% 증가"
+      ],
+      "en": [
+        "19% increased Atlas Drops in this Area",
+        "11% increased Rarity of Items found in this Area",
+        "7% increased Pack size",
+        "(20-25)% increased Monster Movement Speed",
+        "(25-35)% increased Monster Attack Speed",
+        "(25-35)% increased Monster Cast Speed"
+      ]
+    },
+    "MapMonsterFast3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 19% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 11% 증가",
+        "무리 규모 7% 증가",
+        "몬스터의 이동 속도 (25-30)% 증가",
+        "몬스터의 공격 속도 (35-45)% 증가",
+        "몬스터의 시전 속도 (35-45)% 증가"
+      ],
+      "en": [
+        "19% increased Atlas Drops in this Area",
+        "11% increased Rarity of Items found in this Area",
+        "7% increased Pack size",
+        "(25-30)% increased Monster Movement Speed",
+        "(35-45)% increased Monster Attack Speed",
+        "(35-45)% increased Monster Cast Speed"
+      ]
+    },
+    "MapMonsterFast3MapWorldsMaven_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 19% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 11% 증가",
+        "몬스터의 이동 속도 (25-30)% 증가",
+        "몬스터의 공격 속도 (35-45)% 증가",
+        "몬스터의 시전 속도 (35-45)% 증가"
+      ],
+      "en": [
+        "19% increased Atlas Drops in this Area",
+        "11% increased Rarity of Items found in this Area",
+        "(25-30)% increased Monster Movement Speed",
+        "(35-45)% increased Monster Attack Speed",
+        "(35-45)% increased Monster Cast Speed"
+      ]
+    },
+    "MapMonsterFastMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 19% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 11% 증가",
+        "무리 규모 7% 증가",
+        "몬스터의 이동 속도 (15-20)% 증가",
+        "몬스터의 공격 속도 (20-25)% 증가",
+        "몬스터의 시전 속도 (20-25)% 증가"
+      ],
+      "en": [
+        "19% increased Atlas Drops in this Area",
+        "11% increased Rarity of Items found in this Area",
+        "7% increased Pack size",
+        "(15-20)% increased Monster Movement Speed",
+        "(20-25)% increased Monster Attack Speed",
+        "(20-25)% increased Monster Cast Speed"
+      ]
+    },
+    "MapMonsterFireDamage2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터가 (70-89)%의 추가 물리 피해를 화염 속성으로 가함"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters deal (70-89)% extra Physical Damage as Fire"
+      ]
+    },
+    "MapMonsterFireDamage3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터가 (90-110)%의 추가 물리 피해를 화염 속성으로 가함"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters deal (90-110)% extra Physical Damage as Fire"
+      ]
+    },
+    "MapMonsterFireDamage3MapWorldsMaven_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "몬스터가 (90-110)%의 추가 물리 피해를 화염 속성으로 가함"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "Monsters deal (90-110)% extra Physical Damage as Fire"
+      ]
+    },
+    "MapMonsterFireDamageMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터가 (50-69)%의 추가 물리 피해를 화염 속성으로 가함"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters deal (50-69)% extra Physical Damage as Fire"
+      ]
+    },
+    "MapMonsterLife2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터의 생명력 (30-39)% 증폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "(30-39)% more Monster Life"
+      ]
+    },
+    "MapMonsterLife3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터의 생명력 (40-49)% 증폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "(40-49)% more Monster Life"
+      ]
+    },
+    "MapMonsterLife3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "몬스터의 생명력 (40-49)% 증폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "(40-49)% more Monster Life"
+      ]
+    },
+    "MapMonsterLifeLeechImmunityMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터는 흡수 대상이 되지 않음"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters cannot be Leeched from"
+      ]
+    },
+    "MapMonsterLifeLeechImmunityMapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "몬스터는 흡수 대상이 되지 않음"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "Monsters cannot be Leeched from"
+      ]
+    },
+    "MapMonsterLifeMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터의 생명력 (20-29)% 증폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "(20-29)% more Monster Life"
+      ]
+    },
+    "MapMonsterLightningDamage2MapWorlds__": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터가 (70-89)%의 추가 물리 피해를 번개 속성으로 가함"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters deal (70-89)% extra Physical Damage as Lightning"
+      ]
+    },
+    "MapMonsterLightningDamage3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터가 (90-110)%의 추가 물리 피해를 번개 속성으로 가함"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters deal (90-110)% extra Physical Damage as Lightning"
+      ]
+    },
+    "MapMonsterLightningDamage3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "몬스터가 (90-110)%의 추가 물리 피해를 번개 속성으로 가함"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "Monsters deal (90-110)% extra Physical Damage as Lightning"
+      ]
+    },
+    "MapMonsterLightningDamageMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터가 (50-69)%의 추가 물리 피해를 번개 속성으로 가함"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters deal (50-69)% extra Physical Damage as Lightning"
+      ]
+    },
+    "MapMonsterMultipleProjectilesWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 19% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 11% 증가",
+        "무리 규모 7% 증가",
+        "몬스터가 투사체 2개 추가 발사"
+      ],
+      "en": [
+        "19% increased Atlas Drops in this Area",
+        "11% increased Rarity of Items found in this Area",
+        "7% increased Pack size",
+        "Monsters fire 2 additional Projectiles"
+      ]
+    },
+    "MapMonsterMultipleProjectilesWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 19% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 11% 증가",
+        "몬스터가 투사체 2개 추가 발사"
+      ],
+      "en": [
+        "19% increased Atlas Drops in this Area",
+        "11% increased Rarity of Items found in this Area",
+        "Monsters fire 2 additional Projectiles"
+      ]
+    },
+    "MapMonsterPacksAbominationMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "지역에 흉물 서식"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Area is inhabited by Abominations"
+      ]
+    },
+    "MapMonsterPacksAnimalsMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "지역에 동물 서식"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Area is inhabited by Animals"
+      ]
+    },
+    "MapMonsterPacksDemonsMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 악마 서식"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area is inhabited by Demons"
+      ]
+    },
+    "MapMonsterPacksGhostsMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 혼 서식"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area is inhabited by Ghosts"
+      ]
+    },
+    "MapMonsterPacksGoatmenMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 염소인간 서식"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area is inhabited by Goatmen"
+      ]
+    },
+    "MapMonsterPacksHumanoidsMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 인간형 적 서식"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area is inhabited by Humanoids"
+      ]
+    },
+    "MapMonsterPacksKitavaMapWorlds_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "지역에 키타바 광신자 거주"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Area is inhabited by Cultists of Kitava"
+      ]
+    },
+    "MapMonsterPacksLunarisMapWorlds_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 루나리스 광신도 거주"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area is inhabited by Lunaris fanatics"
+      ]
+    },
+    "MapMonsterPacksRangedMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 원거리형 몬스터 서식"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area is inhabited by ranged monsters"
+      ]
+    },
+    "MapMonsterPacksSkeletonsMapWorlds_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 해골 서식"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area is inhabited by Skeletons"
+      ]
+    },
+    "MapMonsterPacksSolarisMapWorlds_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 솔라리스 광신도 거주"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area is inhabited by Solaris fanatics"
+      ]
+    },
+    "MapMonsterPacksSpawnsSeaWitchesMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 바다 마녀 및 유충 서식"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area is inhabited by Sea Witches and their Spawn"
+      ]
+    },
+    "MapMonsterPacksUndeadMapWorlds_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 언데드 서식"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area is inhabited by Undead"
+      ]
+    },
+    "MapMonsterPhysicalReflection2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "희귀 몬스터가 물리 가시를 보유하고 600의 물리 피해 반사"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Rare Monsters have Physical Thorns reflecting 600 Physical Damage"
+      ]
+    },
+    "MapMonsterPhysicalReflection3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "희귀 몬스터가 물리 가시를 보유하고 800의 물리 피해 반사"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Rare Monsters have Physical Thorns reflecting 800 Physical Damage"
+      ]
+    },
+    "MapMonsterPhysicalReflection3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "희귀 몬스터가 물리 가시를 보유하고 800의 물리 피해 반사"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "Rare Monsters have Physical Thorns reflecting 800 Physical Damage"
+      ]
+    },
+    "MapMonsterPhysicalReflectionMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "희귀 몬스터가 물리 가시를 보유하고 400의 물리 피해 반사"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Rare Monsters have Physical Thorns reflecting 400 Physical Damage"
+      ]
+    },
+    "MapMonsterPhysicalResistance2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터의 물리 피해 감소 +30%"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "+30% Monster Physical Damage Reduction"
+      ]
+    },
+    "MapMonsterPhysicalResistance3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "몬스터의 물리 피해 감소 +40%"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "+40% Monster Physical Damage Reduction"
+      ]
+    },
+    "MapMonsterPhysicalResistance3MapWorlds_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터의 물리 피해 감소 +40%"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "+40% Monster Physical Damage Reduction"
+      ]
+    },
+    "MapMonsterPhysicalResistanceMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터의 물리 피해 감소 +20%"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "+20% Monster Physical Damage Reduction"
+      ]
+    },
+    "MapMonsterStatusAilmentAvoidance2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "몬스터가 50%의 확률로 원소 상태 이상 긴급회피"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Monsters have 50% chance to Avoid Elemental Ailments"
+      ]
+    },
+    "MapMonsterStatusAilmentAvoidanceMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "몬스터가 30%의 확률로 원소 상태 이상 긴급회피"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Monsters have 30% chance to Avoid Elemental Ailments"
+      ]
+    },
+    "MapMonsterStatusAilmentImmunityMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "몬스터가 70%의 확률로 원소 상태 이상 긴급회피"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Monsters have 70% chance to Avoid Elemental Ailments"
+      ]
+    },
+    "MapMonsterStatusAilmentImmunityMapWorldsMaven_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "몬스터가 70%의 확률로 원소 상태 이상 긴급회피"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "Monsters have 70% chance to Avoid Elemental Ailments"
+      ]
+    },
+    "MapMonstersAllDamageAlwaysIgnitesMapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "모든 몬스터의 적중 피해가 항상 점화 유발"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "All Monster Damage from Hits always Ignites"
+      ]
+    },
+    "MapMonstersAllDamageAlwaysIgnitesMapWorlds_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "모든 몬스터의 적중 피해가 항상 점화 유발"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "All Monster Damage from Hits always Ignites"
+      ]
+    },
+    "MapMonstersAllResistances2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터의 카오스 저항 +20%",
+        "몬스터의 원소 저항 +30%"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "+20% Monster Chaos Resistance",
+        "+30% Monster Elemental Resistances"
+      ]
+    },
+    "MapMonstersAllResistances3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터의 카오스 저항 +25%",
+        "몬스터의 원소 저항 +40%"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "+25% Monster Chaos Resistance",
+        "+40% Monster Elemental Resistances"
+      ]
+    },
+    "MapMonstersAllResistances3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "몬스터의 카오스 저항 +25%",
+        "몬스터의 원소 저항 +40%"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "+25% Monster Chaos Resistance",
+        "+40% Monster Elemental Resistances"
+      ]
+    },
+    "MapMonstersAllResistancesMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터의 카오스 저항 +15%",
+        "몬스터의 원소 저항 +20%"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "+15% Monster Chaos Resistance",
+        "+20% Monster Elemental Resistances"
+      ]
+    },
+    "MapMonstersAvoidPoisonBleedBlind2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "몬스터가 35%의 확률로 중독, 꿰뚫기, 출혈 회피"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Monsters have a 35% chance to avoid Poison, Impale, and Bleeding"
+      ]
+    },
+    "MapMonstersAvoidPoisonBleedBlind3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "몬스터가 50%의 확률로 중독, 꿰뚫기, 출혈 회피"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Monsters have a 50% chance to avoid Poison, Impale, and Bleeding"
+      ]
+    },
+    "MapMonstersAvoidPoisonBleedBlind3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "몬스터가 50%의 확률로 중독, 꿰뚫기, 출혈 회피"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "Monsters have a 50% chance to avoid Poison, Impale, and Bleeding"
+      ]
+    },
+    "MapMonstersAvoidPoisonBleedBlindMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "몬스터가 20%의 확률로 중독, 꿰뚫기, 출혈 회피"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Monsters have a 20% chance to avoid Poison, Impale, and Bleeding"
+      ]
+    },
+    "MapMonstersBaseSelfCriticalMultiplier2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "몬스터가 치명타로 받는 추가 피해 (31-35)% 감소"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Monsters take (31-35)% reduced Extra Damage from Critical Strikes"
+      ]
+    },
+    "MapMonstersBaseSelfCriticalMultiplier3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "몬스터가 치명타로 받는 추가 피해 (36-40)% 감소"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Monsters take (36-40)% reduced Extra Damage from Critical Strikes"
+      ]
+    },
+    "MapMonstersBaseSelfCriticalMultiplier3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "몬스터가 치명타로 받는 추가 피해 (36-40)% 감소"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "Monsters take (36-40)% reduced Extra Damage from Critical Strikes"
+      ]
+    },
+    "MapMonstersBaseSelfCriticalMultiplierMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "몬스터가 치명타로 받는 추가 피해 (25-30)% 감소"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Monsters take (25-30)% reduced Extra Damage from Critical Strikes"
+      ]
+    },
+    "MapMonstersBlindOnHitMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "몬스터가 명중 시 실명 유발"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Monsters Blind on Hit"
+      ]
+    },
+    "MapMonstersBlindOnHitMapWorldsMaven__": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "몬스터가 명중 시 실명 유발"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "Monsters Blind on Hit"
+      ]
+    },
+    "MapMonstersCantBeSlowedOrTauntedMapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "몬스터의 동작 속도가 기본 수치 밑으로 내려가지 않음",
+        "몬스터의 이동 속도가 기본 수치 밑으로 내려가지 않음",
+        "몬스터 도발 면역"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "Monsters' Action Speed cannot be modified to below Base Value",
+        "Monsters' Movement Speed cannot be modified to below Base Value",
+        "Monsters cannot be Taunted"
+      ]
+    },
+    "MapMonstersCantBeSlowedOrTauntedMapWorlds_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "몬스터의 동작 속도가 기본 수치 밑으로 내려가지 않음",
+        "몬스터의 이동 속도가 기본 수치 밑으로 내려가지 않음",
+        "몬스터 도발 면역"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Monsters' Action Speed cannot be modified to below Base Value",
+        "Monsters' Movement Speed cannot be modified to below Base Value",
+        "Monsters cannot be Taunted"
+      ]
+    },
+    "MapMonstersChanceToInflictStatusAilments2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터가 명중 시 20%의 확률로 점화, 동결, 감전 유발"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Monsters have a 20% chance to Ignite, Freeze and Shock on Hit"
+      ]
+    },
+    "MapMonstersChanceToInflictStatusAilments2MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "몬스터가 명중 시 20%의 확률로 점화, 동결, 감전 유발"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "Monsters have a 20% chance to Ignite, Freeze and Shock on Hit"
+      ]
+    },
+    "MapMonstersChanceToInflictStatusAilmentsMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터가 명중 시 15%의 확률로 점화, 동결, 감전 유발"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Monsters have a 15% chance to Ignite, Freeze and Shock on Hit"
+      ]
+    },
+    "MapMonstersChanceToSuppressSpells2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터의 주문 피해 억제 확률 +45%"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Monsters have +45% chance to Suppress Spell Damage"
+      ]
+    },
+    "MapMonstersChanceToSuppressSpells3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터의 주문 피해 억제 확률 +60%"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Monsters have +60% chance to Suppress Spell Damage"
+      ]
+    },
+    "MapMonstersChanceToSuppressSpells3MapWorldsMaven_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "몬스터의 주문 피해 억제 확률 +60%"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "Monsters have +60% chance to Suppress Spell Damage"
+      ]
+    },
+    "MapMonstersChanceToSuppressSpellsMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터의 주문 피해 억제 확률 +30%"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Monsters have +30% chance to Suppress Spell Damage"
+      ]
+    },
+    "MapMonstersCurseEffectOnSelfFinal2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터에게 걸리는 저주 효과 40% 감폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "40% less effect of Curses on Monsters"
+      ]
+    },
+    "MapMonstersCurseEffectOnSelfFinal3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터에게 걸리는 저주 효과 60% 감폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "60% less effect of Curses on Monsters"
+      ]
+    },
+    "MapMonstersCurseEffectOnSelfFinal3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "몬스터에게 걸리는 저주 효과 60% 감폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "60% less effect of Curses on Monsters"
+      ]
+    },
+    "MapMonstersCurseEffectOnSelfFinalMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터에게 걸리는 저주 효과 25% 감폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "25% less effect of Curses on Monsters"
+      ]
+    },
+    "MapMonstersEnduranceChargeOnHitMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터가 명중 시 인내 충전 획득"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Monsters gain an Endurance Charge on Hit"
+      ]
+    },
+    "MapMonstersEnduranceChargeOnHitMapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "몬스터가 명중 시 인내 충전 획득"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "Monsters gain an Endurance Charge on Hit"
+      ]
+    },
+    "MapMonstersFrenzyChargeOnHitMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터가 명중 시 격분 충전 획득"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Monsters gain a Frenzy Charge on Hit"
+      ]
+    },
+    "MapMonstersFrenzyChargeOnHitMapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "몬스터가 명중 시 격분 충전 획득"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "Monsters gain a Frenzy Charge on Hit"
+      ]
+    },
+    "MapMonstersHinderOnHitMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "몬스터의 주문 명중 시 이동 방해 유발"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Monsters Hinder on Hit with Spells"
+      ]
+    },
+    "MapMonstersHinderOnHitMapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "몬스터의 주문 명중 시 이동 방해 유발"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "Monsters Hinder on Hit with Spells"
+      ]
+    },
+    "MapMonstersImpaleOnHit2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터의 공격이 명중 시 40%의 확률로 꿰뚫음"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters' Attacks have 40% chance to Impale on Hit"
+      ]
+    },
+    "MapMonstersImpaleOnHit3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "몬스터의 공격이 명중 시 60%의 확률로 꿰뚫음"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "Monsters' Attacks have 60% chance to Impale on Hit"
+      ]
+    },
+    "MapMonstersImpaleOnHit3MapWorlds_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터의 공격이 명중 시 60%의 확률로 꿰뚫음"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters' Attacks have 60% chance to Impale on Hit"
+      ]
+    },
+    "MapMonstersImpaleOnHitMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터의 공격이 명중 시 25%의 확률로 꿰뚫음"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters' Attacks have 25% chance to Impale on Hit"
+      ]
+    },
+    "MapMonstersMaimOnHitMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "몬스터가 공격 명중 시 힘줄 절단 유발"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Monsters Maim on Hit with Attacks"
+      ]
+    },
+    "MapMonstersMaimOnHitMapWorldsMaven__": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "몬스터가 공격 명중 시 힘줄 절단 유발"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "Monsters Maim on Hit with Attacks"
+      ]
+    },
+    "MapMonstersMaximumLifeAddedEnergyShield2MapWorlds_____": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터가 최대 생명력의 (30-39)%를 추가 에너지 보호막 최대치로 획득"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Monsters gain (30-39)% of Maximum Life as Extra Maximum Energy Shield"
+      ]
+    },
+    "MapMonstersMaximumLifeAddedEnergyShield3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터가 최대 생명력의 (40-49)%를 추가 에너지 보호막 최대치로 획득"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Monsters gain (40-49)% of Maximum Life as Extra Maximum Energy Shield"
+      ]
+    },
+    "MapMonstersMaximumLifeAddedEnergyShield3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "몬스터가 최대 생명력의 (40-49)%를 추가 에너지 보호막 최대치로 획득"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "Monsters gain (40-49)% of Maximum Life as Extra Maximum Energy Shield"
+      ]
+    },
+    "MapMonstersMaximumLifeAddedEnergyShieldMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터가 최대 생명력의 (20-29)%를 추가 에너지 보호막 최대치로 획득"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Monsters gain (20-29)% of Maximum Life as Extra Maximum Energy Shield"
+      ]
+    },
+    "MapMonstersPowerChargeOnHitMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터가 명중 시 권능 충전 획득"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Monsters gain a Power Charge on Hit"
+      ]
+    },
+    "MapMonstersPowerChargeOnHitMapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "몬스터가 명중 시 권능 충전 획득"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "Monsters gain a Power Charge on Hit"
+      ]
+    },
+    "MapMonstersStealChargesOnHitMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "몬스터가 명중 시 권능, 격분, 인내 충전 강탈"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Monsters steal Power, Frenzy and Endurance charges on Hit"
+      ]
+    },
+    "MapMonstersStealChargesOnHitMapWorldsMaven__": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "몬스터가 명중 시 권능, 격분, 인내 충전 강탈"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "Monsters steal Power, Frenzy and Endurance charges on Hit"
+      ]
+    },
+    "MapMoreMonsterPackVarietyMapWorlds_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "지역에 등장하는 몬스터 종류 증가"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Area has increased monster variety"
+      ]
+    },
+    "MapNemesisModOnRaresMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "희귀 몬스터 수 (20-30)% 증가"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "(20-30)% increased number of Rare Monsters"
+      ]
+    },
+    "MapPlayerCurseElementalWeakness1MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어가 원소 약화 저주에 걸림"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players are Cursed with Elemental Weakness"
+      ]
+    },
+    "MapPlayerCurseElementalWeakness2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어가 원소 약화 저주에 걸림"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players are Cursed with Elemental Weakness"
+      ]
+    },
+    "MapPlayerCurseElementalWeakness2MapWorldsMaven__": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "플레이어가 원소 약화 저주에 걸림"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "Players are Cursed with Elemental Weakness"
+      ]
+    },
+    "MapPlayerCurseEnfeeblement1MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어가 쇠약화 저주에 걸림"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players are Cursed with Enfeeble"
+      ]
+    },
+    "MapPlayerCurseEnfeeblement2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어가 쇠약화 저주에 걸림"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players are Cursed with Enfeeble"
+      ]
+    },
+    "MapPlayerCurseEnfeeblement2MapWorldsMaven_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "플레이어가 쇠약화 저주에 걸림"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "Players are Cursed with Enfeeble"
+      ]
+    },
+    "MapPlayerCurseTemporalChains1MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어가 시간의 사슬 저주에 걸림"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players are Cursed with Temporal Chains"
+      ]
+    },
+    "MapPlayerCurseTemporalChains2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어가 시간의 사슬 저주에 걸림"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players are Cursed with Temporal Chains"
+      ]
+    },
+    "MapPlayerCurseTemporalChains2MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "플레이어가 시간의 사슬 저주에 걸림"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "Players are Cursed with Temporal Chains"
+      ]
+    },
+    "MapPlayerCurseVulnerability1MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어가 취약성 저주에 걸림"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players are Cursed with Vulnerability"
+      ]
+    },
+    "MapPlayerCurseVulnerability2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어가 취약성 저주에 걸림"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players are Cursed with Vulnerability"
+      ]
+    },
+    "MapPlayerCurseVulnerability2MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "플레이어가 취약성 저주에 걸림"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "Players are Cursed with Vulnerability"
+      ]
+    },
+    "MapPlayerElementalEquilibriumMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "플레이어가 노출 유발 불가"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Players cannot inflict Exposure"
+      ]
+    },
+    "MapPlayerElementalEquilibriumMapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "플레이어가 노출 유발 불가"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "Players cannot inflict Exposure"
+      ]
+    },
+    "MapPlayerMaxResists1MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 19% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 11% 증가",
+        "무리 규모 7% 증가",
+        "플레이어의 모든 저항 최대치 -(8-5)%"
+      ],
+      "en": [
+        "19% increased Atlas Drops in this Area",
+        "11% increased Rarity of Items found in this Area",
+        "7% increased Pack size",
+        "Players have -(8-5)% to all maximum Resistances"
+      ]
+    },
+    "MapPlayerMaxResists2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 19% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 11% 증가",
+        "무리 규모 7% 증가",
+        "플레이어의 모든 저항 최대치 -(12-9)%"
+      ],
+      "en": [
+        "19% increased Atlas Drops in this Area",
+        "11% increased Rarity of Items found in this Area",
+        "7% increased Pack size",
+        "Players have -(12-9)% to all maximum Resistances"
+      ]
+    },
+    "MapPlayerMaxResists2MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 19% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 11% 증가",
+        "플레이어의 모든 저항 최대치 -(12-9)%"
+      ],
+      "en": [
+        "19% increased Atlas Drops in this Area",
+        "11% increased Rarity of Items found in this Area",
+        "Players have -(12-9)% to all maximum Resistances"
+      ]
+    },
+    "MapPlayerNoLifeESRegenMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "플레이어가 생명력, 마나 또는 에너지 보호막 재생 불가"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Players cannot Regenerate Life, Mana or Energy Shield"
+      ]
+    },
+    "MapPlayerReducedRegen1MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "플레이어의 생명력 및 에너지 보호막 회복 속도 20% 감폭"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Players have 20% less Recovery Rate of Life and Energy Shield"
+      ]
+    },
+    "MapPlayerReducedRegen2MapWorlds_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "플레이어의 생명력 및 에너지 보호막 회복 속도 40% 감폭"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Players have 40% less Recovery Rate of Life and Energy Shield"
+      ]
+    },
+    "MapPlayerReducedRegen3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "플레이어의 생명력 및 에너지 보호막 회복 속도 60% 감폭"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Players have 60% less Recovery Rate of Life and Energy Shield"
+      ]
+    },
+    "MapPlayerReducedRegen3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "플레이어의 생명력 및 에너지 보호막 회복 속도 60% 감폭"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "Players have 60% less Recovery Rate of Life and Energy Shield"
+      ]
+    },
+    "MapPlayersAccuracyRating2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어의 정확도 20% 감폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players have 20% less Accuracy Rating"
+      ]
+    },
+    "MapPlayersAccuracyRating3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어의 정확도 25% 감폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players have 25% less Accuracy Rating"
+      ]
+    },
+    "MapPlayersAccuracyRating3MapWorldsMaven_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "플레이어의 정확도 25% 감폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "Players have 25% less Accuracy Rating"
+      ]
+    },
+    "MapPlayersAccuracyRatingMapWorlds_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어의 정확도 15% 감폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players have 15% less Accuracy Rating"
+      ]
+    },
+    "MapPlayersBlockAndArmour2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어의 막기 확률 30% 감소",
+        "플레이어의 방어도 25% 감폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players have 30% reduced Chance to Block",
+        "Players have 25% less Armour"
+      ]
+    },
+    "MapPlayersBlockAndArmour3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어의 막기 확률 40% 감소",
+        "플레이어의 방어도 30% 감폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players have 40% reduced Chance to Block",
+        "Players have 30% less Armour"
+      ]
+    },
+    "MapPlayersBlockAndArmour3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "플레이어의 막기 확률 40% 감소",
+        "플레이어의 방어도 30% 감폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "Players have 40% reduced Chance to Block",
+        "Players have 30% less Armour"
+      ]
+    },
+    "MapPlayersBlockAndArmourMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어의 막기 확률 20% 감소",
+        "플레이어의 방어도 20% 감폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players have 20% reduced Chance to Block",
+        "Players have 20% less Armour"
+      ]
+    },
+    "MapPlayersBuffsExpireFaster2MapWorlds___": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "플레이어에게 적용되는 버프가 50% 더 빠르게 만료됨"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Buffs on Players expire 50% faster"
+      ]
+    },
+    "MapPlayersBuffsExpireFaster3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "플레이어에게 적용되는 버프가 70% 더 빠르게 만료됨"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Buffs on Players expire 70% faster"
+      ]
+    },
+    "MapPlayersBuffsExpireFaster3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "플레이어에게 적용되는 버프가 70% 더 빠르게 만료됨"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "Buffs on Players expire 70% faster"
+      ]
+    },
+    "MapPlayersBuffsExpireFasterMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "플레이어에게 적용되는 버프가 30% 더 빠르게 만료됨"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Buffs on Players expire 30% faster"
+      ]
+    },
+    "MapPlayersEvasionAndUnluckyDodge1MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어가 방지하는 억제된 주문 피해 -10%",
+        "몬스터의 정확도 30% 증가"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players have -10% to amount of Suppressed Spell Damage Prevented",
+        "Monsters have 30% increased Accuracy Rating"
+      ]
+    },
+    "MapPlayersEvasionAndUnluckyDodge2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어가 방지하는 억제된 주문 피해 -15%",
+        "몬스터의 정확도 40% 증가"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players have -15% to amount of Suppressed Spell Damage Prevented",
+        "Monsters have 40% increased Accuracy Rating"
+      ]
+    },
+    "MapPlayersEvasionAndUnluckyDodge3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어가 방지하는 억제된 주문 피해 -20%",
+        "몬스터의 정확도 50% 증가"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players have -20% to amount of Suppressed Spell Damage Prevented",
+        "Monsters have 50% increased Accuracy Rating"
+      ]
+    },
+    "MapPlayersEvasionAndUnluckyDodge3MapWorldsMaven_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "플레이어가 방지하는 억제된 주문 피해 -20%",
+        "몬스터의 정확도 50% 증가"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "Players have -20% to amount of Suppressed Spell Damage Prevented",
+        "Monsters have 50% increased Accuracy Rating"
+      ]
+    },
+    "MapPlayersGainReducedFlaskCharges2MapWorlds_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어의 플라스크 충전량 40% 감소"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players gain 40% reduced Flask Charges"
+      ]
+    },
+    "MapPlayersGainReducedFlaskCharges3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "플레이어의 플라스크 충전량 50% 감소"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "Players gain 50% reduced Flask Charges"
+      ]
+    },
+    "MapPlayersGainReducedFlaskCharges3MapWorlds_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어의 플라스크 충전량 50% 감소"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players gain 50% reduced Flask Charges"
+      ]
+    },
+    "MapPlayersGainReducedFlaskChargesMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어의 플라스크 충전량 30% 감소"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players gain 30% reduced Flask Charges"
+      ]
+    },
+    "MapPlayersLessAoERadius2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어의 효과 범위 20% 감폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players have 20% less Area of Effect"
+      ]
+    },
+    "MapPlayersLessAoERadius3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어의 효과 범위 25% 감폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players have 25% less Area of Effect"
+      ]
+    },
+    "MapPlayersLessAoERadius3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "플레이어의 효과 범위 25% 감폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "Players have 25% less Area of Effect"
+      ]
+    },
+    "MapPlayersLessAoERadiusMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어의 효과 범위 15% 감폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players have 15% less Area of Effect"
+      ]
+    },
+    "MapPlayersLessCooldownRecovery2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어의 재사용 대기시간 회복 속도 30% 감폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players have 30% less Cooldown Recovery Rate"
+      ]
+    },
+    "MapPlayersLessCooldownRecovery3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어의 재사용 대기시간 회복 속도 40% 감폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players have 40% less Cooldown Recovery Rate"
+      ]
+    },
+    "MapPlayersLessCooldownRecovery3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "플레이어의 재사용 대기시간 회복 속도 40% 감폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "Players have 40% less Cooldown Recovery Rate"
+      ]
+    },
+    "MapPlayersLessCooldownRecoveryMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어의 재사용 대기시간 회복 속도 20% 감폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players have 20% less Cooldown Recovery Rate"
+      ]
+    },
+    "MapPlayersReducedAuraEffect2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어가 비-저주 오라 스킬로 받는 효과 40% 감소"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players have 40% reduced effect of Non-Curse Auras from Skills"
+      ]
+    },
+    "MapPlayersReducedAuraEffect3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "플레이어가 비-저주 오라 스킬로 받는 효과 60% 감소"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "Players have 60% reduced effect of Non-Curse Auras from Skills"
+      ]
+    },
+    "MapPlayersReducedAuraEffect3MapWorlds_": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어가 비-저주 오라 스킬로 받는 효과 60% 감소"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players have 60% reduced effect of Non-Curse Auras from Skills"
+      ]
+    },
+    "MapPlayersReducedAuraEffectMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어가 비-저주 오라 스킬로 받는 효과 25% 감소"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players have 25% reduced effect of Non-Curse Auras from Skills"
+      ]
+    },
+    "MapPoisoningMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터의 공격 명중 시 중독"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters Poison on Hit"
+      ]
+    },
+    "MapPoisoningMapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "몬스터의 공격 명중 시 중독"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "Monsters Poison on Hit"
+      ]
+    },
+    "MapShockedGround1MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "지역에 20%만큼 피해가 증가한 감전 지대 존재"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Area has patches of Shocked Ground which increase Damage taken by 20%"
+      ]
+    },
+    "MapShockedGround2MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "지역에 35%만큼 피해가 증가한 감전 지대 존재"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Area has patches of Shocked Ground which increase Damage taken by 35%"
+      ]
+    },
+    "MapShockedGround3MapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "지역에 50%만큼 피해가 증가한 감전 지대 존재"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Area has patches of Shocked Ground which increase Damage taken by 50%"
+      ]
+    },
+    "MapShockedGround3MapWorldsMaven": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "지역에 50%만큼 피해가 증가한 감전 지대 존재"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "Area has patches of Shocked Ground which increase Damage taken by 50%"
+      ]
+    },
+    "MapTotemsMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "지역에 다수의 토템 존재"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Area contains many Totems"
+      ]
+    },
+    "MapTwoBossesMapWorlds": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 19% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 11% 증가",
+        "무리 규모 7% 증가",
+        "지역에 고유 보스 2마리 등장"
+      ],
+      "en": [
+        "19% increased Atlas Drops in this Area",
+        "11% increased Rarity of Items found in this Area",
+        "7% increased Pack size",
+        "Area contains two Unique Bosses"
+      ]
+    },
+    "MapUberModAOEPlayer": {
+      "ko": [
+        "플레이어의 효과 범위 (30-25)% 감폭",
+        "무리 규모 5% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 35% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가"
+      ],
+      "en": [
+        "Players have (30-25)% less Area of Effect",
+        "5% increased Pack size",
+        "35% increased Rarity of Items found in this Area",
+        "13% increased Atlas Drops in this Area"
+      ]
+    },
+    "MapUberModAurasAffectMonsters": {
+      "ko": [
+        "동료에게 영향을 주는 플레이어의 오라 스킬이 적에게도 영향을 줌",
+        "무리 규모 5% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 27% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가"
+      ],
+      "en": [
+        "Auras from Player Skills which affect Allies also affect Enemies",
+        "5% increased Pack size",
+        "27% increased Rarity of Items found in this Area",
+        "16% increased Atlas Drops in this Area"
+      ]
+    },
+    "MapUberModBuffExpiry": {
+      "ko": [
+        "플레이어에게 적용되는 버프가 100% 더 빠르게 만료됨",
+        "무리 규모 4% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "지역에서 발견하는 실낱 35% 증폭"
+      ],
+      "en": [
+        "Buffs on Players expire 100% faster",
+        "4% increased Pack size",
+        "6% increased Rarity of Items found in this Area",
+        "10% increased Atlas Drops in this Area",
+        "35% more Threads found in Area"
+      ]
+    },
+    "MapUberModChain": {
+      "ko": [
+        "몬스터의 스킬 3회 추가 연쇄",
+        "몬스터의 투사체가 지형과 충돌 시 연쇄 가능",
+        "무리 규모 6% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 56% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가"
+      ],
+      "en": [
+        "Monsters' skills Chain 3 additional times",
+        "Monsters' Projectiles can Chain when colliding with Terrain",
+        "6% increased Pack size",
+        "56% increased Rarity of Items found in this Area",
+        "16% increased Atlas Drops in this Area"
+      ]
+    },
+    "MapUberModCrit": {
+      "ko": [
+        "몬스터의 치명타 피해 배율 +(70-75)%",
+        "몬스터의 치명타 확률 (650-700)% 증가",
+        "무리 규모 6% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 56% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가"
+      ],
+      "en": [
+        "+(70-75)% to Monster Critical Strike Multiplier",
+        "Monsters have (650-700)% increased Critical Strike Chance",
+        "6% increased Pack size",
+        "56% increased Rarity of Items found in this Area",
+        "16% increased Atlas Drops in this Area"
+      ]
+    },
+    "MapUberModCritDefence": {
+      "ko": [
+        "몬스터가 치명타로 받는 추가 피해 (35-45)% 감소",
+        "무리 규모 5% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 28% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가"
+      ],
+      "en": [
+        "Monsters take (35-45)% reduced Extra Damage from Critical Strikes",
+        "5% increased Pack size",
+        "28% increased Rarity of Items found in this Area",
+        "10% increased Atlas Drops in this Area"
+      ]
+    },
+    "MapUberModCurses": {
+      "ko": [
+        "플레이어가 취약성 저주에 걸림",
+        "플레이어가 시간의 사슬 저주에 걸림",
+        "플레이어가 원소 약화 저주에 걸림",
+        "무리 규모 6% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 11% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "지역에서 발견하는 실낱 35% 증폭"
+      ],
+      "en": [
+        "Players are Cursed with Vulnerability",
+        "Players are Cursed with Temporal Chains",
+        "Players are Cursed with Elemental Weakness",
+        "6% increased Pack size",
+        "11% increased Rarity of Items found in this Area",
+        "13% increased Atlas Drops in this Area",
+        "35% more Threads found in Area"
+      ]
+    },
+    "MapUberModDamageAsChaos": {
+      "ko": [
+        "몬스터가 물리 피해의 (80-100)%를 추가 카오스 피해로 획득",
+        "무리 규모 6% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 36% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가"
+      ],
+      "en": [
+        "Monsters gain (80-100)% of their Physical Damage as Extra Chaos Damage",
+        "6% increased Pack size",
+        "36% increased Rarity of Items found in this Area",
+        "16% increased Atlas Drops in this Area"
+      ]
+    },
+    "MapUberModDamageAsElemental": {
+      "ko": [
+        "몬스터가 물리 피해의 (180-200)%를 추가 무작위 원소 피해로 획득",
+        "무리 규모 6% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 36% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가"
+      ],
+      "en": [
+        "Monsters gain (180-200)% of their Physical Damage as Extra Damage of a random Element",
+        "6% increased Pack size",
+        "36% increased Rarity of Items found in this Area",
+        "16% increased Atlas Drops in this Area"
+      ]
+    },
+    "MapUberModDrowningOrbs": {
+      "ko": [
+        "지역에 질식의 구체 등장",
+        "무리 규모 20% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가"
+      ],
+      "en": [
+        "Area contains Drowning Orbs",
+        "20% increased Pack size",
+        "8% increased Rarity of Items found in this Area",
+        "16% increased Atlas Drops in this Area"
+      ]
+    },
+    "MapUberModElderNovas": {
+      "ko": [
+        "무리 규모 20% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 11% 증가",
+        "지역에 불안정한 촉수 마귀 등장"
+      ],
+      "en": [
+        "20% increased Pack size",
+        "16% increased Atlas Drops in this Area",
+        "11% increased Rarity of Items found in this Area",
+        "Area contains Unstable Tentacle Fiends"
+      ]
+    },
+    "MapUberModEleDamagePenetration": {
+      "ko": [
+        "몬스터 피해가 15%의 원소 저항 관통",
+        "무리 규모 6% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 36% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 19% 증가"
+      ],
+      "en": [
+        "Monster Damage Penetrates 15% Elemental Resistances",
+        "6% increased Pack size",
+        "36% increased Rarity of Items found in this Area",
+        "19% increased Atlas Drops in this Area"
+      ]
+    },
+    "MapUberModEnduranceCharges": {
+      "ko": [
+        "몬스터의 인내 충전 최대치 +1",
+        "몬스터가 피격 시 인내 충전 획득",
+        "무리 규모 5% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "지역에서 발견하는 지도 35% 증폭"
+      ],
+      "en": [
+        "Monsters have +1 to Maximum Endurance Charges",
+        "Monsters gain an Endurance Charge when hit",
+        "5% increased Pack size",
+        "8% increased Rarity of Items found in this Area",
+        "13% increased Atlas Drops in this Area",
+        "35% more Maps found in Area"
+      ]
+    },
+    "MapUberModExarch": {
+      "ko": [
+        "지역에 작열의 총주교의 룬 등장",
+        "무리 규모 20% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가"
+      ],
+      "en": [
+        "Area contains Runes of the Searing Exarch",
+        "20% increased Pack size",
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area"
+      ]
+    },
+    "MapUberModFlaskMeteor": {
+      "ko": [
+        "무리 규모 5% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "플레이어가 플라스크 사용 시 유성의 대상이 됨",
+        "지역에서 발견하는 화폐 45% 증폭"
+      ],
+      "en": [
+        "5% increased Pack size",
+        "8% increased Rarity of Items found in this Area",
+        "13% increased Atlas Drops in this Area",
+        "Players are targeted by a Meteor when they use a Flask",
+        "45% more Currency found in Area"
+      ]
+    },
+    "MapUberModFrenzyCharges": {
+      "ko": [
+        "몬스터가 명중 시 격분 충전 획득",
+        "몬스터의 격분 충전 최대치 +1",
+        "무리 규모 5% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "지역에서 발견하는 지도 35% 증폭"
+      ],
+      "en": [
+        "Monsters gain a Frenzy Charge on Hit",
+        "Monsters have +1 to Maximum Frenzy Charges",
+        "5% increased Pack size",
+        "8% increased Rarity of Items found in this Area",
+        "13% increased Atlas Drops in this Area",
+        "35% more Maps found in Area"
+      ]
+    },
+    "MapUberModGlobalDefences": {
+      "ko": [
+        "플레이어의 방어력 (30-25)% 감폭",
+        "무리 규모 5% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "지역에서 발견하는 실낱 35% 증폭"
+      ],
+      "en": [
+        "Players have (30-25)% less Defences",
+        "5% increased Pack size",
+        "8% increased Rarity of Items found in this Area",
+        "13% increased Atlas Drops in this Area",
+        "35% more Threads found in Area"
+      ]
+    },
+    "MapUberModJuggernaut": {
+      "ko": [
+        "몬스터 기절 면역",
+        "몬스터의 동작 속도가 기본 수치 밑으로 내려가지 않음",
+        "몬스터의 이동 속도가 기본 수치 밑으로 내려가지 않음",
+        "무리 규모 5% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "지역에서 발견하는 화폐 47% 증폭"
+      ],
+      "en": [
+        "Monsters cannot be Stunned",
+        "Monsters' Action Speed cannot be modified to below Base Value",
+        "Monsters' Movement Speed cannot be modified to below Base Value",
+        "5% increased Pack size",
+        "8% increased Rarity of Items found in this Area",
+        "13% increased Atlas Drops in this Area",
+        "47% more Currency found in Area"
+      ]
+    },
+    "MapUberModLabyrinthHazards": {
+      "ko": [
+        "지역에 미궁 위해 요소 등장",
+        "무리 규모 5% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 27% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 19% 증가"
+      ],
+      "en": [
+        "Area contains Labyrinth Hazards",
+        "5% increased Pack size",
+        "27% increased Rarity of Items found in this Area",
+        "19% increased Atlas Drops in this Area"
+      ]
+    },
+    "MapUberModLessFlaskEffect": {
+      "ko": [
+        "플레이어에게 적용되는 플라스크 효과 40% 감폭",
+        "무리 규모 5% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "지역에서 발견하는 화폐 47% 증폭"
+      ],
+      "en": [
+        "Players have 40% less effect of Flasks applied to them",
+        "5% increased Pack size",
+        "8% increased Rarity of Items found in this Area",
+        "16% increased Atlas Drops in this Area",
+        "47% more Currency found in Area"
+      ]
+    },
+    "MapUberModLessPlayerLeech": {
+      "ko": [
+        "흡수로 인한 플레이어의 초당 총 생명력, 마나, 에너지 보호막 회복량 최대치 (60-50)% 감소",
+        "무리 규모 6% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 25% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가"
+      ],
+      "en": [
+        "Players have (60-50)% reduced Maximum total Life, Mana and Energy Shield Recovery per second from Leech",
+        "6% increased Pack size",
+        "25% increased Rarity of Items found in this Area",
+        "16% increased Atlas Drops in this Area"
+      ]
+    },
+    "MapUberModLifeAsEnergyShield": {
+      "ko": [
+        "몬스터가 최대 생명력의 (70-80)%를 추가 에너지 보호막 최대치로 획득",
+        "무리 규모 5% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "지역에서 발견하는 지도 35% 증폭"
+      ],
+      "en": [
+        "Monsters gain (70-80)% of Maximum Life as Extra Maximum Energy Shield",
+        "5% increased Pack size",
+        "8% increased Rarity of Items found in this Area",
+        "13% increased Atlas Drops in this Area",
+        "35% more Maps found in Area"
+      ]
+    },
+    "MapUberModMavenFollower": {
+      "ko": [
+        "메이븐이 플레이어를 방해함",
+        "무리 규모 20% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가"
+      ],
+      "en": [
+        "The Maven interferes with Players",
+        "20% increased Pack size",
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area"
+      ]
+    },
+    "MapUberModMinusMax": {
+      "ko": [
+        "플레이어의 모든 저항 최대치 -20%",
+        "무리 규모 20% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 11% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 19% 증가"
+      ],
+      "en": [
+        "Players have -20% to all maximum Resistances",
+        "20% increased Pack size",
+        "11% increased Rarity of Items found in this Area",
+        "19% increased Atlas Drops in this Area"
+      ]
+    },
+    "MapUberModMonsterAilments": {
+      "ko": [
+        "몬스터가 명중 시 점화, 동결, 감전 유발",
+        "무리 규모 5% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "몬스터가 주는 모든 피해가 점화, 동결, 감전 유발 가능",
+        "지역에서 발견하는 실낱 60% 증폭"
+      ],
+      "en": [
+        "Monsters Ignite, Freeze and Shock on Hit",
+        "5% increased Pack size",
+        "8% increased Rarity of Items found in this Area",
+        "13% increased Atlas Drops in this Area",
+        "All Monster Damage can Ignite, Freeze and Shock",
+        "60% more Threads found in Area"
+      ]
+    },
+    "MapUberModMonsterAttackBlock": {
+      "ko": [
+        "몬스터의 공격 피해 막기 확률 +50%",
+        "무리 규모 5% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "지역에서 발견하는 화폐 47% 증폭"
+      ],
+      "en": [
+        "Monsters have +50% Chance to Block Attack Damage",
+        "5% increased Pack size",
+        "8% increased Rarity of Items found in this Area",
+        "13% increased Atlas Drops in this Area",
+        "47% more Currency found in Area"
+      ]
+    },
+    "MapUberModMonsterDamage": {
+      "ko": [
+        "몬스터 피해 (30-40)% 증가",
+        "무리 규모 7% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 56% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 19% 증가"
+      ],
+      "en": [
+        "(30-40)% increased Monster Damage",
+        "7% increased Pack size",
+        "56% increased Rarity of Items found in this Area",
+        "19% increased Atlas Drops in this Area"
+      ]
+    },
+    "MapUberModMonsterDebuffSpeed": {
+      "ko": [
+        "몬스터에게 적용되는 디버프가 100% 더 빠르게 만료됨",
+        "무리 규모 6% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 12% 증가",
+        "지역에서 발견하는 화폐 64% 증폭"
+      ],
+      "en": [
+        "Debuffs on Monsters expire 100% faster",
+        "6% increased Pack size",
+        "16% increased Atlas Drops in this Area",
+        "12% increased Rarity of Items found in this Area",
+        "64% more Currency found in Area"
+      ]
+    },
+    "MapUberModMonsterLife": {
+      "ko": [
+        "몬스터의 생명력 (90-100)% 증폭",
+        "무리 규모 5% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "지역에서 발견하는 화폐 47% 증폭"
+      ],
+      "en": [
+        "(90-100)% more Monster Life",
+        "5% increased Pack size",
+        "8% increased Rarity of Items found in this Area",
+        "13% increased Atlas Drops in this Area",
+        "47% more Currency found in Area"
+      ]
+    },
+    "MapUberModMonsterSuppress": {
+      "ko": [
+        "몬스터의 주문 피해 억제 확률 +100%",
+        "무리 규모 5% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "지역에서 발견하는 지도 35% 증폭"
+      ],
+      "en": [
+        "Monsters have +100% chance to Suppress Spell Damage",
+        "5% increased Pack size",
+        "8% increased Rarity of Items found in this Area",
+        "13% increased Atlas Drops in this Area",
+        "35% more Maps found in Area"
+      ]
+    },
+    "MapUberModPlayerMarked": {
+      "ko": [
+        "지역에 움직이며 무작위 징표를 유발하는 징표 찍힌 지대 여러 개 등장",
+        "무리 규모 5% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "지역에서 발견하는 실낱 36% 증폭"
+      ],
+      "en": [
+        "Area contains patches of moving Marked Ground, inflicting random Marks",
+        "5% increased Pack size",
+        "8% increased Rarity of Items found in this Area",
+        "16% increased Atlas Drops in this Area",
+        "36% more Threads found in Area"
+      ]
+    },
+    "MapUberModPoison": {
+      "ko": [
+        "몬스터의 공격 명중 시 중독",
+        "몬스터의 중독 지속시간 100% 증가",
+        "몬스터의 모든 명중 피해가 중독 유발 가능",
+        "무리 규모 6% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 49% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가"
+      ],
+      "en": [
+        "Monsters Poison on Hit",
+        "Monsters have 100% increased Poison Duration",
+        "All Damage from Monsters' Hits can Poison",
+        "6% increased Pack size",
+        "49% increased Rarity of Items found in this Area",
+        "16% increased Atlas Drops in this Area"
+      ]
+    },
+    "MapUberModPossessedBoss": {
+      "ko": [
+        "고유 보스가 사로잡힘",
+        "무리 규모 6% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 56% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가"
+      ],
+      "en": [
+        "Unique Bosses are Possessed",
+        "6% increased Pack size",
+        "56% increased Rarity of Items found in this Area",
+        "16% increased Atlas Drops in this Area"
+      ]
+    },
+    "MapUberModPowerCharges": {
+      "ko": [
+        "몬스터가 명중 시 권능 충전 획득",
+        "몬스터의 권능 충전 최대치 +1",
+        "무리 규모 5% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "지역에서 발견하는 지도 35% 증폭"
+      ],
+      "en": [
+        "Monsters gain a Power Charge on Hit",
+        "Monsters have +1 to Maximum Power Charges",
+        "5% increased Pack size",
+        "8% increased Rarity of Items found in this Area",
+        "13% increased Atlas Drops in this Area",
+        "35% more Maps found in Area"
+      ]
+    },
+    "MapUberModProjAOE": {
+      "ko": [
+        "몬스터가 투사체 2개 추가 발사",
+        "몬스터의 효과 범위 100% 증가",
+        "무리 규모 7% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 56% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 19% 증가"
+      ],
+      "en": [
+        "Monsters fire 2 additional Projectiles",
+        "Monsters have 100% increased Area of Effect",
+        "7% increased Pack size",
+        "56% increased Rarity of Items found in this Area",
+        "19% increased Atlas Drops in this Area"
+      ]
+    },
+    "MapUberModRareFracture": {
+      "ko": [
+        "희귀 몬스터가 사망 시 25%의 확률로 분쇄됨",
+        "무리 규모 5% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 19% 증가"
+      ],
+      "en": [
+        "25% chance for Rare Monsters to Fracture on death",
+        "5% increased Pack size",
+        "8% increased Rarity of Items found in this Area",
+        "19% increased Atlas Drops in this Area"
+      ]
+    },
+    "MapUberModRareMonsters": {
+      "ko": [
+        "희귀 몬스터가 각각 속성 1개 추가 보유",
+        "희귀 몬스터 수 (35-45)% 증가",
+        "무리 규모 5% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가"
+      ],
+      "en": [
+        "Rare Monsters each have 1 additional Modifier",
+        "(35-45)% increased number of Rare Monsters",
+        "5% increased Pack size",
+        "8% increased Rarity of Items found in this Area",
+        "13% increased Atlas Drops in this Area"
+      ]
+    },
+    "MapUberModRaresLastGasp": {
+      "ko": [
+        "지역 내 희귀 몬스터가 사망 시 일시적으로 부활",
+        "무리 규모 17% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가"
+      ],
+      "en": [
+        "Rare monsters in area Temporarily Revive on death",
+        "17% increased Pack size",
+        "8% increased Rarity of Items found in this Area",
+        "16% increased Atlas Drops in this Area"
+      ]
+    },
+    "MapUberModReflect": {
+      "ko": [
+        "희귀 몬스터가 물리 가시를 보유하고 1500의 물리 피해 반사",
+        "희귀 몬스터가 원소 가시를 보유하고 2500의 원소 피해 반사",
+        "무리 규모 5% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "지역에서 발견하는 화폐 47% 증폭"
+      ],
+      "en": [
+        "Rare Monsters have Physical Thorns reflecting 1500 Physical Damage",
+        "Rare Monsters have Elemental Thorns reflecting 2500 Elemental Damage",
+        "5% increased Pack size",
+        "8% increased Rarity of Items found in this Area",
+        "10% increased Atlas Drops in this Area",
+        "47% more Currency found in Area"
+      ]
+    },
+    "MapUberModResistancePDR": {
+      "ko": [
+        "몬스터의 물리 피해 감소 +50%",
+        "몬스터의 원소 저항 +55%",
+        "몬스터의 카오스 저항 +35%",
+        "무리 규모 5% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "지역에서 발견하는 지도 35% 증폭"
+      ],
+      "en": [
+        "+50% Monster Physical Damage Reduction",
+        "+55% Monster Elemental Resistances",
+        "+35% Monster Chaos Resistance",
+        "5% increased Pack size",
+        "8% increased Rarity of Items found in this Area",
+        "13% increased Atlas Drops in this Area",
+        "35% more Maps found in Area"
+      ]
+    },
+    "MapUberModSawblades": {
+      "ko": [
+        "플레이어들이 피얼룩 톱날에 습격당함",
+        "무리 규모 5% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "지역에서 발견하는 화폐 47% 증폭"
+      ],
+      "en": [
+        "Players are assaulted by Bloodstained Sawblades",
+        "5% increased Pack size",
+        "8% increased Rarity of Items found in this Area",
+        "13% increased Atlas Drops in this Area",
+        "47% more Currency found in Area"
+      ]
+    },
+    "MapUberModShaperTouched": {
+      "ko": [
+        "지역 내 희귀 몬스터가 쉐이퍼의 손길에 닿음",
+        "무리 규모 20% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 11% 증가"
+      ],
+      "en": [
+        "Rare monsters in area are Shaper-Touched",
+        "20% increased Pack size",
+        "13% increased Atlas Drops in this Area",
+        "11% increased Rarity of Items found in this Area"
+      ]
+    },
+    "MapUberModShrineBuff": {
+      "ko": [
+        "고유 몬스터가 무작위 성소 버프 1개 보유",
+        "무리 규모 5% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "지역에서 발견하는 지도 35% 증폭"
+      ],
+      "en": [
+        "Unique Monsters have a random Shrine Buff",
+        "5% increased Pack size",
+        "8% increased Rarity of Items found in this Area",
+        "13% increased Atlas Drops in this Area",
+        "35% more Maps found in Area"
+      ]
+    },
+    "MapUberModSynthMiniboss": {
+      "ko": [
+        "지도 보스가 결합 보스 대동",
+        "무리 규모 20% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가"
+      ],
+      "en": [
+        "Map Boss is accompanied by a Synthesis Boss",
+        "20% increased Pack size",
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area"
+      ]
+    },
+    "MapUberModTurbo": {
+      "ko": [
+        "몬스터의 시전 속도 (35-45)% 증가",
+        "몬스터의 공격 속도 (35-45)% 증가",
+        "몬스터의 이동 속도 (25-30)% 증가",
+        "무리 규모 7% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 28% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 19% 증가"
+      ],
+      "en": [
+        "(35-45)% increased Monster Cast Speed",
+        "(35-45)% increased Monster Attack Speed",
+        "(25-30)% increased Monster Movement Speed",
+        "7% increased Pack size",
+        "28% increased Rarity of Items found in this Area",
+        "19% increased Atlas Drops in this Area"
+      ]
+    },
+    "MapUberModVines": {
+      "ko": [
+        "몬스터가 명중 시 탐욕스러운 덩굴 2개 유발",
+        "무리 규모 5% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "지역에서 발견하는 지도 40% 증폭"
+      ],
+      "en": [
+        "Monsters inflict 2 Grasping Vines on Hit",
+        "5% increased Pack size",
+        "8% increased Rarity of Items found in this Area",
+        "13% increased Atlas Drops in this Area",
+        "40% more Maps found in Area"
+      ]
+    },
+    "MapUberModVolatiles": {
+      "ko": [
+        "희귀 몬스터가 폭발성 중심부 보유",
+        "무리 규모 5% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 11% 증가",
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "지역에서 발견하는 실낱 53% 증폭"
+      ],
+      "en": [
+        "Rare Monsters have Volatile Cores",
+        "5% increased Pack size",
+        "11% increased Rarity of Items found in this Area",
+        "13% increased Atlas Drops in this Area",
+        "53% more Threads found in Area"
+      ]
+    },
+    "MapUberWeakBurningGround": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "지역에 용암 지대 존재"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Area has patches of Burning Ground"
+      ]
+    },
+    "MapUberWeakChilledGroundSuffix": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "지역에 얼음 지대 존재"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Area has patches of Chilled Ground"
+      ]
+    },
+    "MapUberWeakConsecratedGround": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "지역에 신성화 지대 존재"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Area has patches of Consecrated Ground"
+      ]
+    },
+    "MapUberWeakContainsBeyondDemonFaction": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 크타쉬의 환기자 1마리 등장"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area contains an Evocator of K'Tash"
+      ]
+    },
+    "MapUberWeakContainsBeyondFleshFaction": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 고르의 환기자 1마리 등장"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area contains an Evocator of Ghorr"
+      ]
+    },
+    "MapUberWeakContainsBeyondPaleFaction": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 베이다트의 환기자 1마리 등장"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area contains an Evocator of Beidat"
+      ]
+    },
+    "MapUberWeakContainsDeliriumMirror": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 환영의 거울 1개 등장"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area contains a Mirror of Delirium"
+      ]
+    },
+    "MapUberWeakContainsMirage": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 허상 등장"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area contains a Mirage"
+      ]
+    },
+    "MapUberWeakContainsSentinelApex": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 묻힌 거물 파수꾼 등장"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area contains a buried Apex Sentinel"
+      ]
+    },
+    "MapUberWeakContainsSentinelPandemonium": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 묻힌 대혼란 파수꾼 등장"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area contains a buried Pandemonium Sentinel"
+      ]
+    },
+    "MapUberWeakContainsSentinelStalker": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 묻힌 추적자 파수꾼 등장"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area contains a buried Stalker Sentinel"
+      ]
+    },
+    "MapUberWeakContainsWildwood": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "지역에 취록의 야생림 등장"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Area contains the Viridian Wildwood"
+      ]
+    },
+    "MapUberWeakDangerousBoss": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "고유 보스가 주는 피해 25% 증가",
+        "고유 보스의 공격 및 시전 속도 30% 증가"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Unique Boss deals 25% increased Damage",
+        "Unique Boss has 30% increased Attack and Cast Speed"
+      ]
+    },
+    "MapUberWeakDesecratedGround": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "지역에 훼손된 지대 존재"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Area has patches of desecrated ground"
+      ]
+    },
+    "MapUberWeakHexproof": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터가 사술 방지 보유"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters are Hexproof"
+      ]
+    },
+    "MapUberWeakMassiveBoss": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "고유 보스의 생명력 35% 증가",
+        "고유 보스의 효과 범위 70% 증가"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Unique Boss has 35% increased Life",
+        "Unique Boss has 70% increased Area of Effect"
+      ]
+    },
+    "MapUberWeakMonsterAreaOfEffect": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터의 효과 범위 100% 증가"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Monsters have 100% increased Area of Effect"
+      ]
+    },
+    "MapUberWeakMonsterCannotBeStunned": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터 기절 면역",
+        "몬스터의 생명력 (25-30)% 증폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Monsters cannot be Stunned",
+        "(25-30)% more Monster Life"
+      ]
+    },
+    "MapUberWeakMonsterChaosDamage": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터가 물리 피해의 (31-35)%를 추가 카오스 피해로 획득",
+        "몬스터가 명중 시 2초 동안 위축 유발"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters gain (31-35)% of their Physical Damage as Extra Chaos Damage",
+        "Monsters Inflict Withered for 2 seconds on Hit"
+      ]
+    },
+    "MapUberWeakMonsterColdDamage": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터가 (90-110)%의 추가 물리 피해를 냉기 속성으로 가함"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters deal (90-110)% extra Physical Damage as Cold"
+      ]
+    },
+    "MapUberWeakMonsterCriticalStrikesAndDamage": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터의 치명타 확률 (360-400)% 증가",
+        "몬스터의 치명타 피해 배율 +(41-45)%"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters have (360-400)% increased Critical Strike Chance",
+        "+(41-45)% to Monster Critical Strike Multiplier"
+      ]
+    },
+    "MapUberWeakMonsterDamage": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 19% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 11% 증가",
+        "무리 규모 7% 증가",
+        "몬스터 피해 (22-25)% 증가"
+      ],
+      "en": [
+        "19% increased Atlas Drops in this Area",
+        "11% increased Rarity of Items found in this Area",
+        "7% increased Pack size",
+        "(22-25)% increased Monster Damage"
+      ]
+    },
+    "MapUberWeakMonsterElementalReflection": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "희귀 몬스터가 원소 가시를 보유하고 1500의 원소 피해 반사"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Rare Monsters have Elemental Thorns reflecting 1500 Elemental Damage"
+      ]
+    },
+    "MapUberWeakMonsterFireDamage": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터가 (90-110)%의 추가 물리 피해를 화염 속성으로 가함"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters deal (90-110)% extra Physical Damage as Fire"
+      ]
+    },
+    "MapUberWeakMonsterLife": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터의 생명력 (40-49)% 증폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "(40-49)% more Monster Life"
+      ]
+    },
+    "MapUberWeakMonsterLightningDamage": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터가 (90-110)%의 추가 물리 피해를 번개 속성으로 가함"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters deal (90-110)% extra Physical Damage as Lightning"
+      ]
+    },
+    "MapUberWeakMonsterPhysicalReflection": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "희귀 몬스터가 물리 가시를 보유하고 800의 물리 피해 반사"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Rare Monsters have Physical Thorns reflecting 800 Physical Damage"
+      ]
+    },
+    "MapUberWeakMonsterPhysicalResistance": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터의 물리 피해 감소 +40%"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "+40% Monster Physical Damage Reduction"
+      ]
+    },
+    "MapUberWeakMonsterStatusAilmentImmunity": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "몬스터가 70%의 확률로 원소 상태 이상 긴급회피"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Monsters have 70% chance to Avoid Elemental Ailments"
+      ]
+    },
+    "MapUberWeakMonstersAllDamageAlwaysIgnites": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "모든 몬스터의 적중 피해가 항상 점화 유발"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "All Monster Damage from Hits always Ignites"
+      ]
+    },
+    "MapUberWeakMonstersAllResistances": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터의 카오스 저항 +25%",
+        "몬스터의 원소 저항 +40%"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "+25% Monster Chaos Resistance",
+        "+40% Monster Elemental Resistances"
+      ]
+    },
+    "MapUberWeakMonstersAvoidPoisonBleedBlind": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "몬스터가 50%의 확률로 중독, 꿰뚫기, 출혈 회피"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Monsters have a 50% chance to avoid Poison, Impale, and Bleeding"
+      ]
+    },
+    "MapUberWeakMonstersBaseSelfCriticalMultiplier": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "몬스터가 치명타로 받는 추가 피해 (36-40)% 감소"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Monsters take (36-40)% reduced Extra Damage from Critical Strikes"
+      ]
+    },
+    "MapUberWeakMonstersBlindOnHit": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "몬스터가 명중 시 실명 유발"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Monsters Blind on Hit"
+      ]
+    },
+    "MapUberWeakMonstersCantBeSlowedOrTaunted": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "몬스터의 동작 속도가 기본 수치 밑으로 내려가지 않음",
+        "몬스터의 이동 속도가 기본 수치 밑으로 내려가지 않음",
+        "몬스터 도발 면역"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Monsters' Action Speed cannot be modified to below Base Value",
+        "Monsters' Movement Speed cannot be modified to below Base Value",
+        "Monsters cannot be Taunted"
+      ]
+    },
+    "MapUberWeakMonstersChanceToInflictStatusAilments": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터가 명중 시 20%의 확률로 점화, 동결, 감전 유발"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Monsters have a 20% chance to Ignite, Freeze and Shock on Hit"
+      ]
+    },
+    "MapUberWeakMonstersChanceToSuppressSpells": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터의 주문 피해 억제 확률 +60%"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Monsters have +60% chance to Suppress Spell Damage"
+      ]
+    },
+    "MapUberWeakMonstersCurseEffectOnSelfFinal": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터에게 걸리는 저주 효과 60% 감폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "60% less effect of Curses on Monsters"
+      ]
+    },
+    "MapUberWeakMonstersEnduranceChargeOnHit": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터가 명중 시 인내 충전 획득"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Monsters gain an Endurance Charge on Hit"
+      ]
+    },
+    "MapUberWeakMonstersFrenzyChargeOnHit": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터가 명중 시 격분 충전 획득"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Monsters gain a Frenzy Charge on Hit"
+      ]
+    },
+    "MapUberWeakMonstersImpaleOnHit": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "몬스터의 공격이 명중 시 60%의 확률로 꿰뚫음"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Monsters' Attacks have 60% chance to Impale on Hit"
+      ]
+    },
+    "MapUberWeakMonstersMaimOnHit": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "몬스터가 공격 명중 시 힘줄 절단 유발"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Monsters Maim on Hit with Attacks"
+      ]
+    },
+    "MapUberWeakMonstersMaximumLifeAddedEnergyShield": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터가 최대 생명력의 (40-49)%를 추가 에너지 보호막 최대치로 획득"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Monsters gain (40-49)% of Maximum Life as Extra Maximum Energy Shield"
+      ]
+    },
+    "MapUberWeakMonstersPowerChargeOnHit": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "몬스터가 명중 시 권능 충전 획득"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Monsters gain a Power Charge on Hit"
+      ]
+    },
+    "MapUberWeakMonstersStealChargesOnHit": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "몬스터가 명중 시 권능, 격분, 인내 충전 강탈"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Monsters steal Power, Frenzy and Endurance charges on Hit"
+      ]
+    },
+    "MapUberWeakPlayerCurseElementalWeakness": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어가 원소 약화 저주에 걸림"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players are Cursed with Elemental Weakness"
+      ]
+    },
+    "MapUberWeakPlayerCurseEnfeeblement": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어가 쇠약화 저주에 걸림"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players are Cursed with Enfeeble"
+      ]
+    },
+    "MapUberWeakPlayerCurseTemporalChains": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어가 시간의 사슬 저주에 걸림"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players are Cursed with Temporal Chains"
+      ]
+    },
+    "MapUberWeakPlayerCurseVulnerability": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어가 취약성 저주에 걸림"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players are Cursed with Vulnerability"
+      ]
+    },
+    "MapUberWeakPlayerMaxResists": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 19% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 11% 증가",
+        "무리 규모 7% 증가",
+        "플레이어의 모든 저항 최대치 -(12-9)%"
+      ],
+      "en": [
+        "19% increased Atlas Drops in this Area",
+        "11% increased Rarity of Items found in this Area",
+        "7% increased Pack size",
+        "Players have -(12-9)% to all maximum Resistances"
+      ]
+    },
+    "MapUberWeakPlayerNoLifeESRegen": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "플레이어가 생명력, 마나 또는 에너지 보호막 재생 불가"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Players cannot Regenerate Life, Mana or Energy Shield"
+      ]
+    },
+    "MapUberWeakPlayerReducedRegen": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 16% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 9% 증가",
+        "무리 규모 6% 증가",
+        "플레이어의 생명력 및 에너지 보호막 회복 속도 60% 감폭"
+      ],
+      "en": [
+        "16% increased Atlas Drops in this Area",
+        "9% increased Rarity of Items found in this Area",
+        "6% increased Pack size",
+        "Players have 60% less Recovery Rate of Life and Energy Shield"
+      ]
+    },
+    "MapUberWeakPlayersAccuracyRating": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어의 정확도 25% 감폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players have 25% less Accuracy Rating"
+      ]
+    },
+    "MapUberWeakPlayersBlockAndArmour": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어의 막기 확률 40% 감소",
+        "플레이어의 방어도 30% 감폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players have 40% reduced Chance to Block",
+        "Players have 30% less Armour"
+      ]
+    },
+    "MapUberWeakPlayersBuffsExpireFaster": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "플레이어에게 적용되는 버프가 70% 더 빠르게 만료됨"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Buffs on Players expire 70% faster"
+      ]
+    },
+    "MapUberWeakPlayersEvasionAndUnluckyDodge": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어가 방지하는 억제된 주문 피해 -20%",
+        "몬스터의 정확도 50% 증가"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players have -20% to amount of Suppressed Spell Damage Prevented",
+        "Monsters have 50% increased Accuracy Rating"
+      ]
+    },
+    "MapUberWeakPlayersGainReducedFlaskCharges": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어의 플라스크 충전량 50% 감소"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players gain 50% reduced Flask Charges"
+      ]
+    },
+    "MapUberWeakPlayersLessAoERadius": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어의 효과 범위 25% 감폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players have 25% less Area of Effect"
+      ]
+    },
+    "MapUberWeakPlayersLessCooldownRecovery": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어의 재사용 대기시간 회복 속도 40% 감폭"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players have 40% less Cooldown Recovery Rate"
+      ]
+    },
+    "MapUberWeakPlayersReducedAuraEffect": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 13% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 8% 증가",
+        "무리 규모 5% 증가",
+        "플레이어가 비-저주 오라 스킬로 받는 효과 60% 감소"
+      ],
+      "en": [
+        "13% increased Atlas Drops in this Area",
+        "8% increased Rarity of Items found in this Area",
+        "5% increased Pack size",
+        "Players have 60% reduced effect of Non-Curse Auras from Skills"
+      ]
+    },
+    "MapUberWeakShockedGround": {
+      "ko": [
+        "이 지역에서 발견하는 아틀라스 획득물 10% 증가",
+        "이 지역에서 발견하는 아이템 희귀도 6% 증가",
+        "무리 규모 4% 증가",
+        "지역에 50%만큼 피해가 증가한 감전 지대 존재"
+      ],
+      "en": [
+        "10% increased Atlas Drops in this Area",
+        "6% increased Rarity of Items found in this Area",
+        "4% increased Pack size",
+        "Area has patches of Shocked Ground which increase Damage taken by 50%"
+      ]
+    }
+  },
+  "sha256": [
+    "6733f6bec5795c3c9129c68564058baf9f33f11aaa633d01a811e58e09f54803",
+    "824d63bc46290e7f03901824bb55b926285618095e9d75ade1b471e40b3e1c1e"
+  ]
+}

@@ -41,8 +41,18 @@ def catalog() -> list[dict]:
     global _CAT, _BY_SK
     if _CAT is None:
         try:
-            _CAT = json.loads(resource_path("data/map_mods.json").read_text(encoding="utf-8"))["lines"]
-        except (OSError, ValueError, KeyError):
+            rows = json.loads(resource_path("data/map_mods.json").read_text(encoding="utf-8"))["lines"]
+            if not isinstance(rows, list) or any(
+                not isinstance(row, dict)
+                or not all(isinstance(row.get(key), str) and row[key] for key in ("key", "ko", "en"))
+                or not isinstance(row.get("ko_sk", ""), str)
+                or not isinstance(row.get("tiers"), list)
+                or not all(tier in TIER_KO for tier in row["tiers"])
+                for row in rows
+            ):
+                raise ValueError("잘못된 지도 옵션 목록")
+            _CAT = rows
+        except (OSError, ValueError, KeyError, TypeError):
             _CAT = []
         _BY_SK = {}
         for e in _CAT:
