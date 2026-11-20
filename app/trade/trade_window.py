@@ -16,11 +16,15 @@ import winutil
 from asyncjob import run_async
 from itemmodel import ItemModel, parse
 from theme import build_qss
-from trade import browser, combine, config, focus_log, heist, resistance, templates
+from trade import browser, combine, config, focus_log, heist, items, resistance, templates
 from trade.stats import option_gate
 from trade.results import ResultSession
 from trade.query import (FORBIDDEN_TOME, INFLUENCE_LABELS, SearchTarget, build_query, conditions, item_info,
                          default_minimum, league_for, resistance_rows, result_rows, search_target, summary)
+
+SPECTRE_MODE_ERROR = "망령 검색은 게임 위 시세 모드에서만 사용할 수 있습니다"
+SPECTRE_LEAGUE_ERROR = "카카오 리그 목록에서 Covens를 확인할 수 없습니다"
+SPECTRE_LOCAL_ERROR = "로컬 망령 검색 설정이나 등록 파일을 확인해 주세요"
 
 TRADE_WINDOW_STYLE = """
 QWidget#TradeHero {
@@ -235,14 +239,21 @@ class TradeWindow(QWidget):
             footer.addWidget(widget)
         layout.addLayout(footer)
         QShortcut(QKeySequence("Esc"), self, activated=self._close_on_escape)
-        QShortcut(QKeySequence("Return"), self, activated=self.search)
-        QShortcut(QKeySequence("Enter"), self, activated=self.search)
+        QShortcut(QKeySequence("Return"), self, activated=self._search_shortcut)
+        QShortcut(QKeySequence("Enter"), self, activated=self._search_shortcut)
         self.league.currentTextChanged.connect(self._league_changed)
         self.timer = QTimer(self, interval=200, timeout=self._validate)
         self.timer.start()
 
     def _league_changed(self) -> None:
-        config.save(league=self.league.currentText().strip())
+        league = self.league.currentText().strip()
+        config.save(league=league)
+        info = getattr(self, "info", None)
+        if (not self._loading and info and info.class_label == items.SPECTRE_CLASS
+                and (info.category == items.SPECTRE_CATEGORY or
+                     (self.server == config.KAKAO and items.spectre_enabled() and league == items.SPECTRE_LEAGUE))):
+            self.load(self.model, self._prev_fg, league=league)
+            return
         self._conditions_changed()
 
     def _clear_results(self, message: str) -> None:
@@ -278,7 +289,9 @@ class TradeWindow(QWidget):
         target = SearchTarget() if self._error else search_target(self.info, self.base_button.isChecked())
         self.title.setText(target.label)
         self.title.setAccessibleName(f"검색 대상: {target.label}")
-        if target.category:
+        if self.info.category == items.SPECTRE_CATEGORY:
+            scope = "망령"
+        elif target.category:
             scope = f"{target.label} 전체"
         elif target.name:
             scope = "고유"
@@ -366,7 +379,7 @@ class TradeWindow(QWidget):
         self._apply_resistance_mode()
         self._conditions_changed()
 
-    def load(self, item: ItemModel | str | None, hwnd: int = 0) -> None:
+    def load(self, item: ItemModel | str | None, hwnd: int = 0, *, league: str | None = None) -> None:
         self._loading = True
         self._invalidate_results()
         self.model = parse(item) if isinstance(item, str) else item
@@ -376,22 +389,26 @@ class TradeWindow(QWidget):
         self.current_mode = config.mode()
         self._routing_revision = config.routing_revision()
         self._error = ""
+        if league is None:
+            league = league_for(self.source_fn(), trade.get("league", ""))
         try:
-            self.info = item_info(self.model, self.server)
+            self.info = item_info(self.model, self.server, league=league.strip())
         except ValueError as error:
             self.info = item_info(self.model, config.OFFICIAL)
             self._error = str(error)
         api = self.current_mode == "api"
+        spectre = self.info.category == items.SPECTRE_CATEGORY
         mode_name = "게임 위 시세 모드 (공식 문서 밖 API 사용)" if api else "브라우저 모드"
         self.mode_label.setText(f"POE Delta · {mode_name}")
-        self.search_button.setText("검색" if api else "브라우저로 검색")
+        self.search_button.setText("검색" if api or spectre else "브라우저로 검색")
         self.table.setVisible(api and self.info.supported)
-        self.open_button.setVisible(api and self.info.supported)
-        self._clear_results("검색할 수 없는 아이템입니다" if not self.info.supported or self._error else
+        self.open_button.setVisible(api and self.info.supported and not spectre)
+        self._clear_results(SPECTRE_MODE_ERROR if spectre and not api else
+                            "검색할 수 없는 아이템입니다" if not self.info.supported or self._error else
                             "검색을 눌러 결과를 확인하세요" if api else "브라우저에서 결과를 확인하세요")
         self.league.blockSignals(True)
         self.league.clear()
-        self.league.setEditText(league_for(self.source_fn(), trade.get("league", "")))
+        self.league.setEditText(league)
         self.league.blockSignals(False)
         tome = self.info.category == FORBIDDEN_TOME
         self.ilvl.setChecked(tome and self.info.can_filter_ilvl)
@@ -405,7 +422,7 @@ class TradeWindow(QWidget):
         self.links.setVisible(self.info.links >= 5)
         self.links.setText(f"링크 ≥ {self.info.links}")
         self.corrupted.setChecked(True)
-        self.corrupted.setVisible(not (tome or self.info.viscera))
+        self.corrupted.setVisible(not (tome or self.info.viscera or spectre))
         self.corrupted.setText("타락" if self.info.corrupted else "타락 아님")
         scoped = not self._error and search_target(self.info, True) != search_target(self.info, False)
         self.base_button.setChecked(scoped and not search_target(self.info).category)
@@ -612,6 +629,8 @@ class TradeWindow(QWidget):
         error = self._error
         if not self.info.supported:
             error = self.info.message
+        elif self.info.category == items.SPECTRE_CATEGORY and self.current_mode != "api":
+            error = SPECTRE_MODE_ERROR
         elif self._busy:
             error = "검색 중입니다"
         elif self._until > time.monotonic():
@@ -626,15 +645,28 @@ class TradeWindow(QWidget):
         self.hint.setText(error)
         self.search_button.setEnabled(not error)
 
+    def _search_shortcut(self) -> None:
+        if getattr(getattr(self, "info", None), "category", "") == items.SPECTRE_CATEGORY:
+            if self.search_button.hasFocus():
+                self.search_button.click()
+            return
+        self.search()
+
     def search(self) -> None:
+        spectre = getattr(getattr(self, "info", None), "category", "") == items.SPECTRE_CATEGORY
         if hasattr(self, "info") and self._routing_changed():
             self.load(self.model, self._prev_fg)
+            if spectre:
+                self.result_summary.setText("망령 검색 설정이 바뀌었습니다. 게임 위 시세 모드에서 다시 검색하세요")
             return
         self._validate()
         if not self.search_button.isEnabled() or not self.info.supported:
             return
         query = self._query()
         league, server, lang = self.league.currentText().strip(), self.server, self.model.lang
+        if spectre and not items.resolve_spectre(self.model, server, league):
+            self.load(self.model, self._prev_fg, league=league)
+            return
         if self.current_mode == "browser":
             browser.open_url(browser.build_url(league, query, server, lang))
             self.result_summary.setText("브라우저에서 결과를 확인하세요")
@@ -645,13 +677,21 @@ class TradeWindow(QWidget):
         self._invalidate_results()
         self._clear_results("검색 중입니다")
         generation = self._generation
+        model, identity = self.model, self.info.identity
         session = self._results = ResultSession(config.result_count(config.settings().get("result_count")))
         self._busy = True
         self._validate()
 
         def work():
             try:
+                if spectre and not self._spectre_request_current(generation, model, server, league, identity):
+                    return {"error": SPECTRE_LOCAL_ERROR}
                 leagues = client.leagues(server, lang)
+                if spectre:
+                    if items.SPECTRE_LEAGUE not in leagues:
+                        return {"error": SPECTRE_LEAGUE_ERROR}
+                    if not self._spectre_request_current(generation, model, server, league, identity):
+                        return {"error": SPECTRE_LOCAL_ERROR}
                 chosen = league if league in leagues else leagues[0]
                 return {"league": chosen, "leagues": leagues, "response": client.search(chosen, query, server, lang)}
             except TradeError as error:
@@ -667,17 +707,18 @@ class TradeWindow(QWidget):
                 self._validate()
                 return
             chosen, response = result["league"], result["response"]
-            with QSignalBlocker(self.league):
-                self.league.clear()
-                self.league.addItems(result["leagues"])
-                self.league.setCurrentText(chosen)
-            config.save(league=chosen)
+            if not spectre:
+                with QSignalBlocker(self.league):
+                    self.league.clear()
+                    self.league.addItems(result["leagues"])
+                    self.league.setCurrentText(chosen)
+                config.save(league=chosen)
             session.query_id = response["id"]
             session.ids = response.get("result", [])
             session.total = response.get("total", 0)
             if chosen != league:
                 session.prefix = f"리그를 {chosen}(으)로 바꿨습니다 · "
-            if session.query_id:
+            if session.query_id and not spectre:
                 self._result_link = browser.result_url(chosen, session.query_id, server, lang)
                 self.open_button.setEnabled(True)
             if session.ids:
@@ -693,16 +734,25 @@ class TradeWindow(QWidget):
     def _current_result(self, generation: int) -> bool:
         return generation == self._generation and not self._routing_changed()
 
+    def _spectre_request_current(self, generation, model, server, league, identity) -> bool:
+        return (self._current_result(generation)
+                and items.resolve_spectre(model, server, league) == identity)
+
     def _fetch_results(self, session, client, generation, *, initial):
         from trade.api import TradeError
 
         server, lang = self.server, self.model.lang
+        spectre = self.info.category == items.SPECTRE_CATEGORY
+        model, identity = self.model, self.info.identity
+        league = self.league.currentText().strip()
         ids = session.ids[session.next:session.next + 10]
         self._busy = True
         self._validate()
 
         def work():
             try:
+                if spectre and not self._spectre_request_current(generation, model, server, league, identity):
+                    return [], SPECTRE_LOCAL_ERROR, 0
                 response = client.fetch(ids, session.query_id, server, lang)
                 entries = {row["id"]: row for row in response.get("result", [])}
                 rows = result_rows({"result": [entries[key] for key in ids if key in entries]})

@@ -111,17 +111,45 @@ class StatCondition:
         self.match = replace(self.match, id=self.match.alternate_id, alternate_id=self.match.id)
 
 
-def item_info(model: ItemModel | None, server: str = OFFICIAL) -> TradeItem:
+def _normalized_class(label: str) -> str:
+    return heist.CLASSES.get(label, CLASS_NAMES.get(label, EXTRA_CLASSES.get(label, "")))
+
+
+def _typed_category(model: ItemModel, class_label: str) -> str:
+    label = ko2en._dict().classes.get(class_label, class_label) if model.lang == "ko" else class_label
+    return ("Map" if label == "Maps" else "Flask" if label in items.FLASK_CLASSES
+            else "Gem" if label in items.GEM_CLASSES else "")
+
+
+def _is_tome(model: ItemModel, class_label: str) -> bool:
+    return (class_label, model.base) == TOME_COPY_NAMES.get(model.lang)
+
+
+def owns_search_category(model: ItemModel, *, server: str = OFFICIAL, league: str = "") -> bool:
+    """등급이나 검색 가능 여부가 아니라 기존 검색 분기의 소유 여부를 판정한다."""
+    label = field(model.head, ("Item Class:", "아이템 종류:"))
+    return bool(_normalized_class(label) in SUPPORTED or label in viscera.CLASSES
+                or _is_tome(model, label) or _typed_category(model, label)
+                or items.resolve_spectre(model, server, league))
+
+
+def item_info(model: ItemModel | None, server: str = OFFICIAL, *, league: str = "") -> TradeItem:
     info = TradeItem(model)
     if model is None:
         return info
     validate_server(server, model.lang)
     info.class_label = field(model.head, ("Item Class:", "아이템 종류:"))
-    cls = heist.CLASSES.get(info.class_label, CLASS_NAMES.get(info.class_label, EXTRA_CLASSES.get(info.class_label, "")))
+    cls = _normalized_class(info.class_label)
     info.category = "WEAPON" if cls in WEAPONS else "ARMOUR" if cls in ARMOUR else cls
     info.rarity = field(model.head, ("Rarity:", "아이템 희귀도:"))
     info.rarity = ko2en.RARITY.get(info.rarity, info.rarity)
     info.base, info.name = model.base, model.name
+    if league and not owns_search_category(model) and (spectre := items.resolve_spectre(model, server, league)):
+        info.identity = spectre
+        info.category = items.SPECTRE_CATEGORY
+        info.base, info.name = spectre.base, ""
+        info.supported = True
+        return info
     legacy = cls in GEAR and info.rarity == "Unique"
     if legacy:
         info.template = templates.EQUIPMENT
@@ -134,7 +162,7 @@ def item_info(model: ItemModel | None, server: str = OFFICIAL) -> TradeItem:
                 info.name = ""
     ilvl = field(model.head, ITEM_LEVEL_KEYS)
     info.ilvl = int(ilvl) if ilvl.isdigit() else 0
-    if info.rarity == "Currency" and (info.class_label, model.base) == TOME_COPY_NAMES.get(model.lang):
+    if info.rarity == "Currency" and _is_tome(model, info.class_label):
         info.template = templates.OTHER
         info.category = FORBIDDEN_TOME
         info.base = FORBIDDEN_TOME if server == OFFICIAL else TOME_COPY_NAMES["ko"][1]
@@ -195,9 +223,7 @@ def item_info(model: ItemModel | None, server: str = OFFICIAL) -> TradeItem:
             info.blocked_reason = str(error)
         return info
     if not legacy:
-        label = ko2en._dict().classes.get(info.class_label, info.class_label) if model.lang == "ko" else info.class_label
-        category = ("Map" if label == "Maps" else "Flask" if label in items.FLASK_CLASSES
-                    else "Gem" if label in items.GEM_CLASSES else "")
+        category = _typed_category(model, info.class_label)
         equipment = cls in GEAR and info.rarity in ("Normal", "Magic", "Rare")
         if equipment:
             info.template = templates.EQUIPMENT
@@ -302,7 +328,7 @@ def _option_english(info: TradeItem, mod, support: tuple[str, int] | None) -> st
 
 
 def conditions(info: TradeItem, ratio: float = 0.9) -> list[StatCondition]:
-    if not info.model or info.category == FORBIDDEN_TOME:
+    if not info.model or info.category in (FORBIDDEN_TOME, items.SPECTRE_CATEGORY):
         return []
     if info.viscera:
         rows = []
@@ -482,6 +508,8 @@ def build_query(info: TradeItem, stats: list[StatCondition], *, ilvl: bool = Fal
                 monster_level: bool = False, total_resistance: bool = False) -> dict:
     if not info.supported:
         raise ValueError(info.message)
+    if info.category == items.SPECTRE_CATEGORY:
+        return {"query": {"status": {"option": "securable"}, "type": info.base}, "sort": {"price": "asc"}}
     filters = {}
     if ilvl and info.can_filter_ilvl:
         filters.setdefault("misc_filters", {"filters": {}})["filters"]["ilvl"] = {"min": info.ilvl}

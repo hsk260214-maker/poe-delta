@@ -1,12 +1,16 @@
 """새 범위의 품목 정체성 및 출시 게이트. 로컬 APT 자료만 사용한다."""
 import json
+import os
 import re
 from dataclasses import dataclass
 from functools import lru_cache
+from hashlib import sha256
 from itertools import takewhile
+from pathlib import Path
 
 from data import resource_path
-from itemmodel import mod_en
+from itemmodel import SEP, mod_en
+from trade import config
 from trade.config import OFFICIAL
 from trade.stats import index
 
@@ -68,6 +72,43 @@ class Identity:
     quality: int | None = None
     map_ids: tuple[str, ...] = ()
     apt_category: str = ""
+
+
+SPECTRE_ENV = "POE_DELTA_LOCAL_KAKAO_SPECTRE"
+SPECTRE_CLASS = "시신"
+SPECTRE_CATEGORY = "Spectre"
+SPECTRE_LEAGUE = "Covens"
+_SPECTRE_DIGEST = "e13c9f0f5ffe2d3bf66336fdc237f82ec6475571fd38bc5cea6ae8e42e8b3a88"
+
+
+def spectre_enabled() -> bool:
+    return bool(os.environ.get(SPECTRE_ENV))
+
+
+def resolve_spectre(model, server: str, league: str) -> Identity | None:
+    path = os.environ.get(SPECTRE_ENV)
+    if not (path and model and model.lang == "ko" and server == config.KAKAO and config.KAKAO_ENABLED
+            and league == SPECTRE_LEAGUE and model.head and model.head[0] == f"아이템 종류: {SPECTRE_CLASS}"):
+        return None
+    header = model.head[:model.head.index(SEP)] if SEP in model.head else model.head
+    if (len(header) != 3 or header[1] not in ("아이템 희귀도: 일반", "아이템 희귀도: 화폐")
+            or not model.base or model.base != header[2] or model.base == "전쟁군주"
+            or {"미확인", "Unidentified"}.intersection((*model.head, *model.flags))):
+        return None
+    try:
+        pilot = json.loads(Path(path).read_bytes())
+        payload = json.dumps(pilot, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
+        if sha256(payload).hexdigest() != _SPECTRE_DIGEST:
+            return None
+        rows = catalog()["items"]["ko"]
+        if not rows or any(row[2] == model.base for row in rows):
+            return None
+    except (OSError, ValueError, KeyError, TypeError, IndexError):
+        return None
+    matches = [row for row in pilot["corpse_items"] if row[2] == model.base]
+    if len(matches) == 1 and matches[0][0] == "ITEM" and matches[0][3:] == ["ItemisedCorpse", None, None]:
+        return Identity(matches[0][2], apt_category=SPECTRE_CATEGORY)
+    return None
 
 
 @lru_cache(maxsize=1)
