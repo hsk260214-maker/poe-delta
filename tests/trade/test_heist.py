@@ -212,8 +212,7 @@ def test_area_gate_and_both_search_modes(app, monkeypatch):
         window.base_button.click()
         assert window.base_button.text() == "정확한 베이스로 전환: Blueprint: Mansion"
         check, minimum, _ = next(inputs for row, inputs in zip(window.stats, window.inputs) if row.kind == "heist_area")
-        assert not check.isChecked() and minimum.text() == "83"
-        check.setChecked(True)
+        assert check.isChecked() and minimum.text() == "83"
         assert not sent
         window.search()
     assert len(opened) == len(sent) == 1

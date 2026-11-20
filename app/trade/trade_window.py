@@ -16,10 +16,10 @@ import winutil
 from asyncjob import run_async
 from itemmodel import ItemModel, parse
 from theme import build_qss
-from trade import browser, config, focus_log, heist, resistance
+from trade import browser, combine, config, focus_log, heist, resistance, templates
 from trade.stats import option_gate
 from trade.query import (FORBIDDEN_TOME, INFLUENCE_LABELS, SearchTarget, build_query, conditions, item_info,
-                         league_for, resistance_rows, result_rows, search_target, summary)
+                         default_minimum, league_for, resistance_rows, result_rows, search_target, summary)
 
 TRADE_WINDOW_STYLE = """
 QWidget#TradeHero {
@@ -393,9 +393,12 @@ class TradeWindow(QWidget):
         self.base_button.setChecked(scoped and not search_target(self.info).category)
         self._update_target()
         self.base_button.setVisible(scoped)
-        self.stats = (conditions(self.info, trade.get("min_ratio", 0.9))
+        ratio = trade.get("min_ratio", 0.9)
+        self.stats = (conditions(self.info, ratio)
                       if self.info.supported or self.info.heist or self.info.viscera else [])
-        self.stats, resistance_note = resistance_rows(self.info, self.stats, trade.get("min_ratio", 0.9))
+        self.stats = combine.apply(self.stats, ratio, default_minimum,
+                                   lang=self.model.lang if self.model else "", category=self.info.category)
+        self.stats, resistance_note = resistance_rows(self.info, self.stats, ratio)
         self.total_resistance = any(row.kind == resistance.ROW_KIND for row in self.stats)
         self.resistance_button.setVisible(self.total_resistance)
         self._resistance_widgets = {}
@@ -470,7 +473,8 @@ class TradeWindow(QWidget):
             mandatory = condition.kind == "viscera_tier"
             check.setEnabled(bool(condition.match.id) and not mandatory)
             reason = "단계를 구분하는 필수 조건이라 끌 수 없습니다" if mandatory else condition.match.reason
-            check.setToolTip("\n".join(part for part in (condition.detail or condition.text, reason) if part))
+            source = "\n".join(condition.sources) or condition.detail or condition.text
+            check.setToolTip("\n".join(part for part in (source, reason) if part))
             check.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed)
             check.setMinimumWidth(64)
             badge = QLabel("일반" if condition.badge == "explicit" else condition.badge)
@@ -503,7 +507,7 @@ class TradeWindow(QWidget):
             if condition.kind in ("explicit", "fractured"):
                 switch = QPushButton("종류 전환")
                 switch.setAccessibleName(f"{condition.text} 종류 전환")
-                switch.setEnabled(bool(condition.match.alternate_id))
+                switch.setEnabled(combine.can_switch(condition))
                 if not condition.match.alternate_id:
                     switch.setToolTip("같은 옵션에 대응하는 일반·분열 ID가 모두 있어야 합니다")
                 switch.clicked.connect(lambda _, c=condition, b=badge: self._switch_kind(c, b))
@@ -523,6 +527,11 @@ class TradeWindow(QWidget):
                        for i, (checked, lo, hi) in per_row.items()},
             }
             self._apply_resistance_mode()
+        if not self._error:
+            templates.apply_defaults(self.info, ((row, check) for row, (check, _, _) in zip(self.stats, self.inputs)), {
+                "corrupted": self.corrupted, "monster_level": self.monster_level, "links": self.links,
+                "ilvl": self.ilvl, **self.influence_inputs,
+            })
         if not self.inputs:
             self.stat_layout.addWidget(QLabel("표시할 검색 옵션이 없습니다"))
         elif not self._enabled_options():

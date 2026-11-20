@@ -15,7 +15,7 @@ from itemcheck import CLASS_NAMES
 from itemmodel import (CORRUPT_FLAGS, EATER_FLAGS, EXARCH_FLAGS, ITEM_LEVEL_KEYS, SEP, ItemModel, badge, mod_en,
                        parse, skeleton)
 from trade.config import OFFICIAL, validate_server
-from trade import heist, items, resistance, unique_mods, viscera
+from trade import combine, heist, items, resistance, templates, unique_mods, viscera
 from trade.stats import Match, index, option_gate
 
 WEAPONS = {"One Hand Sword", "Thrusting One Hand Sword", "One Hand Axe", "One Hand Mace",
@@ -66,6 +66,7 @@ class TradeItem:
     equipment_category: str = ""
     heist: heist.Heist | None = None
     viscera: viscera.Viscera | None = None
+    template: str = ""
 
     @property
     def can_filter_ilvl(self) -> bool:
@@ -98,12 +99,15 @@ class StatCondition:
     maximum: float | None = None
     badge: str = ""
     detail: str = ""
+    sources: tuple[str, ...] = ()
+    combinable: bool = True
 
     def switch_kind(self) -> None:
-        if self.kind not in ("explicit", "fractured") or not self.match.alternate_id:
+        if self.kind not in ("explicit", "fractured") or not combine.can_switch(self):
             return
         self.kind = "fractured" if self.kind == "explicit" else "explicit"
-        self.badge = "분열" if self.kind == "fractured" else "explicit"
+        self.badge = ("분열" if self.kind == "fractured" else "일반") + " · 합산" if self.sources else (
+            "분열" if self.kind == "fractured" else "explicit")
         self.match = replace(self.match, id=self.match.alternate_id, alternate_id=self.match.id)
 
 
@@ -119,6 +123,8 @@ def item_info(model: ItemModel | None, server: str = OFFICIAL) -> TradeItem:
     info.rarity = ko2en.RARITY.get(info.rarity, info.rarity)
     info.base, info.name = model.base, model.name
     legacy = cls in GEAR and info.rarity == "Unique"
+    if legacy:
+        info.template = templates.EQUIPMENT
     if legacy and model.lang == "ko" and server == OFFICIAL:
         info.base = ko2en.translate_base(model.base) or ""
         if info.rarity == "Unique":
@@ -129,12 +135,14 @@ def item_info(model: ItemModel | None, server: str = OFFICIAL) -> TradeItem:
     ilvl = field(model.head, ITEM_LEVEL_KEYS)
     info.ilvl = int(ilvl) if ilvl.isdigit() else 0
     if info.rarity == "Currency" and (info.class_label, model.base) == TOME_COPY_NAMES.get(model.lang):
+        info.template = templates.OTHER
         info.category = FORBIDDEN_TOME
         info.base = FORBIDDEN_TOME if server == OFFICIAL else TOME_COPY_NAMES["ko"][1]
         info.name = ""
         info.supported = True
         return info
     if info.class_label in viscera.CLASSES:
+        info.template = templates.OTHER
         info.category = viscera.CATEGORY
         row = viscera.find(model.base, {skeleton(mod.text) for mod in model.mods})
         if row is None or row.slot not in model.head:
@@ -166,6 +174,7 @@ def item_info(model: ItemModel | None, server: str = OFFICIAL) -> TradeItem:
                           and (info.rarity != "Unique" or info.name)
                           and not {"Unidentified", "미확인"}.intersection(model.flags))
     if cls in heist.CATEGORIES:
+        info.template = templates.AREA_LEVEL
         info.supported = False
         try:
             info.identity = items.resolve_heist(model, cls, info.rarity, server)
@@ -191,8 +200,11 @@ def item_info(model: ItemModel | None, server: str = OFFICIAL) -> TradeItem:
                     else "Gem" if label in items.GEM_CLASSES else "")
         equipment = cls in GEAR and info.rarity in ("Normal", "Magic", "Rare")
         if equipment:
+            info.template = templates.EQUIPMENT
             category = ("One-Handed Sword" if cls == "Thrusting One Hand Sword" else
                         cls.replace("One Hand ", "One-Handed ").replace("Two Hand ", "Two-Handed "))
+        else:
+            info.template = {"Map": templates.AREA_LEVEL, "Gem": templates.GEM, "Flask": templates.FLASK}.get(category, "")
         if category:
             try:
                 identity = items.resolve(model, category, info.rarity, server, equipment=equipment)
@@ -303,7 +315,7 @@ def conditions(info: TradeItem, ratio: float = 0.9) -> list[StatCondition]:
             matched = index().match(english, mod.kind, viscera.CATEGORY) if english else Match()
             rows.append(StatCondition(mod.text, mod.kind, matched, False,
                                       default_minimum(english, ratio) if english else None,
-                                      badge=badge(mod) or mod.kind))
+                                      badge=badge(mod) or mod.kind, combinable=False))
         return rows
     if info.identity and info.identity.gem_level is not None:
         return [
@@ -363,7 +375,10 @@ def conditions(info: TradeItem, ratio: float = 0.9) -> list[StatCondition]:
                                    bool(matched.id and (blueprint_enchant or (info.rarity == "Rare" and mod.kind in ("explicit", "fractured"))
                                                         or (info.rarity == "Magic" and mod.kind == "explicit") or destiny)),
                                    minimum,
-                                   badge=badge(mod) or mod.kind))
+                                   badge=badge(mod) or mod.kind,
+                                   combinable=not (support or GRANTS_KO.fullmatch(mod.text)
+                                                   or info.heist or unique == unique_mods.DESTINY
+                                                   or re.search(r"\b(reduced|less)\b", english or ""))))
     return result
 
 

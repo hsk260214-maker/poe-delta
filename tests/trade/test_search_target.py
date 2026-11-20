@@ -61,15 +61,13 @@ def test_conqueror_map_with_ellipses_retains_exact_identity_and_monster_level(ap
         window.load(text)
         assert window.info.supported, window.info.message
         assert all("시타델" not in condition.text and "몬스터 레벨:" not in condition.text for condition in window.stats)
-        assert not window.monster_level.isHidden() and not window.monster_level.isChecked()
+        assert not window.monster_level.isHidden() and window.monster_level.isChecked()
         assert window.monster_level.text() == "몬스터 레벨 = 83"
-        assert "area_level" not in window._query()["query"]["filters"]["map_filters"]["filters"]
-        window.monster_level.click()
         query = window._query()["query"]
         assert query["type"] == {"option": "지도", "discriminator": "map"}
         assert query["filters"]["map_filters"]["filters"]["area_level"] == {"min": 83, "max": 83}
         assert query["filters"]["map_filters"]["filters"]["map_tier"] == {"min": 16, "max": 16}
-        assert "ilvl" not in query["filters"]["misc_filters"]["filters"]
+        assert "misc_filters" not in query["filters"]
         assert [s for s in query["stats"][0]["filters"] if s["id"].startswith("implicit.")] == [
             {"id": "implicit.stat_2563183002|2"},
         ]
@@ -91,11 +89,13 @@ def test_shaper_guardian_map_matches_verified_kakao_query(app, fixtures, server,
         query = window._query()["query"]
         assert query["type"] == base
         assert query["filters"]["type_filters"]["filters"] == {"rarity": {"option": "nonunique"}}
-        assert query["filters"]["map_filters"]["filters"] == {"map_blighted": {"option": "false"}}
+        assert query["filters"]["map_filters"]["filters"] == {
+            "area_level": {"min": 83, "max": 83}, "map_blighted": {"option": "false"},
+        }
         identity = [s for s in query["stats"][0]["filters"] if s["id"].startswith("implicit.")]
         assert identity == [{"id": "implicit.stat_1792283443|1"}]
         window.monster_level.click()
-        assert window._query()["query"]["filters"]["map_filters"]["filters"]["area_level"] == {"min": 83, "max": 83}
+        assert "area_level" not in window._query()["query"]["filters"]["map_filters"]["filters"]
     finally:
         window.close()
 
@@ -298,7 +298,7 @@ def test_supported_items_offer_their_copied_item_level(app, fixtures, fixture, l
         assert window.info.supported, window.info.message
         assert window.ilvl.isHidden() == (level is None)
         assert not window.ilvl.isChecked()
-        misc = lambda: window._query()["query"]["filters"]["misc_filters"]["filters"]
+        misc = lambda: window._query()["query"]["filters"].get("misc_filters", {}).get("filters", {})
         assert "ilvl" not in misc()
         if level is not None:
             assert window.ilvl.text() == f"아이템 레벨 ≥ {level}"
