@@ -1,6 +1,3 @@
-from hashlib import sha256
-import json
-
 import pytest
 from PySide6.QtCore import Qt
 from PySide6.QtTest import QTest
@@ -19,20 +16,8 @@ def clip(base=BASE, *, kind="시신", rarity="일반", tail=""):
     return f"아이템 종류: {kind}\n아이템 희귀도: {rarity}\n{base}\n--------\n{tail}"
 
 
-@pytest.fixture
-def local(tmp_path, monkeypatch):
-    rows = [["ITEM", en, ko, "ItemisedCorpse", None, None]
-            for en, ko in (("Dark Marionette", BASE), ("Perfect Dark Marionette", PERFECT))]
-    raw = json.dumps({"corpse_items": rows}, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
-    path = tmp_path / "pilot.json"
-    path.write_bytes(raw)
-    digest = sha256(raw).hexdigest()
-    monkeypatch.setattr(items, "_SPECTRE_DIGEST", digest)
-    monkeypatch.setenv(items.SPECTRE_ENV, str(path))
-    return path
-
-
-def test_exact_variants_only_and_local_opt_out(local, monkeypatch):
+def test_exact_variants_only_without_local_configuration(monkeypatch):
+    monkeypatch.delenv("POE_DELTA_LOCAL_KAKAO_SPECTRE", raising=False)
     for base in (BASE, PERFECT):
         model = parse(clip(base))
         assert owns_search_category(model, server=config.KAKAO, league="Covens")
@@ -44,12 +29,10 @@ def test_exact_variants_only_and_local_opt_out(local, monkeypatch):
     for text in (clip("꼭두각시"), clip("전쟁군주"), clip(kind="지도 조각"), clip(rarity="희귀"),
                  clip(tail="미확인"), clip("다른 이름\n" + BASE)):
         assert not item_info(parse(text), config.KAKAO, league="Covens").supported
-    monkeypatch.delenv(items.SPECTRE_ENV)
-    assert not item_info(parse(clip()), config.KAKAO, league="Covens").supported
 
 
 @pytest.fixture
-def window(app, local, monkeypatch):
+def window(app, tmp_path, monkeypatch):
     state = {"server": config.KAKAO, "league": "Covens", "mode": "api"}
     calls = []
     scenario = {"league_list": ["Standard", "Covens"], "result": "row"}
@@ -71,7 +54,7 @@ def window(app, local, monkeypatch):
         return {"result": [{"id": "one", "listing": {"price": {"amount": 4, "currency": "chaos"}}}]}
 
     monkeypatch.setattr(api.TradeClient, "_request", request)
-    monkeypatch.setattr(api, "LOCAL", local.parent)
+    monkeypatch.setattr(api, "LOCAL", tmp_path)
     monkeypatch.setattr(trade_window, "run_async", lambda work, done, _fail: done(work()))
     win = trade_window.TradeWindow()
     yield win, state, calls, scenario
@@ -84,7 +67,7 @@ def test_click_only_native_request_and_result(window, result, expected):
     win, state, calls, scenario = window
     scenario["result"] = result
     win.load(clip(PERFECT))
-    assert win.scope_badge.text() == "망령" and win.search_button.isEnabled()
+    assert win.scope_badge.text() == "시신" and win.search_button.isEnabled()
     assert win.open_button.isHidden() and not calls
     win.search_button.click()
     assert [c[0] for c in calls] == ["leagues", "search"] + (["fetch"] if result == "row" else [])
@@ -165,8 +148,12 @@ def test_keyboard_shortcut_requires_spectre_search_button_focus(window, key):
 
 
 @pytest.mark.parametrize("pending_endpoint", ["search", "fetch"])
-@pytest.mark.parametrize("revoke", ["opt_out", "delete", "mutate"])
-def test_queued_spectre_requests_recheck_local_permission(window, local, monkeypatch, pending_endpoint, revoke):
+@pytest.mark.parametrize("revoke", ["delete", "mutate"])
+def test_queued_spectre_requests_require_bundled_data(window, tmp_path, monkeypatch, pending_endpoint, revoke):
+    bundled = items.resource_path
+    local = tmp_path / "spectre_types.json"
+    local.write_bytes(bundled(items.SPECTRE_TYPES).read_bytes())
+    monkeypatch.setattr(items, "resource_path", lambda rel: local if rel == items.SPECTRE_TYPES else bundled(rel))
     win, _, calls, _ = window
     pending = []
     monkeypatch.setattr(trade_window, "run_async", lambda work, done, _fail: pending.append((work, done)))
@@ -179,9 +166,7 @@ def test_queued_spectre_requests_recheck_local_permission(window, local, monkeyp
         done(work())
         assert len(pending) == 1 and [c[0] for c in calls] == ["leagues", "search"]
 
-    if revoke == "opt_out":
-        monkeypatch.delenv(items.SPECTRE_ENV)
-    elif revoke == "delete":
+    if revoke == "delete":
         local.unlink()
     else:
         local.write_text("{}", encoding="utf-8")
@@ -190,5 +175,27 @@ def test_queued_spectre_requests_recheck_local_permission(window, local, monkeyp
     done(work())
     assert not pending
     assert [c[0] for c in calls] == ([] if pending_endpoint == "search" else ["leagues", "search"])
-    assert trade_window.SPECTRE_LOCAL_ERROR in win.result_summary.text()
+    assert trade_window.SPECTRE_DATA_ERROR in win.result_summary.text()
     assert win.table.rowCount() == 0
+
+
+def test_copied_currency_corpse_searches_by_class_without_opt_in(window, monkeypatch):
+    monkeypatch.delenv("POE_DELTA_LOCAL_KAKAO_SPECTRE", raising=False)
+    win, _, calls, _ = window
+    win.load("""아이템 종류: 시신
+아이템 희귀도: 화폐
+불완전한 신성모독자
+--------
+시신 레벨: 71
+몬스터 유형: 언데드
+--------
+아이템 레벨: 71
+--------
+이동하는 저주받은 지대 생성
+--------
+이 아이템에 우클릭하여 이 시신을 생성할 수 있습니다.""")
+    assert win.scope_badge.text() == "시신" and win.search_button.isEnabled() and not calls
+    win.search_button.click()
+    assert calls[1][-1]["json"]["query"] == {
+        "status": {"option": "securable"}, "type": "불완전한 신성모독자",
+    }

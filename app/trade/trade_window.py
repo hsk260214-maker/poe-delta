@@ -24,7 +24,7 @@ from trade.query import (FORBIDDEN_TOME, INFLUENCE_LABELS, SearchTarget, build_q
 
 SPECTRE_MODE_ERROR = "망령 검색은 게임 위 시세 모드에서만 사용할 수 있습니다"
 SPECTRE_LEAGUE_ERROR = "카카오 리그 목록에서 Covens를 확인할 수 없습니다"
-SPECTRE_LOCAL_ERROR = "로컬 망령 검색 설정이나 등록 파일을 확인해 주세요"
+SPECTRE_DATA_ERROR = "시신 검색 조건이나 내장 데이터를 확인할 수 없습니다"
 
 TRADE_WINDOW_STYLE = """
 QWidget#TradeHero {
@@ -251,7 +251,7 @@ class TradeWindow(QWidget):
         info = getattr(self, "info", None)
         if (not self._loading and info and info.class_label == items.SPECTRE_CLASS
                 and (info.category == items.SPECTRE_CATEGORY or
-                     (self.server == config.KAKAO and items.spectre_enabled() and league == items.SPECTRE_LEAGUE))):
+                     (self.server == config.KAKAO and league == items.SPECTRE_LEAGUE))):
             self.load(self.model, self._prev_fg, league=league)
             return
         self._conditions_changed()
@@ -290,7 +290,7 @@ class TradeWindow(QWidget):
         self.title.setText(target.label)
         self.title.setAccessibleName(f"검색 대상: {target.label}")
         if self.info.category == items.SPECTRE_CATEGORY:
-            scope = "망령"
+            scope = items.SPECTRE_CLASS
         elif target.category:
             scope = f"{target.label} 전체"
         elif target.name:
@@ -685,13 +685,13 @@ class TradeWindow(QWidget):
         def work():
             try:
                 if spectre and not self._spectre_request_current(generation, model, server, league, identity):
-                    return {"error": SPECTRE_LOCAL_ERROR}
+                    return {"error": SPECTRE_DATA_ERROR}
                 leagues = client.leagues(server, lang)
                 if spectre:
                     if items.SPECTRE_LEAGUE not in leagues:
                         return {"error": SPECTRE_LEAGUE_ERROR}
                     if not self._spectre_request_current(generation, model, server, league, identity):
-                        return {"error": SPECTRE_LOCAL_ERROR}
+                        return {"error": SPECTRE_DATA_ERROR}
                 chosen = league if league in leagues else leagues[0]
                 return {"league": chosen, "leagues": leagues, "response": client.search(chosen, query, server, lang)}
             except TradeError as error:
@@ -752,7 +752,7 @@ class TradeWindow(QWidget):
         def work():
             try:
                 if spectre and not self._spectre_request_current(generation, model, server, league, identity):
-                    return [], SPECTRE_LOCAL_ERROR, 0
+                    return [], SPECTRE_DATA_ERROR, 0
                 response = client.fetch(ids, session.query_id, server, lang)
                 entries = {row["id"]: row for row in response.get("result", [])}
                 rows = result_rows({"result": [entries[key] for key in ids if key in entries]})
