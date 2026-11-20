@@ -2,12 +2,9 @@
 import argparse
 import hashlib
 import json
-import re
 from pathlib import Path
 
-from build_map_mods import ROOT, TAGS, RANGE, clean
-import mapcheck
-import map_regex
+from build_map_mods import TAGS, clean
 
 STATS = {
     "drops": "map_drop_scaling_+%",
@@ -39,50 +36,6 @@ def extract(en, ko):
     return {"eligible": len(eligible), "maxima": maxima, "lines": lines, "mods": mods}
 
 
-def rendered_rolls(lines):
-    """RePoE 표기 순서대로 범위의 양끝을 렌더링하고 고정 숫자는 그대로 둔다."""
-    return [tuple(RANGE.sub(lambda m: m[endpoint], line) for line in lines) for endpoint in (1, 2)]
-
-
-def preference_evidence(mods, patterns, language):
-    """선택 키의 원본 모드 ID 집합과, 원본 ID별 양성 누락·다른 모드 매치를 기록한다."""
-    column = {"ko": 0, "en": 1}[language]
-    descriptions = {
-        "ko": ("아이템 희귀도: 희귀", "지도 (16등급)", "지도 등급: 16"),
-        "en": ("Rarity: Rare", "Map (Tier 16)", "Map Tier: 16"),
-    }
-    rolls = {mod_id: rendered_rolls(mod[language]) for mod_id, mod in mods.items()}
-    own = {mod_id: {entry["key"] for line in mod[language]
-                    if (entry := mapcheck.entry_for(line.removesuffix(" — 변경이 불가능한 값")
-                                                    .removesuffix(" — Unscalable Value")))}
-           for mod_id, mod in mods.items()}
-    evidence = {}
-    for key, pairs in patterns.items():
-        terms = list(dict.fromkeys(pair[column] for pair in pairs))
-        regex = re.compile("|".join(terms), re.I)
-        positives = {mod_id for mod_id, keys in own.items() if key in keys}
-        missing, collisions = [], []
-        for mod_id, variants in rolls.items():
-            hits = [any(regex.search(line) for line in variant) for variant in variants]
-            if mod_id in positives and not all(hits):
-                missing.append(mod_id)
-            elif mod_id not in positives and any(hits):
-                collisions.append(mod_id)
-        collisions.extend(line for line in descriptions[language] if regex.search(line))
-        evidence[key] = {"terms": terms, "positive_ids": sorted(positives),
-                         "missing": missing, "collision": collisions}
-    return evidence
-
-
-def preference_audit(mods, patterns):
-    return {
-        lang: {key: [row["terms"], [reason for reason in ("missing", "collision")
-                                   if row[reason] or (reason == "missing" and not row["positive_ids"])]]
-               for key, row in preference_evidence(mods, patterns, lang).items()}
-        for lang in ("ko", "en")
-    }
-
-
 def bounds(data):
     bonus = {"drops": 30, "pack": 10, "rarity": 20, "currency": 0, "map": 0}
     ceilings = {key: (sum(sum(values) for values in groups.values()) * 3 + 1) // 2 + bonus[key]
@@ -104,12 +57,6 @@ def main():
     print(bounds(data))
     data["sha256"] = [hashlib.sha256(source).hexdigest() for source in sources]
     args.output.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    # 앱에는 검증한 조각과 판정만 넣고 원본 모드 ID·문구는 테스트 fixture에 둔다.
-    patterns = map_regex.load_patterns(mapcheck.catalog())
-    audit = preference_audit(data["mods"], patterns)
-    (ROOT / "data/map_regex_preference_audit.json").write_text(
-        json.dumps(audit, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8"
-    )
 
 
 if __name__ == "__main__":

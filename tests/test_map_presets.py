@@ -27,13 +27,12 @@ def test_site_numeric_port_matches_reference_for_every_input():
     assert hashlib.sha256(output.encode()).hexdigest() == "0795dfd9a85f3518ed81fc83d16072e36da7fc7a04c2d0ce4a002f915265d90c"
 
 
-@pytest.fixture
-def synthetic_preference_audit(monkeypatch):
-    monkeypatch.setattr(map_regex, "load_preference_audit",
-                        lambda _: {"a": [["가", "갸"], []], "b": [["나"], []]})
+def test_site_identical_golden_unchanged_pack_threshold():
+    assert map_regex.build([], mapcheck.catalog(), map_regex.load_patterns(mapcheck.catalog()),
+                           limits={"pack": "35"}).text == '"규모:.*(3[5-9]|[4-9].|[1-9]..)%"'
 
 
-def test_site_identical_golden_unchanged_pack_and_any(synthetic_preference_audit):
+def test_app_golden_any_keeps_option_order_and_operator():
     catalog = [{"key": "a", "ko": "가"}, {"key": "b", "ko": "나"}, {"key": "c", "ko": "다"}]
     patterns = {"a": [("가", "a"), ("갸", "aa")], "b": [("나", "b")], "c": [("다", "c")]}
     assert map_regex.build(["c"], catalog, patterns, wanted=["a", "b"], limits={"pack": "35"}).text == (
@@ -45,7 +44,7 @@ def test_site_identical_golden_unchanged_pack_and_any(synthetic_preference_audit
     ("or", '"화폐 더 많음: .([4-9].|[1-9]..)%|지도 더 많음: .([3-9].|[1-9]..)%"'),
     ("and", '"화폐 더 많음: .([4-9].|[1-9]..)%" "지도 더 많음: .([3-9].|[1-9]..)%"'),
 ])
-def test_app_golden_all_atlas_rarity_and_narrowed_prefixes(mode, extras, synthetic_preference_audit):
+def test_app_golden_all_atlas_rarity_and_narrowed_prefixes(mode, extras):
     catalog = [{"key": "a", "ko": "가"}, {"key": "b", "ko": "나"}]
     patterns = {"a": [("가", "a"), ("갸", "aa")], "b": [("나", "b")]}
     assert map_regex.build([], catalog, patterns, wanted=["a", "b"], mode="all",
@@ -87,41 +86,6 @@ def test_repoe_upper_bounds_and_full_korean_map_line_corpus(monkeypatch):
         for line in lines:
             if value := re.fullmatch(re.escape(map_regex.LIMIT_NAMES[key]) + r": \+(\d+)%(?: \(augmented\))?", line):
                 assert int(value[1]) <= 999
-
-
-def test_repoe_preference_audits_whole_mods_and_blocks_failures(monkeypatch):
-    monkeypatch.syspath_prepend(str(Path(__file__).resolve().parents[1] / "tools"))
-    from audit_map_regex import preference_evidence, rendered_rolls
-
-    mods = json.loads((FIXTURES / "map_regex_repoe_audit.json").read_bytes())["mods"]
-    assert len(mods) == 336
-    assert rendered_rolls(["희귀 몬스터 수 (20-30)% 증가", "몬스터의 주문 피해 억제 확률 +30%"]) == [
-        ("희귀 몬스터 수 20% 증가", "몬스터의 주문 피해 억제 확률 +30%"),
-        ("희귀 몬스터 수 30% 증가", "몬스터의 주문 피해 억제 확률 +30%"),
-    ]
-    catalog = mapcheck.catalog()
-    patterns = map_regex.load_patterns(catalog)
-    for language in ("ko", "en"):
-        evidence = preference_evidence(mods, patterns, language)
-        for key, row in evidence.items():
-            result = map_regex.build([], catalog, patterns, language, wanted=[key])
-            if not row["positive_ids"] or row["missing"] or row["collision"]:
-                assert not result.text and "선호로 복사할 수 없는 옵션" in result.issue, (language, key)
-            else:
-                assert result.text == '"' + "|".join(row["terms"]) + '"', (language, key)
-    korean = preference_evidence(mods, patterns, "ko")
-    for key, line in [
-        ("monsters have #% chance to suppress spell damage", "몬스터의 주문 피해 억제 확률 +30%"),
-        ("#% increased number of rare monsters", "희귀 몬스터 수 (20-30)% 증가"),
-        ("#% more monster life", "몬스터의 생명력 (15-19)% 증폭"),
-    ]:
-        ids = {mod_id for mod_id, mod in mods.items() if line in mod["ko"]}
-        assert ids and ids <= set(korean[key]["positive_ids"]) and korean[key]["missing"]
-        if "억제" in line:
-            assert ids <= set(korean[key]["missing"])
-    speed = korean["#% increased monster attack speed"]
-    assert speed["positive_ids"] and not speed["missing"] and not speed["collision"]
-    assert korean["monsters gain an endurance charge on hit"]["collision"]
 
 
 @pytest.mark.parametrize("missing", ["catalog", "fragments"])
@@ -246,10 +210,10 @@ def test_english_threshold_is_blocked_and_language_survives_preset_switch(panel)
     card.limit_inputs["pack"].clear()
     card.regex_copy.click()
     clipboard = QApplication.clipboard()
-    assert clipboard.text() == '"!gen"' and clipboard.mimeData().hasFormat(map_regex.CLIPBOARD_MIME)
+    assert clipboard.text() == '"!Mana or"' and clipboard.mimeData().hasFormat(map_regex.CLIPBOARD_MIME)
 
 
-@pytest.mark.parametrize("case", ["empty", "long", "english", "unsupported_preference"])
+@pytest.mark.parametrize("case", ["empty", "long", "english"])
 def test_blocked_output_leaves_clipboard_intact(panel, case):
     card, _, _ = panel
     if case == "empty":
@@ -257,18 +221,31 @@ def test_blocked_output_leaves_clipboard_intact(panel, case):
     elif case == "long":
         card.regex_patterns[REGEN] = [("가" * 248, "a")]
         card._update_regex()
-    elif case == "english":
+    else:
         card.limit_inputs["currency"].setText("35")
         card.regex_language.setCurrentIndex(1)
-    else:
-        card._pick("#% increased number of rare monsters", "want")
-        assert "놓칠 수 있음" in card.regex_status.text()
     clipboard = QApplication.clipboard()
     clipboard.setText("원래 내용")
     assert not card.regex_text.text() and not card.regex_copy.isEnabled() and card.regex_status.text()
     card.regex_copy.click()
     QTest.keyClick(card.regex_text, Qt.Key.Key_C, Qt.KeyboardModifier.ControlModifier)
     assert clipboard.text() == "원래 내용"
-    if case == "unsupported_preference":
-        card._pick("#% increased number of rare monsters", "avoid")
-        assert card.regex_copy.isEnabled()
+
+
+@pytest.mark.parametrize("mode", ["want", "avoid"])
+def test_unresolved_fragment_blocks_copy_but_preserves_selection_and_warning(panel, mode):
+    card, settings, _ = panel
+    key = "#% increased number of rare monsters"
+    card.regex_patterns[key] = [(None, "Rare Monsters")]
+    card._pick(key, mode)
+    clipboard = QApplication.clipboard()
+    clipboard.setText("원래 내용")
+    assert not card.regex_text.text() and not card.regex_copy.isEnabled()
+    assert "모든 등급" in card.regex_status.text() and "희귀 몬스터 수" in card.regex_status.text()
+    card.regex_copy.click()
+    QTest.keyClick(card.regex_text, Qt.Key.Key_C, Qt.KeyboardModifier.ControlModifier)
+    assert clipboard.text() == "원래 내용"
+    assert [key, mode] in settings["map_presets"][0]["order"]
+    assert map_warn.avoid_keys() == ({REGEN, key} if mode == "avoid" else {REGEN})
+    card.regex_language.setCurrentIndex(1)
+    assert card.regex_copy.isEnabled() and "Rare Monsters" in card.regex_text.text()

@@ -9,39 +9,28 @@ from data import resource_path
 
 LIMIT = 250
 CLIPBOARD_MIME = "application/x-poe-delta-map-regex"
-Patterns = dict[str, list[tuple[str, str]]]
+Patterns = dict[str, list[tuple[str | None, str | None]]]
 LIMIT_NAMES = {"drops": "아틀라스 획득물", "pack": "몬스터 무리 규모", "rarity": "아이템 희귀도",
                "currency": "화폐 더 많음", "map": "지도 더 많음"}
 PREFIXES = dict(zip(LIMIT_NAMES, ("획득물:.*", "규모:.*", "희귀도:.*", "화폐 더 많음: .", "지도 더 많음: .")))
 CATALOG_UNAVAILABLE = "지도 옵션 목록을 읽을 수 없어요."
 FRAGMENTS_UNAVAILABLE = "앱에 내장된 지도 정규식 데이터를 읽을 수 없어요."
-PREFERENCE_ISSUES = {"missing": "해당 옵션을 놓칠 수 있음", "collision": "다른 옵션도 검색됨",
-                     "unverified": "검증 자료 없음"}
 
 
 def load_patterns(catalog: list[dict]) -> Patterns:
     keys = {row["key"] for row in catalog}
     try:
-        rows = json.loads(resource_path("data/map_regex_fragments.json").read_text(encoding="utf-8"))
+        rows = json.loads(resource_path("data/map_regex_fragments.json").read_text(encoding="utf-8"))["fragments"]
         patterns = {}
-        for key, pairs in rows.items():
-            if not isinstance(pairs, list) or not pairs or not all(
-                isinstance(pair, list) and len(pair) == 2 and all(isinstance(term, str) and term for term in pair)
-                for pair in pairs
+        for key, pair in rows.items():
+            if not isinstance(pair, list) or len(pair) != 2 or not all(
+                term is None or (isinstance(term, str) and term) for term in pair
             ):
                 return {}
             if key in keys:
-                patterns[key] = [tuple(pair) for pair in pairs]
+                patterns[key] = [tuple(pair)]
         return patterns
-    except (OSError, ValueError, TypeError, AttributeError):
-        return {}
-
-
-def load_preference_audit(language: str) -> dict:
-    try:
-        entries = json.loads(resource_path("data/map_regex_preference_audit.json").read_text(encoding="utf-8"))[language]
-        return entries if isinstance(entries, dict) else {}
-    except (OSError, ValueError, TypeError, KeyError):
+    except (OSError, ValueError, TypeError, AttributeError, KeyError):
         return {}
 
 
@@ -108,32 +97,20 @@ def build(selected: Sequence[str], catalog: list[dict], patterns: Patterns, lang
     if not (selected or wanted or numeric):
         return Result(issue="지도 옵션을 고르거나 수치 조건을 입력해 주세요.")
     labels = {row["key"]: row["ko"] for row in catalog}
-    unsupported = (set(selected) | set(wanted)) - patterns.keys()
+    column = 1 if language == "en" else 0
+    terms_by_key = {key: list(dict.fromkeys(pair[column] for pair in patterns.get(key, ()) if pair[column]))
+                    for key in (*selected, *wanted)}
+    unsupported = [key for key, terms in terms_by_key.items() if not terms]
     if unsupported:
         names = ", ".join(labels.get(key, key) for key in sorted(unsupported))
-        return Result(issue=f"정규식이 지원되지 않는 옵션: {names}")
-    column = 1 if language == "en" else 0
-    wants = [list(dict.fromkeys(pair[column] for pair in patterns[key])) for key in wanted]
-    if wanted:
-        audit = load_preference_audit("en" if column else "ko")
-        failures = []
-        for key, terms in zip(wanted, wants):
-            entry = audit.get(key)
-            reasons = entry[1] if (
-                isinstance(entry, list) and len(entry) == 2 and entry[0] == terms
-                and isinstance(entry[1], list) and all(reason in ("missing", "collision") for reason in entry[1])
-            ) else ["unverified"]
-            if reasons:
-                failures.append(f"{labels.get(key, key)} ({', '.join(PREFERENCE_ISSUES[reason] for reason in reasons)})")
-        if failures:
-            return Result(issue="선호로 복사할 수 없는 옵션: " + ", ".join(failures))
+        return Result(issue=f"선택한 언어에서 모든 등급에 맞고 다른 옵션과 겹치지 않는 정규식을 찾지 못했어요: {names}")
+    wants = [terms_by_key[key] for key in wanted]
     if wants and mode != "all":
         wants = [dict.fromkeys(term for group in wants for term in group)]
     parts = ['"' + "|".join(group) + '"' for group in wants]
     terms: dict[str, None] = {}
     for key in selected:
-        for pair in patterns[key]:
-            term = pair[column]
+        for term in terms_by_key[key]:
             terms.pop(term, None)
             terms[term] = None
     if terms:

@@ -1,3 +1,4 @@
+import re
 import sys
 
 import pytest
@@ -40,16 +41,16 @@ def test_map_panel_copies_bundled_patterns_without_local_files(app, monkeypatch,
     card.search.setText("목록에 없음")
     assert card.regex_copy.isEnabled()
     QTest.keyClick(card.regex_text, Qt.Key.Key_C, Qt.KeyboardModifier.ControlModifier)
-    assert clipboard.text() == '"!재생"'
+    assert clipboard.text() == '"!마나 또는"'
     assert clipboard.mimeData().hasFormat(map_regex.CLIPBOARD_MIME)
     card.regex_language.setCurrentIndex(1)
     card.regex_copy.click()
-    assert clipboard.text() == '"!gen"'
+    assert clipboard.text() == '"!Mana or"'
     assert avoids(card.preset) == [REGEN]
     card._pick(RESIST, "avoid")
     card._pick(REGEN, "avoid")
     card._pick(REGEN, "avoid")
-    assert card.regex_text.text() == '"!o al|gen"'
+    assert card.regex_text.text() == '"!to all|Mana or"'
 
     card._pick("missing key", "avoid")
     assert not card.regex_copy.isEnabled() and not card.regex_text.text()
@@ -71,10 +72,10 @@ def test_length_includes_quote_negation_and_separator(length):
 
 
 @pytest.mark.parametrize("language,expected", [
-    ("ko", r'"!동.속.*증|배율.+4\d|배율.+7\d|의.방어력"'),
-    ("en", '"!r at|tip|lier|efe"'),
+    ("ko", '"!공격 속도.*증가|몬스터의 시전|피해 배율|방어력.*감폭"'),
+    ("en", '"!Monster Attack|Monster Cast|Monster Critical|less Defences"'),
 ])
-def test_bundled_multiline_options_keep_site_fragments(language, expected):
+def test_bundled_multiline_avoid_byte_golden(language, expected):
     catalog = mapcheck.catalog()
     selected = [
         "#% increased monster attack speed",
@@ -82,7 +83,16 @@ def test_bundled_multiline_options_keep_site_fragments(language, expected):
         "#% to monster critical strike multiplier",
         "players have #% less defences",
     ]
-    assert map_regex.build(selected, catalog, map_regex.load_patterns(catalog), language).text == expected
+    assert map_regex.build(selected, catalog, map_regex.load_patterns(catalog), language).text.encode() == expected.encode()
+
+
+def test_maximum_resistance_avoid_matches_all_tiers():
+    catalog = mapcheck.catalog()
+    text = map_regex.build([RESIST], catalog, map_regex.load_patterns(catalog)).text
+    assert text == '"!모든 저항"'
+    pattern = re.compile(text[2:-1], re.I)
+    for roll in (5, 8, 9, 12, 20):
+        assert pattern.search(f"플레이어의 모든 저항 최대치 -{roll}%")
 
 
 def test_maven_only_option_without_site_match_blocks_partial_regex():
@@ -103,5 +113,5 @@ def test_maven_checkbox_is_disabled_and_old_selection_does_not_block_copy(app, m
     (want, avoid), = [(want, avoid) for row, _, want, avoid in card.boxes if row["key"] == maven]
     assert all(not button.isEnabled() and not button.isChecked() for button in (want, avoid))
     assert len(saved) == 1 and saved[0]["map_avoid"] == [REGEN]
-    assert card.regex_copy.isEnabled() and card.regex_text.text() == '"!재생"'
+    assert card.regex_copy.isEnabled() and card.regex_text.text() == '"!마나 또는"'
     host.close()
