@@ -14,7 +14,7 @@ import ko2en
 from itemcheck import CLASS_NAMES
 from itemmodel import (CORRUPT_FLAGS, EATER_FLAGS, EXARCH_FLAGS, ITEM_LEVEL_KEYS, SEP, ItemModel, badge, mod_en,
                        parse, skeleton)
-from trade.config import OFFICIAL, validate_server
+from trade.config import KAKAO, OFFICIAL, validate_server
 from trade import combine, heist, items, resistance, templates, unique_mods, viscera
 from trade.stats import Match, index, option_gate
 
@@ -67,6 +67,8 @@ class TradeItem:
     heist: heist.Heist | None = None
     viscera: viscera.Viscera | None = None
     template: str = ""
+    unidentified_unique: bool = False
+    unique_options: tuple[str, ...] = ()
 
     @property
     def can_filter_ilvl(self) -> bool:
@@ -149,6 +151,18 @@ def item_info(model: ItemModel | None, server: str = OFFICIAL, *, league: str = 
         info.category = items.SPECTRE_CATEGORY
         info.base, info.name = spectre.base, ""
         info.supported = True
+        return info
+    if cls in GEAR and info.rarity == "Unique" and items.UNIDENTIFIED_FLAGS.intersection(
+        (*model.head, *model.flags),
+    ):
+        info.unidentified_unique = True
+        category = ("One-Handed Sword" if cls == "Thrusting One Hand Sword" else
+                    cls.replace("One Hand ", "One-Handed ").replace("Two Hand ", "Two-Handed "))
+        try:
+            info.unique_options, level = items.unidentified_unique_options(model, category)
+            info.ilvl = level or 0
+        except ValueError as error:
+            info.blocked_reason = str(error)
         return info
     legacy = cls in GEAR and info.rarity == "Unique"
     if legacy:
@@ -500,6 +514,39 @@ def search_target(info: TradeItem, exact_base: bool | None = None) -> SearchTarg
         return SearchTarget(category=info.equipment_category)
     return SearchTarget(info.base, info.name if info.rarity == "Unique" else None,
                         discriminator=info.identity.discriminator if info.identity else None)
+
+
+# APT v3.30.102: Config.ts's poeWebApi explicitly routes en→Official and ko→Kakao.
+# Its pathofexile-trade.ts encodes name/type, identified.option = String(false),
+# ilvl min/max and passes the body as POST JSON. That does not establish browser prefill.
+_UNIDENTIFIED_API_PATHS = {(OFFICIAL, "en", "api"), (KAKAO, "ko", "api")}
+
+
+def exact_unique_level(text: str) -> int:
+    value = text.strip()
+    if not re.fullmatch(r"[0-9]+", value) or not (level := int(value)):
+        raise ValueError("아이템 레벨을 양의 정수로 입력하세요")
+    return level
+
+
+def build_unidentified_unique_query(info: TradeItem, name: str, level_text: str, server: str, mode: str) -> dict:
+    if not info.unidentified_unique or not info.model or info.blocked_reason:
+        raise ValueError(info.message)
+    if not info.unique_options:
+        raise ValueError("이 베이스에 연결된 고유 이름이 없습니다")
+    if name not in info.unique_options:
+        raise ValueError("이 베이스의 고유 이름을 선택하세요")
+    level = exact_unique_level(level_text)
+    validate_server(server, info.model.lang)
+    if (server, info.model.lang, mode) not in _UNIDENTIFIED_API_PATHS:
+        raise ValueError("이 거래소·언어·모드의 미확인 고유 검색은 지원하지 않습니다")
+    return {"query": {
+        "status": {"option": "securable"}, "name": name, "type": info.model.base,
+        "stats": [{"type": "and", "filters": []}],
+        "filters": {"misc_filters": {"filters": {
+            "identified": {"option": "false"}, "ilvl": {"min": level, "max": level},
+        }}},
+    }, "sort": {"price": "asc"}}
 
 
 def build_query(info: TradeItem, stats: list[StatCondition], *, ilvl: bool = False,

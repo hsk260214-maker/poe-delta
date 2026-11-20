@@ -1,0 +1,36 @@
+{
+  "official_en": {
+    "method": "POST",
+    "url": "https://www.pathofexile.com/api/trade/search/Standard",
+    "body": {
+      "query": {
+        "status": {"option": "securable"},
+        "name": "Watcher's Eye",
+        "type": "Prismatic Jewel",
+        "stats": [{"type": "and", "filters": []}],
+        "filters": {"misc_filters": {"filters": {
+          "identified": {"option": "false"},
+          "ilvl": {"min": 85, "max": 85}
+        }}}
+      },
+      "sort": {"price": "asc"}
+    }
+  },
+  "kakao_ko": {
+    "method": "POST",
+    "url": "https://poe.kakaogames.com/api/trade/search/Covens",
+    "body": {
+      "query": {
+        "status": {"option": "securable"},
+        "name": "감시자의 눈",
+        "type": "분광 주얼",
+        "stats": [{"type": "and", "filters": []}],
+        "filters": {"misc_filters": {"filters": {
+          "identified": {"option": "false"},
+          "ilvl": {"min": 85, "max": 85}
+        }}}
+      },
+      "sort": {"price": "asc"}
+    }
+  }
+}

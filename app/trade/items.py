@@ -1,4 +1,4 @@
-"""새 범위의 품목 정체성 및 출시 게이트. 로컬 APT 자료만 사용한다."""
+"""정확한 거래소 품목 식별과 출시 게이트."""
 import json
 import re
 from dataclasses import dataclass
@@ -7,7 +7,7 @@ from hashlib import sha256
 from itertools import takewhile
 
 from data import resource_path
-from itemmodel import SEP, mod_en
+from itemmodel import ITEM_LEVEL_KEYS, SEP, mod_en
 from trade import config
 from trade.config import OFFICIAL
 from trade.stats import index
@@ -175,6 +175,38 @@ def _number(lines, keys, pattern):
     if len(set(values)) > 1:
         raise ValueError("품목의 수치가 서로 일치하지 않습니다")
     return values[0] if values else None
+
+
+UNIDENTIFIED_FLAGS = {"Unidentified", "미확인"}
+# 공개 품목명만 수록한다. 베이스 및 조인 분류는 기존 번들에서 확인한다.
+# https://www.poewiki.net/wiki/Watcher%27s_Eye
+# https://poedb.tw/kr/Watchers_Eye
+_WATCHERS_EYE_NAMES = {"en": "Watcher's Eye", "ko": "감시자의 눈"}
+
+
+def unidentified_unique_options(model, category):
+    """Return exact local names and the copied level, never an inferred unique identity."""
+    header = model.head[:model.head.index(SEP)] if SEP in model.head else model.head
+    lines = [*model.head, *model.flags, *(mod.text for mod in model.mods)]
+    if (len(header) != 3 or header[2] != model.base or model.name != model.base or VARIANT.match(model.base)
+            or {"Synthesised Item", "결합된 아이템"}.intersection(lines)):
+        raise ValueError("미확인 고유의 베이스 또는 변형을 정확히 식별할 수 없습니다")
+    base = _lookup(model.lang, "ITEM", category, model.base)
+    if base[4] or (reason := blocked(Identity(base[2], apt_category=base[3]), "Unique")):
+        raise ValueError("이 품목 변형은 아직 시세 검색을 지원하지 않습니다" if base[4] else reason)
+    levels = [line for line in lines if line.startswith(ITEM_LEVEL_KEYS)]
+    expected_level = ITEM_LEVEL_KEYS[model.lang == "ko"]
+    if len(levels) > 1 or (levels and not levels[0].startswith(expected_level)):
+        raise ValueError("복사한 아이템 레벨을 하나로 확인할 수 없습니다")
+    level = _number(levels, {expected_level[:-1]}, r"([1-9][0-9]*)") if levels else None
+
+    uniques = [row for row in catalog()["items"][model.lang] if row[0] == "UNIQUE"]
+    names = [row[2] for row in uniques if row[3:] == [base[3], None, base[1]]]
+    if (base[1], base[3]) == ("Prismatic Jewel", "Jewel"):
+        name = _WATCHERS_EYE_NAMES[model.lang]
+        if not any(row[1] == "Watcher's Eye" or row[2] == name for row in uniques):
+            names.append(name)
+    return tuple(sorted(name for name in set(names) if sum(r[2] == name for r in uniques) <= 1)), level
 
 
 def resolve_heist(model, category, rarity, server):

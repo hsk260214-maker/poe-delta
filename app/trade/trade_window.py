@@ -19,8 +19,9 @@ from theme import build_qss
 from trade import browser, combine, config, focus_log, heist, items, resistance, templates
 from trade.stats import option_gate
 from trade.results import ResultSession
-from trade.query import (FORBIDDEN_TOME, INFLUENCE_LABELS, SearchTarget, build_query, conditions, item_info,
-                         default_minimum, league_for, resistance_rows, result_rows, search_target, summary)
+from trade.query import (FORBIDDEN_TOME, INFLUENCE_LABELS, SearchTarget, build_query,
+                         build_unidentified_unique_query, conditions, default_minimum, exact_unique_level,
+                         item_info, league_for, resistance_rows, result_rows, search_target, summary)
 
 SPECTRE_MODE_ERROR = "망령 검색은 게임 위 시세 모드에서만 사용할 수 있습니다"
 SPECTRE_LEAGUE_ERROR = "카카오 리그 목록에서 Covens를 확인할 수 없습니다"
@@ -62,6 +63,9 @@ QPushButton#TradeSearch:enabled {
     color: #17120b; background: #e8bc74; border: 2px solid #e8bc74; font-weight: 700;
 }
 QPushButton#TradeSearch:hover { background: #f3cf95; }
+QComboBox#TradeUniqueName:focus, QLineEdit#TradeUniqueLevel:focus {
+    border: 2px solid palette(highlight);
+}
 QPushButton#TradeSearch:focus:enabled { border-color: #ffffff; }
 """
 
@@ -139,6 +143,26 @@ class TradeWindow(QWidget):
         self.copied_item = _wrapped_label()
         self.copied_item.setObjectName("TradeSource")
         hero_layout.addWidget(self.copied_item)
+        self.unique_selection = QWidget()
+        unique_layout = QGridLayout(self.unique_selection)
+        unique_layout.setContentsMargins(0, 0, 0, 0)
+        self.unique_name = QComboBox()
+        self.unique_name.setObjectName("TradeUniqueName")
+        self.unique_name.setAccessibleName("검색할 고유 이름")
+        self.unique_level = QLineEdit()
+        self.unique_level.setObjectName("TradeUniqueLevel")
+        self.unique_level.setAccessibleName("정확히 일치하는 아이템 레벨")
+        self.unique_level.setPlaceholderText("양의 정수")
+        for i, (label, widget) in enumerate((("고유 이름", self.unique_name),
+                                            ("아이템 레벨", self.unique_level))):
+            name = QLabel(label)
+            name.setBuddy(widget)
+            unique_layout.addWidget(name, i, 0)
+            unique_layout.addWidget(widget, i, 1)
+        hero_layout.addWidget(self.unique_selection)
+        self.unique_selection.hide()
+        self.unique_name.currentIndexChanged.connect(self._unique_conditions_changed)
+        self.unique_level.textChanged.connect(self._unique_conditions_changed)
         layout.addWidget(hero)
         self.focus_hint = QLabel("거래소 창을 클릭하면 입력할 수 있습니다")
         self.focus_hint.hide()
@@ -285,7 +309,27 @@ class TradeWindow(QWidget):
         self._update_target()
         self._conditions_changed()
 
+    def _unique_conditions_changed(self) -> None:
+        if not self._loading and self.info.unidentified_unique:
+            self._update_target()
+            self._conditions_changed()
+
     def _update_target(self) -> None:
+        if self.info.unidentified_unique:
+            name = self.unique_name.currentData()
+            target = SearchTarget(self.model.base, name) if name else SearchTarget()
+            self.title.setText(target.label if name else "고유 이름을 선택하세요")
+            self.title.setAccessibleName(f"검색 대상: {self.title.text()}")
+            try:
+                level = exact_unique_level(self.unique_level.text())
+                scope = f"미확인 · 아이템 레벨 {level} 정확히 일치"
+            except ValueError:
+                scope = "미확인 · 아이템 레벨 입력 필요"
+            self.scope_badge.setText(scope)
+            self.scope_badge.show()
+            self.copied_item.setText(f"복사한 베이스: {self.model.base}")
+            self.copied_item.show()
+            return
         target = SearchTarget() if self._error else search_target(self.info, self.base_button.isChecked())
         self.title.setText(target.label)
         self.title.setAccessibleName(f"검색 대상: {target.label}")
@@ -398,13 +442,21 @@ class TradeWindow(QWidget):
             self._error = str(error)
         api = self.current_mode == "api"
         spectre = self.info.category == items.SPECTRE_CATEGORY
+        unidentified = self.info.unidentified_unique
+        self.unique_selection.setVisible(unidentified)
+        self.unique_name.clear()
+        self.unique_name.addItem("선택하세요")
+        for name in self.info.unique_options:
+            self.unique_name.addItem(name, name)
+        self.unique_name.setEnabled(bool(self.info.unique_options))
+        self.unique_level.setText(str(self.info.ilvl) if unidentified and self.info.ilvl else "")
         mode_name = "게임 위 시세 모드 (공식 문서 밖 API 사용)" if api else "브라우저 모드"
         self.mode_label.setText(f"POE Delta · {mode_name}")
         self.search_button.setText("검색" if api or spectre else "브라우저로 검색")
-        self.table.setVisible(api and self.info.supported)
-        self.open_button.setVisible(api and self.info.supported and not spectre)
+        self.table.setVisible(api and (self.info.supported or unidentified))
+        self.open_button.setVisible(api and self.info.supported and not spectre and not unidentified)
         self._clear_results(SPECTRE_MODE_ERROR if spectre and not api else
-                            "검색할 수 없는 아이템입니다" if not self.info.supported or self._error else
+                            "검색할 수 없는 아이템입니다" if (not self.info.supported and not unidentified) or self._error else
                             "검색을 눌러 결과를 확인하세요" if api else "브라우저에서 결과를 확인하세요")
         self.league.blockSignals(True)
         self.league.clear()
@@ -422,7 +474,7 @@ class TradeWindow(QWidget):
         self.links.setVisible(self.info.links >= 5)
         self.links.setText(f"링크 ≥ {self.info.links}")
         self.corrupted.setChecked(True)
-        self.corrupted.setVisible(not (tome or self.info.viscera or spectre))
+        self.corrupted.setVisible(not (tome or self.info.viscera or spectre or unidentified))
         self.corrupted.setText("타락" if self.info.corrupted else "타락 아님")
         scoped = not self._error and search_target(self.info, True) != search_target(self.info, False)
         self.base_button.setChecked(scoped and not search_target(self.info).category)
@@ -572,7 +624,7 @@ class TradeWindow(QWidget):
         elif not self._enabled_options():
             self.stat_layout.addWidget(QLabel("선택할 수 있는 검색 옵션이 없습니다"))
         self._update_bulk_buttons()
-        self.search_button.setVisible(bool(self.info.supported or self.info.heist))
+        self.search_button.setVisible(bool(self.info.supported or self.info.heist or unidentified))
         self._loading = False
         self._validate()
 
@@ -591,6 +643,10 @@ class TradeWindow(QWidget):
         self._conditions_changed()
 
     def _query(self) -> dict:
+        if self.info.unidentified_unique:
+            return build_unidentified_unique_query(
+                self.info, self.unique_name.currentData(), self.unique_level.text(), self.server, self.current_mode,
+            )
         for condition, (check, minimum, maximum) in zip(self.stats, self.inputs):
             condition.checked = check.isChecked()
             if resistance.excluded(condition, self.total_resistance) or (
@@ -627,7 +683,7 @@ class TradeWindow(QWidget):
             self.load(self.model, self._prev_fg)
             return
         error = self._error
-        if not self.info.supported:
+        if not self.info.supported and not self.info.unidentified_unique:
             error = self.info.message
         elif self.info.category == items.SPECTRE_CATEGORY and self.current_mode != "api":
             error = SPECTRE_MODE_ERROR
@@ -646,7 +702,8 @@ class TradeWindow(QWidget):
         self.search_button.setEnabled(not error)
 
     def _search_shortcut(self) -> None:
-        if getattr(getattr(self, "info", None), "category", "") == items.SPECTRE_CATEGORY:
+        info = getattr(self, "info", None)
+        if info and (info.unidentified_unique or info.category == items.SPECTRE_CATEGORY):
             if self.search_button.hasFocus():
                 self.search_button.click()
             return
@@ -660,7 +717,10 @@ class TradeWindow(QWidget):
                 self.result_summary.setText("망령 검색 설정이 바뀌었습니다. 게임 위 시세 모드에서 다시 검색하세요")
             return
         self._validate()
-        if not self.search_button.isEnabled() or not self.info.supported:
+        if not self.search_button.isEnabled():
+            return
+        unidentified = self.info.unidentified_unique
+        if not (self.info.supported or unidentified):
             return
         query = self._query()
         league, server, lang = self.league.currentText().strip(), self.server, self.model.lang
@@ -684,6 +744,8 @@ class TradeWindow(QWidget):
 
         def work():
             try:
+                if unidentified and not self._current_result(generation):
+                    return {"error": "미확인 고유 검색 조건이 바뀌었습니다"}
                 if spectre and not self._spectre_request_current(generation, model, server, league, identity):
                     return {"error": SPECTRE_DATA_ERROR}
                 leagues = client.leagues(server, lang)
@@ -692,6 +754,11 @@ class TradeWindow(QWidget):
                         return {"error": SPECTRE_LEAGUE_ERROR}
                     if not self._spectre_request_current(generation, model, server, league, identity):
                         return {"error": SPECTRE_DATA_ERROR}
+                if unidentified:
+                    if not self._current_result(generation):
+                        return {"error": "미확인 고유 검색 조건이 바뀌었습니다"}
+                    if league not in leagues:
+                        return {"error": "선택한 리그에서 미확인 고유를 검색할 수 없습니다"}
                 chosen = league if league in leagues else leagues[0]
                 return {"league": chosen, "leagues": leagues, "response": client.search(chosen, query, server, lang)}
             except TradeError as error:
@@ -718,7 +785,7 @@ class TradeWindow(QWidget):
             session.total = response.get("total", 0)
             if chosen != league:
                 session.prefix = f"리그를 {chosen}(으)로 바꿨습니다 · "
-            if session.query_id and not spectre:
+            if session.query_id and not spectre and not unidentified:
                 self._result_link = browser.result_url(chosen, session.query_id, server, lang)
                 self.open_button.setEnabled(True)
             if session.ids:
@@ -743,6 +810,7 @@ class TradeWindow(QWidget):
 
         server, lang = self.server, self.model.lang
         spectre = self.info.category == items.SPECTRE_CATEGORY
+        unidentified = self.info.unidentified_unique
         model, identity = self.model, self.info.identity
         league = self.league.currentText().strip()
         ids = session.ids[session.next:session.next + 10]
@@ -751,6 +819,8 @@ class TradeWindow(QWidget):
 
         def work():
             try:
+                if unidentified and not self._current_result(generation):
+                    return [], "미확인 고유 검색 조건이 바뀌었습니다", 0
                 if spectre and not self._spectre_request_current(generation, model, server, league, identity):
                     return [], SPECTRE_DATA_ERROR, 0
                 response = client.fetch(ids, session.query_id, server, lang)
