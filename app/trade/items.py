@@ -11,6 +11,7 @@ from itemmodel import ITEM_LEVEL_KEYS, SEP, mod_en
 from trade import config
 from trade.config import OFFICIAL
 from trade.stats import index
+from trade.unique_candidates import candidate_names
 
 MAP_TIER = re.compile(r"\s*\((?:Tier\s+(\d+)|(\d+)\s*등급)\)", re.I)
 VARIANT = re.compile(r"^(?:Synthesised|Foulborn|Vestigial|결합된|삿된|흔적(?:이 남은)?)\s")
@@ -259,6 +260,7 @@ def unidentified_unique_options(model, category):
         name = _WATCHERS_EYE_NAMES[model.lang]
         if not any(row[1] == "Watcher's Eye" or row[2] == name for row in uniques):
             names.append(name)
+    names.extend(candidate_names(model.lang, base[1], base[3], uniques))
     return tuple(sorted(name for name in set(names) if sum(r[2] == name for r in uniques) <= 1)), level
 
 

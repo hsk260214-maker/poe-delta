@@ -35,7 +35,6 @@
   - **게임 위 시세 모드:** 가격이 싼 순서로 매물 20개와 요약을 게임 위 창에 보여 줍니다.
   - **브라우저 모드:** 조건이 채워진 거래소 페이지를 브라우저로 엽니다.
 - 공식 거래소와 카카오 거래소(한글 클라이언트)를 고를 수 있습니다.
-- 옵션 문장을 거래소 조건으로 바꾸는 데에는 [Awakened PoE Trade](https://github.com/SnosMe/awakened-poe-trade)(MIT)의 데이터를 씁니다(아래 레퍼런스 참고).
 
 ### 작은 추가·변경
 
@@ -118,16 +117,14 @@ python -m pip install -r requirements-dev.txt; python -m pytest tests   # 테스
 
 - [Path of Building Community](https://github.com/PathOfBuildingCommunity/PathOfBuilding) (MIT): DPS·EHP 계산 전부. 프로그램에 넣어 배포하지 않고, 실행할 때 공식 릴리스를 받아서 씁니다.
 - [RePoE fork](https://repoe-fork.github.io/): 아이템 옵션, 영문·한글 문장 데이터
-- [Awakened PoE Trade](https://github.com/SnosMe/awakened-poe-trade) (MIT): 한글 클라이언트 문장과 이름 데이터 보충
 - [PySide6](https://doc.qt.io/qtforpython/), [lupa](https://github.com/scoder/lupa), [requests](https://github.com/psf/requests)
 
 ### POE Delta의 거래소 검색에서 쓰거나 참고한 것
 
-- **POE Delta가 더 쓰는 외부 자료:** [Awakened PoE Trade](https://github.com/SnosMe/awakened-poe-trade)(MIT)의 오프라인 거래소 stat 데이터 (고정 커밋 `803d188d1359c4d5b1e3826da5dc680ea74a158f`, `data/LICENSE-awakened-poe-trade.txt`)
+- 거래소 및 번역 데이터의 출처와 고지는 [제3자 자료 고지](docs/THIRD_PARTY_NOTICES.md)에 있습니다.
 - **3.30 살덩이 단계 자료:** [PoEDB 살덩이 목록](https://poedb.tw/kr/Viscera)의 단계별 공식 거래소 링크(이름·부위·거래소 ID·범위)를 `tools/build_viscera.py`로 정리한 `data/viscera.json`
 - **이름이 바뀐 한글 옵션 대응표:** 카카오 거래소에서 확인한 항목만 `data/ko_aliases.json`에 기록합니다(예: `지역에 허상 등장`).
 - 기능 아이디어만 참고하고 코드는 가져오지 않은 프로그램:
-  - [Awakened PoE Trade](https://github.com/SnosMe/awakened-poe-trade): `Ctrl+D` 시세 확인, 옵션 체크·최소값 조정
   - [PoE Overlay Community Fork](https://github.com/PoE-Overlay-Community/PoE-Overlay-Community-Fork): 거래소 결과 요약, 클릭으로 조건 켜고 끄기
   - [PoeTradeSearch](https://github.com/phiDelPark/PoeTradeSearch) (phiDelPark): 한글 거래소 검색 방식
   - [Path of Building Community](https://github.com/PathOfBuildingCommunity/PathOfBuilding): 검색 조건을 거래소 링크(`/trade/search/{리그}?q=…`)로 여는 방식
@@ -135,7 +132,6 @@ python -m pip install -r requirements-dev.txt; python -m pytest tests   # 테스
 ## 라이선스
 
 - 원본 Exile Delta의 [MIT 라이선스](LICENSE)(Copyright (c) 2026 KyungseokKANG)를 그대로 따릅니다.
-- Awakened PoE Trade 데이터의 라이선스는 [`data/LICENSE-awakened-poe-trade.txt`](data/LICENSE-awakened-poe-trade.txt)에 있습니다.
 - POE Delta에서 생긴 문제는 원작자가 아니라 이 저장소의 [Issues](https://github.com/hsk260214-maker/poe-delta/issues)로 알려 주세요.
 
 ## 알림

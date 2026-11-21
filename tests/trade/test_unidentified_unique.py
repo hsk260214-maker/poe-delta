@@ -58,8 +58,9 @@ def test_post_matches_fixed_apt_contract(scenario, fixtures, market, lang, leagu
     original = (win.model.name, win.model.base, tuple(win.model.head), tuple(win.model.flags))
     assert not win.unique_selection.isHidden() and win.unique_level.text() == "85"
     assert win.unique_name.currentData() is None and not win.search_button.isEnabled()
-    win.unique_name.setCurrentIndex(1)
-    assert win.unique_name.currentData() == expected["body"]["query"]["name"]
+    name = expected["body"]["query"]["name"]
+    win.unique_name.setCurrentIndex(win.unique_name.findData(name))
+    assert win.unique_name.currentData() == name
     assert not network and not opened
     assert win.title.text() == f'{expected["body"]["query"]["name"]} · {expected["body"]["query"]["type"]}'
     assert win.scope_badge.text() == "미확인 · 아이템 레벨 85 정확히 일치"
@@ -151,3 +152,41 @@ def test_identified_unique_retains_existing_path(scenario):
     win.load("Item Class: Rings\nRarity: Unique\nVentor's Gamble\nGold Ring\n--------\nItem Level: 85")
     assert win.unique_selection.isHidden() and win.search_button.isEnabled()
     assert win._query()["query"]["name"] == "Ventor's Gamble"
+
+
+def test_simple_robe_candidate_preserves_copy_and_manual_level(scenario):
+    win, _, network, opened = scenario
+    win.load("아이템 종류: 갑옷\n아이템 희귀도: 고유\n단순한 로브\n--------\n"
+             "홈: W-W-W-W-W-W\n--------\n아이템 레벨: 85\n--------\n미확인")
+    copied = (win.model.base, tuple(win.model.head), tuple(win.model.flags))
+    assert win.info.unique_options == ("천 개의 리본", "타뷸라 라사")
+    assert win.unique_name.currentData() is None and not win.search_button.isEnabled()
+    win.unique_name.setCurrentIndex(win.unique_name.findData("타뷸라 라사"))
+    assert not network
+    win.search_button.click()
+    win.unique_level.setText("86")
+    assert len(network) == 1
+    win.search_button.click()
+    for sent, level in zip(network, (85, 86), strict=True):
+        query = sent["body"]["query"]
+        assert (query["name"], query["type"]) == ("타뷸라 라사", "단순한 로브")
+        assert query["filters"]["misc_filters"]["filters"] == {
+            "identified": {"option": "false"}, "ilvl": {"min": level, "max": level},
+        }
+    assert (win.model.base, tuple(win.model.head), tuple(win.model.flags)) == copied
+    assert not opened
+
+
+def test_bundled_index_adds_referenced_and_literal_names_only_to_their_exact_base():
+    for cls, base, expected in (
+        ("장화", "염소가죽 장화", "아버라스의 발굽"),
+        ("장갑", "매복 미트", "건축가의 손길"),
+        ("한손 도끼", "도살자 도끼", "액툼"),
+        ("반지", "뼈 반지", "내키지 않는 포옹"),
+    ):
+        text = copy_text(base=base).replace("주얼", cls)
+        info = item_info(parse(text), config.KAKAO)
+        assert expected in info.unique_options
+        assert "타뷸라 라사" not in info.unique_options
+    en = copy_text("en", base="Bone Ring").replace("Jewels", "Rings")
+    assert "Unwilling Embrace" in item_info(parse(en), config.OFFICIAL).unique_options
