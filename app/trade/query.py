@@ -69,6 +69,7 @@ class TradeItem:
     template: str = ""
     unidentified_unique: bool = False
     unique_options: tuple[str, ...] = ()
+    map_fragment_ref: str = ""
 
     @property
     def can_filter_ilvl(self) -> bool:
@@ -176,6 +177,14 @@ def item_info(model: ItemModel | None, server: str = OFFICIAL, *, league: str = 
                 info.name = ""
     ilvl = field(model.head, ITEM_LEVEL_KEYS)
     info.ilvl = int(ilvl) if ilvl.isdigit() else 0
+    if model.lang == "ko" and info.class_label == items.MAP_FRAGMENT_CLASS:
+        info.category = items.MAP_FRAGMENT_CLASS
+        info.map_fragment_ref = items.map_fragment_ref(model)
+        info.supported = bool(info.map_fragment_ref and server == KAKAO and league == items.INVITATION_LEAGUE)
+        if not info.supported:
+            info.blocked_reason = ("절규하는 초대는 한국어 카카오 Covens에서만 검색할 수 있습니다"
+                                   if info.map_fragment_ref else "검색 가능한 일반 절규하는 초대를 정확히 식별할 수 없습니다")
+        return info
     if info.rarity == "Currency" and _is_tome(model, info.class_label):
         info.template = templates.OTHER
         info.category = FORBIDDEN_TOME
@@ -342,7 +351,7 @@ def _option_english(info: TradeItem, mod, support: tuple[str, int] | None) -> st
 
 
 def conditions(info: TradeItem, ratio: float = 0.9) -> list[StatCondition]:
-    if not info.model or info.category in (FORBIDDEN_TOME, items.SPECTRE_CATEGORY):
+    if not info.model or info.category in (FORBIDDEN_TOME, items.SPECTRE_CATEGORY, items.MAP_FRAGMENT_CLASS):
         return []
     if info.viscera:
         rows = []
@@ -557,6 +566,11 @@ def build_query(info: TradeItem, stats: list[StatCondition], *, ilvl: bool = Fal
         raise ValueError(info.message)
     if info.category == items.SPECTRE_CATEGORY:
         return {"query": {"status": {"option": "securable"}, "type": info.base}, "sort": {"price": "asc"}}
+    if info.map_fragment_ref:
+        query = {"status": {"option": "securable"}, "type": info.base}
+        if ilvl and info.can_filter_ilvl:
+            query["filters"] = {"misc_filters": {"filters": {"ilvl": {"min": info.ilvl}}}}
+        return {"query": query, "sort": {"price": "asc"}}
     filters = {}
     if ilvl and info.can_filter_ilvl:
         filters.setdefault("misc_filters", {"filters": {}})["filters"]["ilvl"] = {"min": info.ilvl}
@@ -681,6 +695,27 @@ def build_query(info: TradeItem, stats: list[StatCondition], *, ilvl: bool = Fal
 def league_for(source: dict | None, saved: str) -> str:
     source = source or {}
     return (source.get("character", {}).get("league") or saved) if source.get("type") == "account" else saved
+
+
+def exact_invitation_results(entries, requested_ids):
+    indexed = {}
+    duplicates = set()
+    for entry in entries:
+        if not isinstance(entry, dict) or not isinstance(key := entry.get("id"), str) or key not in requested_ids:
+            continue
+        if key in indexed:
+            duplicates.add(key)
+        indexed[key] = entry
+    matched = []
+    for key in dict.fromkeys(requested_ids):
+        if key in duplicates or key not in indexed:
+            continue
+        entry = indexed[key]
+        item = entry.get("item")
+        if (isinstance(item, dict) and item.get("baseType") == item.get("typeLine") == items.INVITATION_NAME
+                and type(item.get("frameType")) is int and item["frameType"] == 0):
+            matched.append(entry)
+    return matched
 
 
 def result_rows(response: dict, now: datetime | None = None) -> list[dict]:

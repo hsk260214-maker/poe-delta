@@ -178,6 +178,29 @@ def _number(lines, keys, pattern):
 
 
 UNIDENTIFIED_FLAGS = {"Unidentified", "미확인"}
+MAP_FRAGMENT_CLASS = "기타 지도 아이템"
+INVITATION_LEAGUE = "Covens"
+INVITATION_NAME = "절규하는 초대"
+
+
+def map_fragment_ref(model) -> str:
+    header = model.head[:model.head.index(SEP)] if SEP in model.head else model.head
+    if (model.lang != "ko" or model.name != INVITATION_NAME or model.base != INVITATION_NAME
+            or header != [f"아이템 종류: {MAP_FRAGMENT_CLASS}", "아이템 희귀도: 일반", INVITATION_NAME]
+            or UNIDENTIFIED_FLAGS.intersection((*model.head, *model.flags))):
+        return ""
+    levels = [line for line in (*model.head, *(mod.text for mod in model.mods))
+              if line.startswith(ITEM_LEVEL_KEYS)]
+    if len(levels) != 1 or not re.fullmatch(r"아이템 레벨: [1-9][0-9]*", levels[0]):
+        return ""
+    try:
+        matches = [row for row in catalog()["items"]["ko"] if row[2] == INVITATION_NAME]
+    except (OSError, ValueError, KeyError, TypeError, IndexError):
+        return ""
+    expected = ["ITEM", "Screaming Invitation", INVITATION_NAME, "Invitation", None, None]
+    return expected[1] if matches == [expected] else ""
+
+
 # 공개 품목명만 수록한다. 베이스 및 조인 분류는 기존 번들에서 확인한다.
 # https://www.poewiki.net/wiki/Watcher%27s_Eye
 # https://poedb.tw/kr/Watchers_Eye

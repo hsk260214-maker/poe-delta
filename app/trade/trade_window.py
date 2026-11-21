@@ -20,12 +20,15 @@ from trade import browser, combine, config, focus_log, heist, items, resistance,
 from trade.stats import option_gate
 from trade.results import ResultSession
 from trade.query import (FORBIDDEN_TOME, INFLUENCE_LABELS, SearchTarget, build_query,
-                         build_unidentified_unique_query, conditions, default_minimum, exact_unique_level,
+                         build_unidentified_unique_query, conditions, default_minimum, exact_invitation_results, exact_unique_level,
                          item_info, league_for, resistance_rows, result_rows, search_target, summary)
 
 SPECTRE_MODE_ERROR = "망령 검색은 게임 위 시세 모드에서만 사용할 수 있습니다"
 SPECTRE_LEAGUE_ERROR = "카카오 리그 목록에서 Covens를 확인할 수 없습니다"
 SPECTRE_DATA_ERROR = "시신 검색 조건이나 내장 데이터를 확인할 수 없습니다"
+INVITATION_MODE_ERROR = "절규하는 초대는 게임 위 시세 모드에서만 검색할 수 있습니다"
+INVITATION_LEAGUE_ERROR = "카카오 리그 목록에서 Covens를 확인할 수 없습니다"
+INVITATION_CHANGED = "절규하는 초대 검색 조건이 바뀌었습니다"
 
 TRADE_WINDOW_STYLE = """
 QWidget#TradeHero {
@@ -273,6 +276,9 @@ class TradeWindow(QWidget):
         league = self.league.currentText().strip()
         config.save(league=league)
         info = getattr(self, "info", None)
+        if not self._loading and info and info.map_fragment_ref and self.server == config.KAKAO:
+            self.load(self.model, self._prev_fg, league=league)
+            return
         if (not self._loading and info and info.class_label == items.SPECTRE_CLASS
                 and (info.category == items.SPECTRE_CATEGORY or
                      (self.server == config.KAKAO and league == items.SPECTRE_LEAGUE))):
@@ -335,6 +341,8 @@ class TradeWindow(QWidget):
         self.title.setAccessibleName(f"검색 대상: {target.label}")
         if self.info.category == items.SPECTRE_CATEGORY:
             scope = items.SPECTRE_CLASS
+        elif self.info.map_fragment_ref:
+            scope = items.MAP_FRAGMENT_CLASS
         elif target.category:
             scope = f"{target.label} 전체"
         elif target.name:
@@ -443,6 +451,7 @@ class TradeWindow(QWidget):
         api = self.current_mode == "api"
         spectre = self.info.category == items.SPECTRE_CATEGORY
         unidentified = self.info.unidentified_unique
+        invitation = bool(self.info.map_fragment_ref)
         self.unique_selection.setVisible(unidentified)
         self.unique_name.clear()
         self.unique_name.addItem("선택하세요")
@@ -452,12 +461,13 @@ class TradeWindow(QWidget):
         self.unique_level.setText(str(self.info.ilvl) if unidentified and self.info.ilvl else "")
         mode_name = "게임 위 시세 모드 (공식 문서 밖 API 사용)" if api else "브라우저 모드"
         self.mode_label.setText(f"POE Delta · {mode_name}")
-        self.search_button.setText("검색" if api or spectre else "브라우저로 검색")
+        self.search_button.setText("검색" if api or spectre or invitation else "브라우저로 검색")
         self.table.setVisible(api and (self.info.supported or unidentified))
-        self.open_button.setVisible(api and self.info.supported and not spectre and not unidentified)
+        self.open_button.setVisible(api and self.info.supported and not (spectre or unidentified or invitation))
         self._clear_results(SPECTRE_MODE_ERROR if spectre and not api else
                             "검색할 수 없는 아이템입니다" if (not self.info.supported and not unidentified) or self._error else
-                            "검색을 눌러 결과를 확인하세요" if api else "브라우저에서 결과를 확인하세요")
+                            "검색을 눌러 결과를 확인하세요" if api else
+                            INVITATION_MODE_ERROR if invitation else "브라우저에서 결과를 확인하세요")
         self.league.blockSignals(True)
         self.league.clear()
         self.league.setEditText(league)
@@ -474,7 +484,7 @@ class TradeWindow(QWidget):
         self.links.setVisible(self.info.links >= 5)
         self.links.setText(f"링크 ≥ {self.info.links}")
         self.corrupted.setChecked(True)
-        self.corrupted.setVisible(not (tome or self.info.viscera or spectre or unidentified))
+        self.corrupted.setVisible(not (tome or self.info.viscera or spectre or unidentified or invitation))
         self.corrupted.setText("타락" if self.info.corrupted else "타락 아님")
         scoped = not self._error and search_target(self.info, True) != search_target(self.info, False)
         self.base_button.setChecked(scoped and not search_target(self.info).category)
@@ -687,6 +697,8 @@ class TradeWindow(QWidget):
             error = self.info.message
         elif self.info.category == items.SPECTRE_CATEGORY and self.current_mode != "api":
             error = SPECTRE_MODE_ERROR
+        elif self.info.map_fragment_ref and self.current_mode != "api":
+            error = INVITATION_MODE_ERROR
         elif self._busy:
             error = "검색 중입니다"
         elif self._until > time.monotonic():
@@ -703,7 +715,7 @@ class TradeWindow(QWidget):
 
     def _search_shortcut(self) -> None:
         info = getattr(self, "info", None)
-        if info and (info.unidentified_unique or info.category == items.SPECTRE_CATEGORY):
+        if info and (info.unidentified_unique or info.map_fragment_ref or info.category == items.SPECTRE_CATEGORY):
             if self.search_button.hasFocus():
                 self.search_button.click()
             return
@@ -720,6 +732,7 @@ class TradeWindow(QWidget):
         if not self.search_button.isEnabled():
             return
         unidentified = self.info.unidentified_unique
+        invitation = bool(self.info.map_fragment_ref)
         if not (self.info.supported or unidentified):
             return
         query = self._query()
@@ -744,11 +757,18 @@ class TradeWindow(QWidget):
 
         def work():
             try:
+                if invitation and not self._current_result(generation):
+                    return {"error": INVITATION_CHANGED}
                 if unidentified and not self._current_result(generation):
                     return {"error": "미확인 고유 검색 조건이 바뀌었습니다"}
                 if spectre and not self._spectre_request_current(generation, model, server, league, identity):
                     return {"error": SPECTRE_DATA_ERROR}
                 leagues = client.leagues(server, lang)
+                if invitation:
+                    if not self._current_result(generation):
+                        return {"error": INVITATION_CHANGED}
+                    if league not in leagues:
+                        return {"error": INVITATION_LEAGUE_ERROR}
                 if spectre:
                     if items.SPECTRE_LEAGUE not in leagues:
                         return {"error": SPECTRE_LEAGUE_ERROR}
@@ -774,7 +794,7 @@ class TradeWindow(QWidget):
                 self._validate()
                 return
             chosen, response = result["league"], result["response"]
-            if not spectre:
+            if not (spectre or invitation):
                 with QSignalBlocker(self.league):
                     self.league.clear()
                     self.league.addItems(result["leagues"])
@@ -785,7 +805,7 @@ class TradeWindow(QWidget):
             session.total = response.get("total", 0)
             if chosen != league:
                 session.prefix = f"리그를 {chosen}(으)로 바꿨습니다 · "
-            if session.query_id and not spectre and not unidentified:
+            if session.query_id and not (spectre or unidentified or invitation):
                 self._result_link = browser.result_url(chosen, session.query_id, server, lang)
                 self.open_button.setEnabled(True)
             if session.ids:
@@ -811,6 +831,7 @@ class TradeWindow(QWidget):
         server, lang = self.server, self.model.lang
         spectre = self.info.category == items.SPECTRE_CATEGORY
         unidentified = self.info.unidentified_unique
+        invitation = bool(self.info.map_fragment_ref)
         model, identity = self.model, self.info.identity
         league = self.league.currentText().strip()
         ids = session.ids[session.next:session.next + 10]
@@ -819,11 +840,15 @@ class TradeWindow(QWidget):
 
         def work():
             try:
+                if invitation and not self._current_result(generation):
+                    return [], INVITATION_CHANGED, 0
                 if unidentified and not self._current_result(generation):
                     return [], "미확인 고유 검색 조건이 바뀌었습니다", 0
                 if spectre and not self._spectre_request_current(generation, model, server, league, identity):
                     return [], SPECTRE_DATA_ERROR, 0
                 response = client.fetch(ids, session.query_id, server, lang)
+                if invitation:
+                    return result_rows({"result": exact_invitation_results(response.get("result", []), ids)}), "", client.remaining(server)
                 entries = {row["id"]: row for row in response.get("result", [])}
                 rows = result_rows({"result": [entries[key] for key in ids if key in entries]})
                 return rows, "", client.remaining(server)
@@ -866,7 +891,9 @@ class TradeWindow(QWidget):
     def _finish_results(self, session, wait, *, initial):
         self._busy = False
         self._until = time.monotonic() + wait
-        if initial:
+        if self.info.map_fragment_ref:
+            session.summary = f"이름과 등급이 일치한 매물 {len(session.rows)}개"
+        elif initial:
             session.summary = summary(session.total, session.rows)
         message = [session.prefix + session.summary, f"표시 {len(session.rows)} / 받은 {len(session.ids)}개"]
         if session.error:
