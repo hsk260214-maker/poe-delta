@@ -345,6 +345,8 @@ class TradeWindow(QWidget):
             scope = items.MAP_FRAGMENT_CLASS
         elif target.category:
             scope = f"{target.label} 전체"
+        elif self.info.foulborn:
+            scope = "삿된: 예"
         elif target.name:
             scope = "고유"
         elif target.base is None:

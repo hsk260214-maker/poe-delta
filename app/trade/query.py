@@ -58,6 +58,7 @@ class TradeItem:
     ilvl: int = 0
     links: int = 0
     corrupted: bool = False
+    foulborn: bool = False
     supported: bool = False
     influences: tuple[str, ...] = ()
     eldritch_sources: tuple[str, ...] = ()
@@ -168,7 +169,17 @@ def item_info(model: ItemModel | None, server: str = OFFICIAL, *, league: str = 
     legacy = cls in GEAR and info.rarity == "Unique"
     if legacy:
         info.template = templates.EQUIPMENT
-    if legacy and model.lang == "ko" and server == OFFICIAL:
+    if legacy and model.lang == "ko" and model.name.startswith(items.FOULBORN_PREFIX):
+        category = ("One-Handed Sword" if cls == "Thrusting One Hand Sword" else
+                    cls.replace("One Hand ", "One-Handed ").replace("Two Hand ", "Two-Handed "))
+        try:
+            info.identity = items.resolve_foulborn(model, category, server)
+            info.base, info.name = info.identity.base, info.identity.name
+            info.foulborn = True
+        except ValueError as error:
+            info.blocked_reason = str(error)
+            return info
+    if legacy and not info.foulborn and model.lang == "ko" and server == OFFICIAL:
         info.base = ko2en.translate_base(model.base) or ""
         if info.rarity == "Unique":
             translated = parse(ko2en.translate_item("\n".join(model.head) + "\n" + SEP).text)
@@ -576,6 +587,8 @@ def build_query(info: TradeItem, stats: list[StatCondition], *, ilvl: bool = Fal
         filters.setdefault("misc_filters", {"filters": {}})["filters"]["ilvl"] = {"min": info.ilvl}
     if corrupted and info.category not in (FORBIDDEN_TOME, viscera.CATEGORY):
         filters.setdefault("misc_filters", {"filters": {}})["filters"]["corrupted"] = {"option": "true" if info.corrupted else "false"}
+    if info.foulborn:
+        filters.setdefault("misc_filters", {"filters": {}})["filters"]["foulborn_item"] = {"option": "true"}
     if links and info.links >= 5:
         filters["socket_filters"] = {"filters": {"links": {"min": info.links}}}
     identity = info.identity

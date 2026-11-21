@@ -205,6 +205,36 @@ def map_fragment_ref(model) -> str:
 # https://www.poewiki.net/wiki/Watcher%27s_Eye
 # https://poedb.tw/kr/Watchers_Eye
 _WATCHERS_EYE_NAMES = {"en": "Watcher's Eye", "ko": "감시자의 눈"}
+FOULBORN_PREFIX = "삿된 "
+# 두 공개 이름만 보완한다. 철제 관의 식별과 분류는 기존 번들에 의존한다.
+# https://poedb.tw/kr/Asenaths_Mark
+# https://poedb.tw/us/Asenaths_Mark
+_ASENATHS_MARK_NAMES = {"en": "Asenath's Mark", "ko": "아세나스의 징표"}
+
+
+def resolve_foulborn(model, category, server):
+    target = "en" if server == OFFICIAL else "ko"
+    header = model.head[:model.head.index(SEP)] if SEP in model.head else model.head
+    if len(header) != 4 or header[2:] != [model.name, model.base]:
+        raise ValueError("삿된 고유의 이름과 베이스를 정확히 확인할 수 없습니다")
+    name = model.name.removeprefix(FOULBORN_PREFIX)
+    base = _lookup("ko", "ITEM", category, model.base)
+    if base[4]:
+        raise ValueError("삿된 고유 베이스의 변형을 지원하지 않습니다")
+    try:
+        unique = _lookup("ko", "UNIQUE", category, name)
+    except BaseNotFound:
+        if (base[1], base[3], name) != ("Iron Circlet", "Helmet", _ASENATHS_MARK_NAMES["ko"]) or any(
+            row[0] == "UNIQUE" and (row[1] == _ASENATHS_MARK_NAMES["en"] or row[2] == name)
+            for row in catalog()["items"]["ko"]
+        ):
+            raise
+        exact_name = _ASENATHS_MARK_NAMES[target]
+    else:
+        if unique[4] or unique[5] != base[1]:
+            raise ValueError("삿된 고유 이름과 베이스가 일치하지 않습니다")
+        exact_name = _localized(unique, target)
+    return Identity(_localized(base, target), exact_name, apt_category=base[3])
 
 
 def unidentified_unique_options(model, category):
